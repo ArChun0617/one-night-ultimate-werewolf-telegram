@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Teddy Lok <teddydesu@gmail.com>, ArChun <archun0617@gmail.com>",
   "license": "ISC",
   "dependencies": {
     "node-telegram-bot-api": "^0.27.0"
