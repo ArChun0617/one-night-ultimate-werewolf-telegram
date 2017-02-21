@@ -4,12 +4,23 @@
   "description": "Telegram Bot moderates One Night Ultimate Werewolf game",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "npm run build && node ./dist/index.js",
+    "build": "node ./node_modules/webpack/bin/webpack.js",
+    "app": "nodemon ./src/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Teddy Lok <teddydesu@gmail.com>, ArChun <archun0617@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "node-telegram-bot-api": "^0.27.0"
+    "node-telegram-bot-api": "^0.27.0",
+    "nodemon": "^1.11.0"
+  },
+  "engines": {
+    "node": ">=6.0"
+  },
+  "devDependencies": {
+    "awesome-typescript-loader": "^3.0.4",
+    "typescript": "^2.1.6",
+    "webpack": "^2.2.1"
   }
 }
