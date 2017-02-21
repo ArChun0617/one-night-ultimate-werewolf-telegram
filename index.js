@@ -1,5 +1,5 @@
 var slackAPI = require('slackbotapi');
-var Game = require('./game');
+var Game = require('./src/game');
 
 var CMD_PREFIX = '!w';
 
