@@ -6,7 +6,7 @@ export interface RoleInterface {
 
 export interface RoleOptions {
   id: number;
-  role?: string;
+  role: string;
 }
 
 export class Role implements RoleInterface {
