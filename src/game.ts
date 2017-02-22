@@ -32,7 +32,7 @@ export class Game {
     // create user role and set the player id
     _.map(roles, (role) => {
       switch (role) {
-        case 'werewolf':
+        case Role.WEREWOLF:
           this.players.push(new Werewolf({ id: 1 }));
           break;
         default:
