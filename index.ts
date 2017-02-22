@@ -2,7 +2,7 @@ console.log('This is server');
 
 // const TelegramBot = require('node-telegram-bot-api');
 import * as TelegramBot from 'node-telegram-bot-api';
-const token = '312958690:AAHFt5195080aCBqF3P4Hi89ShnfKe862JI';
+const token = process.env.BOT_TOKEN || '312958690:AAHFt5195080aCBqF3P4Hi89ShnfKe862JI';
 
 //括號裡面的內容需要改為在第5步獲得的Token
 const bot = new TelegramBot(token, {polling: true});
