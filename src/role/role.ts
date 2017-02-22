@@ -1,6 +1,7 @@
 export interface RoleInterface {
   id: number;
   role: string;
+  currentRole: string;
   name: string;
   useAbility();
 }
@@ -14,6 +15,7 @@ export interface RoleOptions {
 export class Role implements RoleInterface {
   id: number;
   role: string;
+  currentRole: string;
   name: string;
 
   public static DOPPELGANGER:string = 'doppelganger';
@@ -32,6 +34,7 @@ export class Role implements RoleInterface {
   constructor(options: RoleOptions) {
     this.id = options.id;
     this.role = options.role;
+    this.currentRole = options.role;
     this.name = options.name;
   }
 
