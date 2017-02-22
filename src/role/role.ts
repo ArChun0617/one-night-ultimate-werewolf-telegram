@@ -1,17 +1,20 @@
 export interface RoleInterface {
   id: number;
   role: string;
+  name: string;
   useAbility();
 }
 
 export interface RoleOptions {
   id: number;
   role: string;
+  name: string;
 }
 
 export class Role implements RoleInterface {
   id: number;
   role: string;
+  name: string;
 
   public static DOPPELGANGER:string = 'doppelganger';
   public static WEREWOLF:string = 'werewolf';
@@ -29,6 +32,7 @@ export class Role implements RoleInterface {
   constructor(options: RoleOptions) {
     this.id = options.id;
     this.role = options.role;
+    this.name = options.name;
   }
 
   useAbility() {
