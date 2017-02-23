@@ -49,6 +49,26 @@ export class Game {
       .catch(err => console.log(err));
   }
 
+  private prepareDeck() {
+    return new Promise((resolve, reject) => {
+      this.deck = DeckFactory.generate(this.gameRoles);
+
+      // assign role
+      _.map(this.players, (player) => {
+        player.setRole(this.deck.getRoles().shift());
+      });
+
+      // set the table cards
+      this.table.setRoles(this.deck.getRoles());
+
+      if (this.deck.getRoles().length !== 0) {
+        reject('Role card does not distribute correctly');
+      }
+
+      resolve();
+    });
+  }
+
   private announcePlayerRole(msg) {
     console.log('announcePlayerRole');
     return new Promise((resolve, reject) => {
@@ -73,26 +93,6 @@ export class Game {
       });
 
       setTimeout(() => resolve(), 10000);
-    });
-  }
-
-  private prepareDeck() {
-    return new Promise((resolve, reject) => {
-      this.deck = DeckFactory.generate(this.gameRoles);
-
-      // assign role
-      _.map(this.players, (player) => {
-        player.setRole(this.deck.getRoles().shift());
-      });
-
-      // set the table cards
-      this.table.setRoles(this.deck.getRoles());
-
-      if (this.deck.getRoles().length !== 0) {
-        reject('Role card does not distribute correctly');
-      }
-
-      resolve();
     });
   }
 
