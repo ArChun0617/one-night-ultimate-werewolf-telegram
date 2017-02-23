@@ -11,6 +11,14 @@ const token = process.env.BOT_TOKEN || '312958690:AAHFt5195080aCBqF3P4Hi89ShnfKe
 const bot = new TelegramBot(token, { polling: true });
 
 bot.onText(/\/start/, (msg) => {
+  // make sure single game first, avoid bug at this moment
+  if (games.length > 0) {
+    bot.sendMessage(msg.chat.id, `${Emoji.get('no_entry_sign')}  Sorry. There is another game has been started`);
+    return;
+  }
+
+  console.log('msg', msg);
+
   // temp dummy for game user
   const users = [
     { id: 1, name: 'Apple' },
@@ -53,7 +61,15 @@ bot.onText(/\/start/, (msg) => {
 
   const game = new Game(gameId, bot, players, roles);
   gameId++;
-  game.start(msg);
+  game.start(msg)
+    .then(() => {
+      console.log('Kill Game', game.id);
+      _.remove(this.games, (g: Game) => g.id === game.id);
+    });
+});
+
+bot.onText(/\/join/, (msg) => {
+
 });
 
 console.log('Server is on ...');

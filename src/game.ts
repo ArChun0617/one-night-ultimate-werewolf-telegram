@@ -25,7 +25,7 @@ export class Game {
   start(msg) {
     this.bot.sendMessage(msg.chat.id, `${Emoji.get('game_die')}  Game start`);
 
-    this.prepareDeck()
+    return this.prepareDeck()
       .then(() => this.announcePlayerRole(msg))
       .then(() => this.startNight(msg))
       .then(() => {
@@ -42,9 +42,12 @@ export class Game {
       })
       .then(() => {
         console.log('Game conversation counter');
-        setTimeout(() => {
-          this.beginVoting();
-        }, this.gameTime);
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            this.beginVoting();
+            resolve();
+          }, this.gameTime);
+        });
       })
       .catch(err => console.log(err));
   }
