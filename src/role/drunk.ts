@@ -7,7 +7,8 @@ export class Drunk extends Role {
     });
   }
 
-  wakeUp() {
+  wakeUp(bot, msg, players, table) {
+    console.log(`${this.name} wake up called`);
     // sendMessage [left] [center] [right], choose one of the center card to exchange
   }
 }

@@ -7,7 +7,8 @@ export class Werewolf extends Role {
     });
   }
 
-  wakeUp() {
+  wakeUp(bot, msg, players, table) {
+    console.log(`${this.name} wake up called`);
     // notify buddies
     // IF single wolf, sendMessage Three buttons to choose
     // on callback_query lock the card

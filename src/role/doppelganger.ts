@@ -7,7 +7,8 @@ export class Doppelganger extends Role {
     });
   }
 
-  wakeUp() {
+  wakeUp(bot, msg, players, table) {
+    console.log(`${this.name} wake up called`);
     // clone a user
     // apply that role ability
   }

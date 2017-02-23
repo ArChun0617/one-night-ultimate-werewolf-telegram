@@ -7,7 +7,8 @@ export class Mason extends Role {
     });
   }
 
-  wakeUp() {
+  wakeUp(bot, msg, players, table) {
+    console.log(`${this.name} wake up called`);
     // notify buddies
   }
 }

@@ -8,14 +8,14 @@ export class Seer extends Role {
     });
   }
 
-  wakeUp(bot, msg, users, players) {
+  wakeUp(bot, msg, players, table) {
     // sendMessage [AB] [BC] [AC] [Player1] [Player2] ...
     // lock the option when callback_query
     const key = [];
 
-    _.map(users, (user) => {
+    _.map(players, (player) => {
       key.push(
-        [{ text: user.name, callback_data: user.id }]
+        [{ text: player.name, callback_data: player.id }]
       );
     });
 
@@ -23,9 +23,7 @@ export class Seer extends Role {
     key.push([{ text: "Center Left & Right", callback_data: "CARD_AC" }]);
     key.push([{ text: "Center Middle & Right", callback_data: "CARD_BC" }]);
 
-    const options = null;
-    
-    bot.sendMessage(msg.chat.id, "`Seer`, wake up. You may look at another player's card or two of the center cards.", options)
+    bot.sendMessage(msg.chat.id, "`Seer`, wake up. You may look at another player's card or two of the center cards.", key)
       .then((sended) => {
         // `sended` is the sent message.
         console.log('sended', sended);

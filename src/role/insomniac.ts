@@ -7,7 +7,8 @@ export class Insomniac extends Role {
     });
   }
 
-  wakeUp() {
+  wakeUp(bot, msg, players, table) {
+    console.log(`${this.name} wake up called`);
     // sendMessage [view] click to know the final role
   }
 }

@@ -7,7 +7,8 @@ export class Hunter extends Role {
     });
   }
 
-  wakeUp() {
+  wakeUp(bot, msg, players, table) {
+    console.log(`${this.name} wake up called`);
     // use only on vote phrase
     // kill the people when user vote
   }

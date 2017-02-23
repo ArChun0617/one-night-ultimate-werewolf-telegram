@@ -93,5 +93,13 @@ export class Game {
     console.log('[Table]', this.table);
     console.log('[Players]', this.players);
 
+    // this won't work, need to use promise
+    _.map(this.nightSequence, (currentRole) => {
+      const player = _.find(this.players, (player) => player.role.name === currentRole);
+      if (player) {
+        console.log(`Wake up ${currentRole}`);
+        player.role.wakeUp(this.bot, msg, this.players, this.table);
+      }
+    });
   }
 }
