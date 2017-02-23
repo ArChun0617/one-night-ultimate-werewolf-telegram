@@ -36,7 +36,12 @@ bot.onText(/\/newgame/, (msg) => {
   ];
 
   const players: Player[] = [
-    new Player({ id: msg.from.id, name: msg.from.first_name })
+    new Player({ id: msg.from.id, name: msg.from.first_name }),
+    new Player({ id: 2, name: 'Player2' }),
+    new Player({ id: 3, name: 'Player3' }),
+    new Player({ id: 4, name: 'Player4' }),
+    new Player({ id: 5, name: 'Player5' }),
+    new Player({ id: 6, name: 'Player6' })
   ];
 
   games.push(new Game(gameId, bot, players, roles));
