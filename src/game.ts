@@ -8,82 +8,93 @@ import { Table } from "./npc/table";
 
 export class Game {
   id: number;
-  users: any[];
   players: any[];
-  table: Table;
+  table: Table = new Table();
   bot: any;
   deck: Deck;
   gameRoles: string[];
+  gameTime: number = 600000;
 
-  constructor(id: number, bot: any) {
+  constructor(id: number, bot: any, players: Player[], roles: string[]) {
     this.id = id;
-    this.table = new Table();
-    this.players = [];
     this.bot = bot;
-
-    // temp dummy for game user
-    this.users = [
-      { id: 1, name: 'Apple' },
-      { id: 2, name: 'Bob' },
-      { id: 3, name: 'Candy' },
-      { id: 4, name: 'Davis' },
-      { id: 5, name: 'Ethan' },
-      { id: 6, name: 'Fred' },
-    ];
+    this.gameRoles = roles;
+    this.players = players;
   }
 
   start(msg) {
     this.bot.sendMessage(msg.chat.id, `${Emoji.get('game_die')}  Game start`);
 
-    // TODO: stage II
-    // ask for number of players
-    // ask for roles
-    // roles count is three more than players number
-    this.gameRoles = [
-      Role.WEREWOLF,
-      Role.WEREWOLF,
-      Role.MINION,
-      Role.SEER,
-      Role.ROBBER,
-      Role.TROUBLEMAKER,
-      Role.INSOMNIAC,
-      Role.DRUNK,
-      Role.TANNER
-    ];
+    this.prepareDeck()
+      .then(() => this.announcePlayerRole(msg))
+      .then(() => this.startNight(msg))
+      .then(() => {
+        console.log('[Deck]', this.deck);
+        console.log('[Table]', this.table);
+        console.log('[Players]', this.players);
+      })
+      .then(() => {
+        console.log('send start msg');
+        this.bot.sendMessage(
+          msg.chat.id,
+          `${Emoji.get('hourglass_flowing_sand')}  Everyone wake up, you have 10mins to discuss ...`
+        );
+      })
+      .then(() => {
+        console.log('Game conversation counter');
+        setTimeout(() => {
+          this.beginVoting();
+        }, this.gameTime);
+      })
+      .catch(err => console.log(err));
+  }
 
-    // 
-    if (this.users.length + 3 !== this.gameRoles.length) {
+  private announcePlayerRole(msg) {
+    console.log('announcePlayerRole');
+    return new Promise((resolve, reject) => {
       this.bot.sendMessage(
         msg.chat.id,
-        `${Emoji.get('bomb')}  Error: Number of players and roles doesn't match.`
+        `${Emoji.get('eyeglasses')}  Everyone, please check your role`,
+        {
+          reply_markup: JSON.stringify({
+            inline_keyboard: [
+              [{ text: 'VIEW', callback_data: 'view_role' }]
+            ]
+          })
+        }
       );
-    }
 
-    // create a new deck
-    this.deck = DeckFactory.generate(this.gameRoles);
+      this.bot.on('callback_query', (msg) => {
+        console.log('Callback_query Called', msg);
+      });
 
-    // assign role
-    _.map(this.users, (user) => {
-      const player = new Player(user);
-      player.setRole(this.deck.getRoles().shift());
-      this.players.push(player);
+      setTimeout(() => resolve(), 10000);
     });
+  }
 
-    // set the table cards
-    this.table.setRoles(this.deck.getRoles());
+  private prepareDeck() {
+    return new Promise((resolve, reject) => {
+      this.deck = DeckFactory.generate(this.gameRoles);
 
-    if (this.deck.getRoles().length !== 0) {
-      throw new Error('Role card does not distribute correctly');
-    }
+      // assign role
+      _.map(this.players, (player) => {
+        player.setRole(this.deck.getRoles().shift());
+      });
 
-    // notify the user their role
+      // set the table cards
+      this.table.setRoles(this.deck.getRoles());
 
-    // night event
-    console.log('[Deck]', this.deck);
-    console.log('[Table]', this.table);
-    console.log('[Players]', this.players);
+      if (this.deck.getRoles().length !== 0) {
+        reject('Role card does not distribute correctly');
+      }
 
-    this.wakeUp(Role.DOPPELGANGER, msg)
+      resolve();
+    });
+  }
+
+  private startNight(msg) {
+    this.bot.sendMessage(msg.chat.id, `${Emoji.get('crescent_moon')}  Night start, Everyone close your eye.`);
+    return this.wakeUp(Role.DOPPELGANGER, msg)
       .then(() => this.wakeUp(Role.WEREWOLF, msg))
       .then(() => this.wakeUp(Role.MINION, msg))
       .then(() => this.wakeUp(Role.MASON, msg))
@@ -91,14 +102,10 @@ export class Game {
       .then(() => this.wakeUp(Role.ROBBER, msg))
       .then(() => this.wakeUp(Role.TROUBLEMAKER, msg))
       .then(() => this.wakeUp(Role.DRUNK, msg))
-      .then(() => this.wakeUp(Role.INSOMNIAC, msg))
-      .then(() => this.bot.sendMessage(
-        msg.chat.id,
-        `${Emoji.get('hourglass_flowing_sand')}  Everyone wake up, you have 10mins to discuss ...`
-      ));
+      .then(() => this.wakeUp(Role.INSOMNIAC, msg));
   }
 
-  wakeUp(currentRole, msg): Promise<any> {
+  private wakeUp(currentRole, msg): Promise<any> {
     if (!this.isExistInCurrentGame(currentRole)) {
       return Promise.resolve();
     }
@@ -113,13 +120,15 @@ export class Game {
         npc.wakeUp(this.bot, msg, this.players, this.table);
       }
 
-      setTimeout(() => {
-        resolve();
-      }, 1000);
+      setTimeout(() => resolve(), 1000);
     });
   }
 
-  isExistInCurrentGame(role) {
+  private beginVoting() {
+    console.log('Begin vote');
+  }
+
+  private isExistInCurrentGame(role) {
     return _.indexOf(this.gameRoles, role) >= 0;
   }
 }
