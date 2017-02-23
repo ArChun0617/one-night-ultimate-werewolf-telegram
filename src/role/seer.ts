@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import { Role } from "./role";
+import { Player } from "../player/player";
 
 export class Seer extends Role {
   constructor() {
@@ -13,7 +14,7 @@ export class Seer extends Role {
     // lock the option when callback_query
     const key = [];
 
-    _.map(players, (player) => {
+    _.map(players, (player: Player) => {
       key.push(
         [{ text: player.name, callback_data: player.id }]
       );
@@ -31,13 +32,13 @@ export class Seer extends Role {
   }
 
   callbackAbility(bot, msg, users, players) {
-    const caller = _.findWhere(users, {id: msg.from.id});
-
-    //Check if the caller is a Seer
-    if (caller.role != Role.SEER) {
-      bot.answerCallbackQuery(msg.id, "${Emoji.get('clap')} you asshole !");
-      return;
-    }
+    // const caller = _.find(users, user => user.id === msg.from.id);
+    //
+    // //Check if the caller is a Seer
+    // if (caller.role != Role.SEER) {
+    //   bot.answerCallbackQuery(msg.id, "${Emoji.get('clap')} you asshole !");
+    //   return;
+    // }
 
     // TODO: avoid syntax error for testing first
     let choice = 'xxx';
@@ -46,19 +47,19 @@ export class Seer extends Role {
 
     if (!choice) choice = msg.data;	//To lock the Seer with only one choice	
 
-    const target = _.findWhere(players, {id: choice});
+    const target: Player = _.find(players, (player: Player) => player.id == parseInt(choice));
 
     if (target) {
       // if target to a specific guy
-      rtnMsg = target.name + " : " + target.currentRole;
+      rtnMsg = target.name + " : " + target.getRole().name;
     }
     else {
       switch (choice) {
-        case "CARD_AB":
+        case 'CARD_AB':
           rtnMsg = table[0].name + " : " + table[0].currentRole + "\n" + table[1].name + " : " + table[1].currentRole;
-        case "CARD_AC":
+        case 'CARD_AC':
           rtnMsg = table[0].name + " : " + table[0].currentRole + "\n" + table[2].name + " : " + table[2].currentRole;
-        case "CARD_BC":
+        case 'CARD_BC':
           rtnMsg = table[1].name + " : " + table[1].currentRole + "\n" + table[2].name + " : " + table[2].currentRole;
       }
     }

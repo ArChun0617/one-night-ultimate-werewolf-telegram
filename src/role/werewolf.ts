@@ -1,6 +1,10 @@
-import { Role } from "./role";
+import { Role } from './role';
+import { Promise } from 'es6-promise';
 
 export class Werewolf extends Role {
+  private resolve: any;
+  private reject: any;
+  
   constructor() {
     super({
       name: Role.WEREWOLF

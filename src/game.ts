@@ -13,17 +13,7 @@ export class Game {
   table: Table;
   bot: any;
   deck: Deck;
-  nightSequence: string[] = [
-    Role.DOPPELGANGER,
-    Role.WEREWOLF,
-    Role.MINION,
-    Role.MASON,
-    Role.SEER,
-    Role.ROBBER,
-    Role.TROUBLEMAKER,
-    Role.DRUNK,
-    Role.INSOMNIAC
-  ];
+  gameRoles: string[];
 
   constructor(id: number, bot: any) {
     this.id = id;
@@ -49,7 +39,7 @@ export class Game {
     // ask for number of players
     // ask for roles
     // roles count is three more than players number
-    const gameRoles = [
+    this.gameRoles = [
       Role.WEREWOLF,
       Role.WEREWOLF,
       Role.MINION,
@@ -62,7 +52,7 @@ export class Game {
     ];
 
     // 
-    if (this.users.length + 3 !== gameRoles.length) {
+    if (this.users.length + 3 !== this.gameRoles.length) {
       this.bot.sendMessage(
         msg.chat.id,
         `${Emoji.get('bomb')}  Error: Number of players and roles doesn't match.`
@@ -70,7 +60,7 @@ export class Game {
     }
 
     // create a new deck
-    this.deck = DeckFactory.generate(gameRoles);
+    this.deck = DeckFactory.generate(this.gameRoles);
 
     // assign role
     _.map(this.users, (user) => {
@@ -87,19 +77,49 @@ export class Game {
     }
 
     // notify the user their role
-    
+
     // night event
     console.log('[Deck]', this.deck);
     console.log('[Table]', this.table);
     console.log('[Players]', this.players);
 
-    // this won't work, need to use promise
-    _.map(this.nightSequence, (currentRole) => {
-      const player = _.find(this.players, (player) => player.role.name === currentRole);
+    this.wakeUp(Role.DOPPELGANGER, msg)
+      .then(() => this.wakeUp(Role.WEREWOLF, msg))
+      .then(() => this.wakeUp(Role.MINION, msg))
+      .then(() => this.wakeUp(Role.MASON, msg))
+      .then(() => this.wakeUp(Role.SEER, msg))
+      .then(() => this.wakeUp(Role.ROBBER, msg))
+      .then(() => this.wakeUp(Role.TROUBLEMAKER, msg))
+      .then(() => this.wakeUp(Role.DRUNK, msg))
+      .then(() => this.wakeUp(Role.INSOMNIAC, msg))
+      .then(() => this.bot.sendMessage(
+        msg.chat.id,
+        `${Emoji.get('hourglass_flowing_sand')}  Everyone wake up, you have 10mins to discuss ...`
+      ));
+  }
+
+  wakeUp(currentRole, msg): Promise<any> {
+    if (!this.isExistInCurrentGame(currentRole)) {
+      return Promise.resolve();
+    }
+
+    return new Promise((resolve, reject) => {
+      const player = _.find(this.players, (player) => player.getOriginalRole().name === currentRole);
+
       if (player) {
-        console.log(`Wake up ${currentRole}`);
-        player.role.wakeUp(this.bot, msg, this.players, this.table);
+        player.getOriginalRole().wakeUp(this.bot, msg, this.players, this.table);
+      } else {
+        const npc = _.find(this.table.getRoles(), (role: Role) => role.name === currentRole);
+        npc.wakeUp(this.bot, msg, this.players, this.table);
       }
+
+      setTimeout(() => {
+        resolve();
+      }, 1000);
     });
+  }
+
+  isExistInCurrentGame(role) {
+    return _.indexOf(this.gameRoles, role) >= 0;
   }
 }

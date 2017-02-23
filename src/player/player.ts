@@ -1,11 +1,11 @@
 
-import { Role } from "../role/role";
+import { Role, RoleInterface } from "../role/role";
 
 export class Player {
-  private id: number;
-  private originalRole: Role = null;
-  private role: Role;
-  private name: string;
+  id: number;
+  name: string;
+  originalRole: Role = null;
+  role: Role;
 
   constructor(options) {
     this.id = options.id;
@@ -18,5 +18,13 @@ export class Player {
     }
 
     this.role = role;
+  }
+
+  getRole(): any {
+    return this.role;
+  }
+
+  getOriginalRole(): any {
+    return this.originalRole;
   }
 }
