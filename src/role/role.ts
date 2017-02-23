@@ -1,21 +1,13 @@
 export interface RoleInterface {
-  id: number;
-  role: string;
-  currentRole: string;
   name: string;
-  useAbility();
+  useAbility(bot, msg, users, players);
 }
 
 export interface RoleOptions {
-  id: number;
-  role: string;
   name: string;
 }
 
 export class Role implements RoleInterface {
-  id: number;
-  role: string;
-  currentRole: string;
   name: string;
 
   public static DOPPELGANGER:string = 'doppelganger';
@@ -32,13 +24,10 @@ export class Role implements RoleInterface {
   public static HUNTER:string = 'hunter';
   
   constructor(options: RoleOptions) {
-    this.id = options.id;
-    this.role = options.role;
-    this.currentRole = options.role;
     this.name = options.name;
   }
 
-  useAbility() {
+  useAbility(bot, msg, users, players) {
     throw new Error('UseAbility function does not implemented');
   }
 }

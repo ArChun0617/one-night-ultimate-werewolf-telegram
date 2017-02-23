@@ -1,16 +1,9 @@
 import { Role } from "./role";
 
-interface DrunkOptions {
-  id: number;
-  name: string;
-}
-
 export class Drunk extends Role {
-  constructor(options: DrunkOptions) {
+  constructor() {
     super({
-      id: options.id,
-      role: Role.DRUNK,
-      name: options.name
+      name: Role.DRUNK
     });
   }
 

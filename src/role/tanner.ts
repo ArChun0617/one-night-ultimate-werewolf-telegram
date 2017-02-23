@@ -1,16 +1,9 @@
 import { Role } from "./role";
 
-interface TannerOptions {
-  id: number;
-  name: string;
-}
-
 export class Tanner extends Role {
-  constructor(options: TannerOptions) {
+  constructor() {
     super({
-      id: options.id,
-      role: Role.TANNER,
-      name: options.name
+      name: Role.TANNER
     });
   }
 

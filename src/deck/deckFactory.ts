@@ -12,62 +12,60 @@ import { Insomniac } from "../role/insomniac";
 import { Villager } from "../role/villager";
 import { Tanner } from "../role/tanner";
 import { Hunter } from "../role/hunter";
+import { Deck } from "./deck";
 
-export const ShufflePhase = {
-  assignRoles: (players, gameRoles) => {
-    players = _.shuffle(players);
-
-    const roles = [];
+export const DeckFactory = {
+  /**
+   * 
+   * @param gameRoles
+   * @returns {Deck}
+   */
+  generate: (gameRoles): Deck => {
+    const roles:Role[] = [];
 
     _.map(gameRoles, (role) => {
-      const player = players.shift();
-      const option = {
-        id: player.id,
-        name: player.name
-      };
-
       switch (role) {
         case Role.DOPPELGANGER:
-          roles.push(new Doppelganger(option));
+          roles.push(new Doppelganger());
           break;
         case Role.WEREWOLF:
-          roles.push(new Werewolf(option));
+          roles.push(new Werewolf());
           break;
         case Role.MINION:
-          roles.push(new Minion(option));
+          roles.push(new Minion());
           break;
         case Role.MASON:
-          roles.push(new Mason(option));
+          roles.push(new Mason());
           break;
         case Role.SEER:
-          roles.push(new Seer(option));
+          roles.push(new Seer());
           break;
         case Role.ROBBER:
-          roles.push(new Robber(option));
+          roles.push(new Robber());
           break;
         case Role.TROUBLEMAKER:
-          roles.push(new Troublemaker(option));
+          roles.push(new Troublemaker());
           break;
         case Role.DRUNK:
-          roles.push(new Drunk(option));
+          roles.push(new Drunk());
           break;
         case Role.INSOMNIAC:
-          roles.push(new Insomniac(option));
+          roles.push(new Insomniac());
           break;
         case Role.VILLAGER:
-          roles.push(new Villager(option));
+          roles.push(new Villager());
           break;
         case Role.TANNER:
-          roles.push(new Tanner(option));
+          roles.push(new Tanner());
           break;
         case Role.HUNTER:
-          roles.push(new Hunter(option));
+          roles.push(new Hunter());
           break;
         default:
           return;
       }
     });
 
-    return roles;
+    return new Deck(roles);
   }
 };

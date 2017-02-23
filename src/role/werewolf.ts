@@ -1,16 +1,9 @@
 import { Role } from "./role";
 
-interface WerewolfOptions {
-  id: number;
-  name: string;
-}
-
 export class Werewolf extends Role {
-  constructor(options: WerewolfOptions) {
+  constructor() {
     super({
-      id: options.id,
-      role: Role.WEREWOLF,
-      name: options.name
+      name: Role.WEREWOLF
     });
   }
 

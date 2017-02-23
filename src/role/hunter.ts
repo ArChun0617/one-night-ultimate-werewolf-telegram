@@ -1,16 +1,9 @@
 import { Role } from "./role";
 
-interface HunterOptions {
-  id: number;
-  name: string;
-}
-
 export class Hunter extends Role {
-  constructor(options: HunterOptions) {
+  constructor() {
     super({
-      id: options.id,
-      role: Role.HUNTER,
-      name: options.name
+      name: Role.HUNTER
     });
   }
 

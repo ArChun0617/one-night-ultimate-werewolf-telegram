@@ -1,16 +1,9 @@
 import { Role } from "./role";
 
-interface DoppelgangerOptions {
-  id: number;
-  name: string;
-}
-
 export class Doppelganger extends Role {
-  constructor(options: DoppelgangerOptions) {
+  constructor() {
     super({
-      id: options.id,
-      role: Role.DOPPELGANGER,
-      name: options.name
+      name: Role.DOPPELGANGER
     });
   }
 

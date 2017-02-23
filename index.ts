@@ -14,7 +14,7 @@ const game = new Game(bot);
 
 //收到Start訊息時會觸發這段程式
 bot.onText(/\/start/, (msg) => {
-  game.start();
+  game.start(msg);
   // const chatId = msg.chat.id; //用戶的ID
   // const resp = `你好! ${msg.text}`; //括號裡面的為回應內容，可以隨意更改
   //

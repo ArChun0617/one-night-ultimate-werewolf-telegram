@@ -1,16 +1,9 @@
 import { Role } from "./role";
 
-interface MinionOptions {
-  id: number;
-  name: string;
-}
-
 export class Minion extends Role {
-  constructor(options: MinionOptions) {
+  constructor() {
     super({
-      id: options.id,
-      role: Role.MINION,
-      name: options.name
+      name: Role.MINION
     });
   }
 

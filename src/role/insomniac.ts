@@ -1,16 +1,9 @@
 import { Role } from "./role";
 
-interface InsomniacOptions {
-  id: number;
-  name: string;
-}
-
 export class Insomniac extends Role {
-  constructor(options: InsomniacOptions) {
+  constructor() {
     super({
-      id: options.id,
-      role: Role.INSOMNIAC,
-      name: options.name
+      name: Role.INSOMNIAC
     });
   }
 

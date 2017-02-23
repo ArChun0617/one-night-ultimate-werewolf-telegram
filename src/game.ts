@@ -1,13 +1,20 @@
 import * as Emoji from 'node-emoji';
-import { ShufflePhase } from "./phase/shufflePhase";
+import * as _ from 'lodash';
+import { DeckFactory } from "./deck/deckFactory";
+import { Role } from "./role/role";
+import { Deck } from "./deck/deck";
+import { Player } from "./player/player";
+import { Table } from "./npc/table";
 
 export class Game {
   users: any[];
   players: any[];
+  table: Table;
   bot: any;
+  deck: Deck;
 
   constructor(bot: any) {
-    // TODO: init the game here
+    this.table = new Table();
     this.players = [];
     this.bot = bot;
 
@@ -22,28 +29,56 @@ export class Game {
     ];
   }
 
-  start() {
-    console.log(`${Emoji.get('game_die')}  Game start`);
+  start(msg) {
+    this.bot.sendMessage(msg.chat.id, `${Emoji.get('game_die')}  Game start`);
 
     // TODO: stage II
     // ask for number of players
     // ask for roles
-    const roles = [
-      'werewolf',
-      'minion',
-      'seer',
-      'robber',
-      'troublemaker',
-      'tanner'
+    // roles count is three more than players number
+    const gameRoles = [
+      Role.WEREWOLF,
+      Role.WEREWOLF,
+      Role.MINION,
+      Role.SEER,
+      Role.ROBBER,
+      Role.TROUBLEMAKER,
+      Role.INSOMNIAC,
+      Role.DRUNK,
+      Role.TANNER
     ];
 
-    // settle role and init role object
-    // create user role and set the player id
-    this.players = ShufflePhase.assignRoles(this.users, roles);
+    // 
+    if (this.users.length + 3 !== gameRoles.length) {
+      this.bot.sendMessage(
+        msg.chat.id,
+        `${Emoji.get('bomb')}  Error: Number of players and roles doesn't match.`
+      );
+    }
+
+    // create a new deck
+    this.deck = DeckFactory.generate(gameRoles);
+
+    // assign role
+    let roles = _.clone(this.deck.getRoles());
+    _.map(this.users, (user) => {
+      const player = new Player(user);
+      roles = player.pickRole(roles);
+      this.players.push(player);
+    });
+
+    // set the table cards
+    roles = this.table.pickRole(roles);
+
+    if (roles.length !== 0) {
+      throw new Error('Role card does not distribute correctly');
+    }
 
     // notify the user their role
     
     // night event
-    console.log('this.players', this.players);
+    console.log('[Deck]', this.deck);
+    console.log('[Table]', this.table);
+    console.log('[Players]', this.players);
   }
 }
