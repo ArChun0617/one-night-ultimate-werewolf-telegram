@@ -66,6 +66,10 @@ export class Game {
 
       this.bot.on('callback_query', (msg) => {
         console.log('Callback_query Called', msg);
+        if (msg.data === 'view_role') {
+          const player = _.find(this.players, (player) => player.id == 1);
+          this.bot.answerCallbackQuery(msg.id, `Your role is ${player.getOriginalRole().name}`);
+        }
       });
 
       setTimeout(() => resolve(), 10000);
