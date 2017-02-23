@@ -2,31 +2,33 @@
 import { Role } from "../role/role";
 
 export class Table {
-  private left: Role = null;
-  private center: Role = null;
-  private right: Role = null;
+  private roles: Role[] = [];
 
-  pickRole(roles: Role[]): Role[] {
-    if (this.left || this.center || this.right) {
-      throw new Error('Table cards has been there');
-    }
-
-    this.left = roles.shift();
-    this.center = roles.shift();
-    this.right = roles.shift();
-    
-    return roles;
+  setRoles(roles: Role[]) {
+    this.roles = roles;
   }
 
   setLeft(role: Role) {
-    this.left = role;
+    this.roles[0] = role;
   }
 
   setCenter(role: Role) {
-    this.center = role;
+    this.roles[1] = role;
   }
 
   setRight(role: Role) {
-    this.right = role;
+    this.roles[2] = role;
+  }
+
+  getLeft() {
+    return this.roles[0];
+  }
+
+  getCenter() {
+    return this.roles[1];
+  }
+
+  getRight() {
+    return this.roles[2];
   }
 }

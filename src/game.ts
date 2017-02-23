@@ -12,6 +12,17 @@ export class Game {
   table: Table;
   bot: any;
   deck: Deck;
+  nightSequence: string[] = [
+    Role.DOPPELGANGER,
+    Role.WEREWOLF,
+    Role.MINION,
+    Role.MASON,
+    Role.SEER,
+    Role.ROBBER,
+    Role.TROUBLEMAKER,
+    Role.DRUNK,
+    Role.INSOMNIAC
+  ];
 
   constructor(bot: any) {
     this.table = new Table();
@@ -63,12 +74,11 @@ export class Game {
     let roles = _.clone(this.deck.getRoles());
     _.map(this.users, (user) => {
       const player = new Player(user);
-      roles = player.pickRole(roles);
-      this.players.push(player);
+      this.players.push(player.setRole(roles.shift()));
     });
 
     // set the table cards
-    roles = this.table.pickRole(roles);
+    this.table.setRoles(roles);
 
     if (roles.length !== 0) {
       throw new Error('Role card does not distribute correctly');

@@ -12,17 +12,11 @@ export class Player {
     this.name = options.name;
   }
 
-  pickRole(roles: Role[]): Role[] {
-    if (this.originalRole) {
-      throw new Error('Player already pick a role.');
+  setRole(role: Role) {
+    if (!this.originalRole) {
+      this.originalRole = role;
     }
 
-    this.originalRole = roles.shift();
-    this.role = this.originalRole;
-    return roles;
-  }
-
-  setRole(role: Role) {
     this.role = role;
   }
 }
