@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as TelegramBot from 'node-telegram-bot-api';
+import * as Emoji from 'node-emoji';
 import { Game } from './src/game';
-import { Emoji } from 'node-emoji';
 import { Role } from "./src/role/role";
 import { Player } from "./src/player/player";
 
@@ -10,7 +10,7 @@ const games = [];
 const token = process.env.BOT_TOKEN || '312958690:AAHFt5195080aCBqF3P4Hi89ShnfKe862JI';
 const bot = new TelegramBot(token, { polling: true });
 
-bot.onText(/\/start/, (msg) => {
+bot.onText(/\/newgame/, (msg) => {
   // make sure single game first, avoid bug at this moment
   if (games.length > 0) {
     bot.sendMessage(msg.chat.id, `${Emoji.get('no_entry_sign')}  Sorry. There is another game has been started`);
@@ -18,16 +18,6 @@ bot.onText(/\/start/, (msg) => {
   }
 
   console.log('msg', msg);
-
-  // temp dummy for game user
-  const users = [
-    { id: 1, name: 'Apple' },
-    { id: 2, name: 'Bob' },
-    { id: 3, name: 'Candy' },
-    { id: 4, name: 'Davis' },
-    { id: 5, name: 'Ethan' },
-    { id: 6, name: 'Fred' },
-  ];
 
   // TODO: stage II
   // ask for number of players
@@ -45,31 +35,41 @@ bot.onText(/\/start/, (msg) => {
     Role.TANNER
   ];
 
-  const players = [];
+  const players: Player[] = [
+    new Player({ id: msg.from.id, name: msg.from.first_name })
+  ];
 
-  _.map(users, (user) => {
-    players.push(new Player(user));
+  games.push(new Game(gameId, bot, players, roles));
+  console.log(`GAME ${gameId} has been created`);
+  gameId++;
+});
+
+bot.onText(/\/join/, (msg) => {
+  const game = _.find(games, (g) => g.id === 0);
+  const player = new Player({
+    id: msg.from.id,
+    name: msg.from.first_name
   });
+  game.addPlayer(player);
+});
 
-  if (users.length + 3 !== roles.length) {
-    bot.sendMessage(
-      msg.chat.id,
-      `${Emoji.get('bomb')}  Error: Number of players and roles doesn't match.`
-    );
+bot.onText(/\/start/, (msg) => {
+  const game = _.find(games, (g) => g.id === 0);
+
+  if (!game) {
+    bot.sendMessage(msg.chat.id, `${Emoji.get('bomb')}  Sorry. Please create a new game (/newgame)`);
     return;
   }
 
-  const game = new Game(gameId, bot, players, roles);
-  gameId++;
   game.start(msg)
     .then(() => {
       console.log('Kill Game', game.id);
       _.remove(this.games, (g: Game) => g.id === game.id);
+    })
+    .catch((error) => {
+      console.log(`Error ${error}`);
+      bot.sendMessage(msg.chat.id, `${Emoji.get('bomb')}  Error: ${error}.`);
     });
-});
-
-bot.onText(/\/join/, (msg) => {
-
 });
 
 console.log('Server is on ...');

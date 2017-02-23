@@ -22,8 +22,18 @@ export class Game {
     this.players = players;
   }
 
+  addPlayer(player: Player) {
+    if (!_.find(this.players, (p) => p.id === player.id)) {
+      this.players.push(player);
+    }
+  }
+
   start(msg) {
     this.bot.sendMessage(msg.chat.id, `${Emoji.get('game_die')}  Game start`);
+
+    if (this.players.length + 3 !== this.gameRoles.length) {
+      return Promise.reject('Number of players and roles doesn\'t match');
+    }
 
     return this.prepareDeck()
       .then(() => this.announcePlayerRole(msg))
