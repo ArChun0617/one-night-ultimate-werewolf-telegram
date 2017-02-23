@@ -77,12 +77,13 @@ export class Game {
       this.players.push(player.setRole(roles.shift()));
     });
 
-    // set the table cards
-    this.table.setRoles(roles);
-
-    if (roles.length !== 0) {
-      throw new Error('Role card does not distribute correctly');
+    if (roles.length !== 3) {
+      throw new Error('There should be three cards remain on table');
     }
+
+    // set the table cards
+    this.table.setRoles(_.clone(roles));
+
 
     // notify the user their role
     
