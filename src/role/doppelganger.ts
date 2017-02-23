@@ -7,7 +7,7 @@ export class Doppelganger extends Role {
     });
   }
 
-  useAbility() {
+  wakeUp() {
     // clone a user
     // apply that role ability
   }

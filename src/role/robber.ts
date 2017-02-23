@@ -7,7 +7,7 @@ export class Robber extends Role {
     });
   }
 
-  useAbility() {
+  wakeUp() {
     // sendMessage [Player1] [Player2] [DO NOTHING] ...
     // lock the option when callback_query to notify the new role
   }

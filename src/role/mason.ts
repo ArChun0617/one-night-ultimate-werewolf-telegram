@@ -7,7 +7,7 @@ export class Mason extends Role {
     });
   }
 
-  useAbility() {
+  wakeUp() {
     // notify buddies
   }
 }

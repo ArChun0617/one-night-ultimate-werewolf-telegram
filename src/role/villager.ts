@@ -7,7 +7,7 @@ export class Villager extends Role {
     });
   }
 
-  useAbility() {
+  wakeUp() {
 
   }
 }

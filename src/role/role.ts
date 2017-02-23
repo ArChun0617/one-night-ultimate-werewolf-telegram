@@ -1,6 +1,6 @@
 export interface RoleInterface {
   name: string;
-  useAbility(bot, msg, users, players);
+  wakeUp(bot, msg, users, players);
 }
 
 export interface RoleOptions {
@@ -27,7 +27,7 @@ export class Role implements RoleInterface {
     this.name = options.name;
   }
 
-  useAbility(bot, msg, users, players) {
+  wakeUp(bot, msg, users, players) {
     throw new Error('UseAbility function does not implemented');
   }
 }

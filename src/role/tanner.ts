@@ -7,7 +7,7 @@ export class Tanner extends Role {
     });
   }
 
-  useAbility() {
+  wakeUp() {
 
   }
 }

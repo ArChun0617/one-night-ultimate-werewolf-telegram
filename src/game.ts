@@ -7,6 +7,7 @@ import { Player } from "./player/player";
 import { Table } from "./npc/table";
 
 export class Game {
+  id: number;
   users: any[];
   players: any[];
   table: Table;
@@ -24,7 +25,8 @@ export class Game {
     Role.INSOMNIAC
   ];
 
-  constructor(bot: any) {
+  constructor(id: number, bot: any) {
+    this.id = id;
     this.table = new Table();
     this.players = [];
     this.bot = bot;
@@ -90,5 +92,6 @@ export class Game {
     console.log('[Deck]', this.deck);
     console.log('[Table]', this.table);
     console.log('[Players]', this.players);
+
   }
 }

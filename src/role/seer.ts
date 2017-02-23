@@ -8,7 +8,7 @@ export class Seer extends Role {
     });
   }
 
-  useAbility(bot, msg, users, players) {
+  wakeUp(bot, msg, users, players) {
     // sendMessage [AB] [BC] [AC] [Player1] [Player2] ...
     // lock the option when callback_query
     const key = [];

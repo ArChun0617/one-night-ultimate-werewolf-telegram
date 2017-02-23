@@ -7,7 +7,7 @@ export class Insomniac extends Role {
     });
   }
 
-  useAbility() {
+  wakeUp() {
     // sendMessage [view] click to know the final role
   }
 }

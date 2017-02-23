@@ -7,7 +7,7 @@ export class Hunter extends Role {
     });
   }
 
-  useAbility() {
+  wakeUp() {
     // use only on vote phrase
     // kill the people when user vote
   }

@@ -7,7 +7,7 @@ export class Troublemaker extends Role {
     });
   }
 
-  useAbility() {
+  wakeUp() {
     // sendMessage [Player1 <> Player2] [Player1 <> Player3] ...
   }
 }

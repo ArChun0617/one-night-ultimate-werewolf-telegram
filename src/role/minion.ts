@@ -7,7 +7,7 @@ export class Minion extends Role {
     });
   }
 
-  useAbility() {
+  wakeUp() {
     // notify werewolf buddies
   }
 }

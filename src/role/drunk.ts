@@ -7,7 +7,7 @@ export class Drunk extends Role {
     });
   }
 
-  useAbility() {
+  wakeUp() {
     // sendMessage [left] [center] [right], choose one of the center card to exchange
   }
 }

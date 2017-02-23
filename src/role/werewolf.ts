@@ -7,7 +7,7 @@ export class Werewolf extends Role {
     });
   }
 
-  useAbility() {
+  wakeUp() {
     // notify buddies
     // IF single wolf, sendMessage Three buttons to choose
     // on callback_query lock the card
