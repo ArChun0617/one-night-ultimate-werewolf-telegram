@@ -71,19 +71,18 @@ export class Game {
     this.deck = DeckFactory.generate(gameRoles);
 
     // assign role
-    let roles = _.clone(this.deck.getRoles());
     _.map(this.users, (user) => {
       const player = new Player(user);
-      this.players.push(player.setRole(roles.shift()));
+      player.setRole(this.deck.getRoles().shift());
+      this.players.push(player);
     });
 
-    if (roles.length !== 3) {
-      throw new Error('There should be three cards remain on table');
-    }
-
     // set the table cards
-    this.table.setRoles(_.clone(roles));
+    this.table.setRoles(this.deck.getRoles());
 
+    if (this.deck.getRoles().length !== 0) {
+      throw new Error('Role card does not distribute correctly');
+    }
 
     // notify the user their role
     
