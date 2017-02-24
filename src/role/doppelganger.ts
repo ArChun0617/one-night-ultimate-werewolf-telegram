@@ -3,6 +3,7 @@ import { Role } from "./role";
 export class Doppelganger extends Role {
   constructor() {
     super({
+      emoji: Role.DOPPELGANGER_EMOJI,
       name: Role.DOPPELGANGER
     });
   }

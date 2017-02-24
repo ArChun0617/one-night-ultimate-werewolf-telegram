@@ -1,4 +1,3 @@
-
 import { Role, RoleInterface } from "../role/role";
 
 export class Player {
@@ -26,5 +25,12 @@ export class Player {
 
   getOriginalRole(): any {
     return this.originalRole;
+  }
+  
+  swapRole(target: Player) {
+	  let targetRole: Role = target.getRole();
+	  
+	  target.setRole(this.getRole());
+	  this.setRole(targetRole);
   }
 }

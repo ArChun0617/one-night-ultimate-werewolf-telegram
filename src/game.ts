@@ -41,6 +41,11 @@ export class Game {
     this.gameRoles = roles;
     this.players = players;
   }
+  
+  show() {
+	console.log('[Table]', this.table);
+	console.log('[Players]', this.players);
+  }
 
   start(msg) {
     this.setStatus(Game.STATUS_START_GAME);
@@ -108,7 +113,7 @@ export class Game {
     }
 
     const player = this.getPlayer(msg.from.id);
-    console.log(`Callback_query Called [Game]: ${this.id} | [Event]: ${event} | [Player] ${player ? player.name : 'Nan'}`);
+    console.log(`Callback_query Called [Game]: ${this.id} | [Event]: ${event} | [Player] ${player ? player.name + "(" + player.getRole().name + ")" : 'Nan'}`);
 
     if (!player) {
       this.sendInvalidActionMessage(msg.id);
@@ -153,7 +158,7 @@ export class Game {
         {
           reply_markup: JSON.stringify({
             inline_keyboard: [
-              [{ text: 'VIEW', callback_data: 'view_role' }]
+              [{ text: 'View your role', callback_data: 'view_role' }]
             ]
           })
         }

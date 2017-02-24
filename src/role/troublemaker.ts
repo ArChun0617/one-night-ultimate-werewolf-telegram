@@ -1,8 +1,11 @@
+import * as _ from 'lodash';
 import { Role } from "./role";
+import { Player } from "../player/player";
 
 export class Troublemaker extends Role {
   constructor() {
     super({
+      emoji: Role.TROUBLEMAKER_EMOJI,
       name: Role.TROUBLEMAKER
     });
   }
