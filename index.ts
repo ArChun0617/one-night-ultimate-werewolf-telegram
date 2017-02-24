@@ -38,7 +38,7 @@ bot.onText(/\/newgame/, (msg) => {
   const players: Player[] = [
     new Player({ id: msg.from.id, name: msg.from.first_name })
   ];
-  
+
   games.push(new Game(id, bot, players, roles));
   bot.sendMessage(msg.chat.id, `${Emoji.get('star')}  Created a new game, please enter \/join to join this game`);
   console.log(`GAME ${id} has been created`);
@@ -67,6 +67,11 @@ bot.onText(/\/start/, (msg) => {
     bot.sendMessage(msg.chat.id, `${Emoji.get('bomb')}  Sorry. Please create a new game (/newgame)`);
     return;
   }
+
+  // TODO: hardcode to add dummy players
+  if (game.players.length < 6)
+    for(let i = game.players.length; i < 6; i++)
+      game.players.push(new Player({ id: i, name: 'Player'+i }));
 
   game.start(msg)
     .then(() => {
