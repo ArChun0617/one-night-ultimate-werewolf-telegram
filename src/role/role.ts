@@ -1,6 +1,7 @@
 export interface RoleInterface {
   name: string;
   wakeUp(bot, msg, players, table);
+  notifyRole(bot, msg);
 }
 
 export interface RoleOptions {
@@ -29,5 +30,9 @@ export class Role implements RoleInterface {
 
   wakeUp(bot, msg, players, table) {
     throw new Error('UseAbility function does not implemented');
+  }
+
+  notifyRole(bot, msg) {
+    bot.answerCallbackQuery(msg.id, `Your role is ${this.name}`);
   }
 }
