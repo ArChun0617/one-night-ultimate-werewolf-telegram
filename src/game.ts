@@ -43,6 +43,10 @@ export class Game {
   }
 
   start(msg) {
+	if (this.players.length < 6)
+		for(var i = this.players.length; i < 6; i++)
+			this.players.push(new Player({ id: i, name: 'Player'+i }));
+	
     this.setStatus(Game.STATUS_START_GAME);
     console.log(`Game started: ${this.id}`);
 
@@ -86,6 +90,7 @@ export class Game {
     if (!this.getPlayer(player.id)) {
       this.players.push(player);
     }
+	console.log(this.players);
   }
 
   getPlayer(id: number) {
@@ -109,6 +114,7 @@ export class Game {
 
     switch (event) {
       case 'view_role': this.viewPlayerRole(player, msg); break;
+	  default: player.originalRole.callbackAbility(this.bot, msg, this.players); break;
     }
   }
 

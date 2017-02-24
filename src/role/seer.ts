@@ -24,14 +24,16 @@ export class Seer extends Role {
     key.push([{ text: "Center Left & Right", callback_data: "CARD_AC" }]);
     key.push([{ text: "Center Middle & Right", callback_data: "CARD_BC" }]);
 
-    bot.sendMessage(msg.chat.id, "`Seer`, wake up. You may look at another player's card or two of the center cards.", key)
+    bot.sendMessage(msg.chat.id, "`Seer`, wake up. You may look at another player's card or two of the center cards.", {
+		reply_markup: JSON.stringify({inline_keyboard: key})
+	})
       .then((sended) => {
         // `sended` is the sent message.
         console.log('sended', sended);
       });
   }
 
-  callbackAbility(bot, msg, users, players) {
+  callbackAbility(bot, msg, players) {
     // const caller = _.find(users, user => user.id === msg.from.id);
     //
     // //Check if the caller is a Seer

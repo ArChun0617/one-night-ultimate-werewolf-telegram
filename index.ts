@@ -35,14 +35,8 @@ bot.onText(/\/newgame/, (msg) => {
     Role.DRUNK,
     Role.TANNER
   ];
-
   const players: Player[] = [
-    new Player({ id: msg.from.id, name: msg.from.first_name }),
-    new Player({ id: 2, name: 'Player2' }),
-    new Player({ id: 3, name: 'Player3' }),
-    new Player({ id: 4, name: 'Player4' }),
-    new Player({ id: 5, name: 'Player5' }),
-    new Player({ id: 6, name: 'Player6' })
+    new Player({ id: msg.from.id, name: msg.from.first_name })
   ];
   
   games.push(new Game(id, bot, players, roles));
@@ -56,6 +50,11 @@ bot.onText(/\/join/, (msg) => {
     id: msg.from.id,
     name: msg.from.first_name
   });
+  
+  if (!game) {
+    bot.sendMessage(msg.chat.id, `${Emoji.get('bomb')}  Sorry. Please create a new game (/newgame)`);
+    return;
+  }
 
   // validation game isStarted
   game.addPlayer(player);
