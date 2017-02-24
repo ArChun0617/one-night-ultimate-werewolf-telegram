@@ -57,7 +57,7 @@ bot.onText(/\/join/, (msg) => {
   }
 
   // validation game isStarted
-  game.addPlayer(player);
+  game.addPlayer(msg, player);
 });
 
 bot.onText(/\/start/, (msg) => {

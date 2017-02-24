@@ -1,30 +1,24 @@
 import * as _ from 'lodash';
 import { Role } from './role';
 import { Player } from "../player/player";
-import { Promise } from 'es6-promise';
 
 export class Werewolf extends Role {
-  private resolve: any;
-  private reject: any;
-
   constructor() {
     super({
       name: Role.WEREWOLF
     });
   }
 
-  wakeUp(bot, msg, players, table) {
+  wakeUp(bot, msg) {
     console.log(`${this.name} wake up called`);
     // notify buddies
     // IF single wolf, sendMessage Three buttons to choose
     // on callback_query lock the card
-    const key = [];
-
-    key.push([{ text: "Wake Up", callback_data: "WAKE_UP" }]);
-    key.push([{ text: "Left", callback_data: "CARD_A" }]);
-    key.push([{ text: "Middle", callback_data: "CARD_B" }]);
-    key.push([{ text: "Right", callback_data: "CARD_C" }]);
-
+    const key = [
+		[{ text: "Wake Up", callback_data: "WAKE_UP" }],
+		[{ text: "Left", callback_data: "CARD_A" }, { text: "Middle", callback_data: "CARD_B" }, { text: "Right", callback_data: "CARD_C" }]
+	];
+	
     bot.sendMessage(msg.chat.id, "`Werewolves`, wake up and look for other werewolves. If there is only one Werewolf, you may look at a card from the center.", {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
@@ -34,46 +28,38 @@ export class Werewolf extends Role {
       });
   }
 
-  callbackAbility(bot, msg, players) {
+  callbackAbility(bot, msg, players, table) {
     // TODO: avoid syntax error for testing first
-    console.log(`callbackAbility:`, msg);
+    console.log(`${this.name} callbackAbility:`, msg);
+	
+	let rtnMsg: string = "";
+    const target: Player[] = _.filter(players, (player: Player) => player.getRole().name == Role.WEREWOLF);
+	
+	if (msg.data == "WAKE_UP" && target.length == 2) {
+		rtnMsg = "Werewolf is :\n";
 
-    const target: Player = _.find(players, (player: Player) => player.getRole().name == Role.WEREWOLF);
-
-    let rtnMsg: string = "";
-
-    rtnMsg += `${target.name} : ${target.getRole().name}\n`;
-    // _.map(target, (player: Player) => {
-    // 	rtnMsg += player.name + " : " + player.role + "\n";
-    // });
-
-    bot.answerCallbackQuery(msg.id, rtnMsg);
-
-
-    /*
-     if (target.count > 1) {
-     // 2 werewolf
-     const rtnMsg:string;
-
-     _.map(target, (player: Player) => {
-     rtnMsg += player.name + " : " + player.role + "\n";
-     });
-
-     bot.answerCallbackQuery(msg.id, rtnMsg);
-     }
-     else if (target.count == 1) {
-     // 1 werewolf
-     }
-     else {
-     // no werewolf
-     }
-
-     let rtnMsg = '';
-
-     _.map(target, (player: Player) => {
-     rtnMsg += player.name + " : " + player.role + "\n";
-     });
-     */
-    bot.answerCallbackQuery(msg.id, rtnMsg);
+		//rtnMsg += `${target.name} : ${target.getRole().name}\n`;
+		_.map(target, (player: Player) => {
+			rtnMsg += player.name + " : " + player.role.name + "\n";
+		});
+	}
+	else if ((msg.data == "CARD_A" || msg.data == "CARD_B" || msg.data == "CARD_C") && target.length == 1) {
+		rtnMsg = "Centre Card is :\n";
+		
+		if (msg.data == "CARD_A") {
+			rtnMsg += "[" + table.getLeft().name + "] [?] [?]";
+		}
+		else if (msg.data == "CARD_B") {
+			rtnMsg += "[?] [" + table.getCenter().name + "] [?]";
+		}
+		else if (msg.data == "CARD_C") {
+			rtnMsg += "[?] [?] [" + table.getRight().name + "]";
+		}
+		else {
+			rtnMsg = "";
+		}
+	}
+	
+	bot.answerCallbackQuery(msg.id, rtnMsg);
   }
 }

@@ -10,20 +10,24 @@ export class Seer extends Role {
   }
 
   wakeUp(bot, msg, players, table) {
+    console.log(`${this.name} wake up called`);
     // sendMessage [AB] [BC] [AC] [Player1] [Player2] ...
     // lock the option when callback_query
     const key = [];
-
+	let pos = 0;
+	let btnPerLine = 3;
+	
     _.map(players, (player: Player) => {
-      key.push(
-        [{ text: player.name, callback_data: player.id }]
-      );
+		let row = pos/btnPerLine|0;
+	  if (!key[row]) key[row] = [];
+	  key[row].push({ text: player.name, callback_data: ""+player.id });
+	  pos++;
     });
 
-    key.push([{ text: "Center Left & Middle", callback_data: "CARD_AB" }]);
-    key.push([{ text: "Center Left & Right", callback_data: "CARD_AC" }]);
-    key.push([{ text: "Center Middle & Right", callback_data: "CARD_BC" }]);
+    key.push([{ text: "Left & Middle", callback_data: "CARD_AB" }, { text: "Left & Right", callback_data: "CARD_AC" }, { text: "Middle & Right", callback_data: "CARD_BC" }]);
 
+	console.log(JSON.stringify(key));
+	
     bot.sendMessage(msg.chat.id, "`Seer`, wake up. You may look at another player's card or two of the center cards.", {
 		reply_markup: JSON.stringify({inline_keyboard: key})
 	})
@@ -33,7 +37,8 @@ export class Seer extends Role {
       });
   }
 
-  callbackAbility(bot, msg, players) {
+  callbackAbility(bot, msg, players, table) {
+    console.log(`${this.name} callbackAbility:`, msg);
     // const caller = _.find(users, user => user.id === msg.from.id);
     //
     // //Check if the caller is a Seer
@@ -43,14 +48,12 @@ export class Seer extends Role {
     // }
 
     // TODO: avoid syntax error for testing first
-    let choice = 'xxx';
+    let choice = msg.data;
     let rtnMsg = '';
-    const table = [];
 
-    if (!choice) choice = msg.data;	//To lock the Seer with only one choice	
-
+    //if (!choice) choice = msg.data;	//To lock the Seer with only one choice
     const target: Player = _.find(players, (player: Player) => player.id == parseInt(choice));
-
+	
     if (target) {
       // if target to a specific guy
       rtnMsg = target.name + " : " + target.getRole().name;
@@ -58,11 +61,16 @@ export class Seer extends Role {
     else {
       switch (choice) {
         case 'CARD_AB':
-          rtnMsg = table[0].name + " : " + table[0].currentRole + "\n" + table[1].name + " : " + table[1].currentRole;
+          rtnMsg = "[" + table.getLeft().name + "] [" + table.getCenter().name + "] [?]";
+		  break;
         case 'CARD_AC':
-          rtnMsg = table[0].name + " : " + table[0].currentRole + "\n" + table[2].name + " : " + table[2].currentRole;
+          rtnMsg = "[" + table.getLeft().name + "] [?] [" + table.getRight().name + "]";
+		  break;
         case 'CARD_BC':
-          rtnMsg = table[1].name + " : " + table[1].currentRole + "\n" + table[2].name + " : " + table[2].currentRole;
+          rtnMsg = "[?] [" + table.getCenter().name + "] [" + table.getRight().name + "] [?]";
+		  break;
+		default:
+		  break;
       }
     }
 

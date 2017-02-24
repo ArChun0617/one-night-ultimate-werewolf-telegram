@@ -82,10 +82,17 @@ export class Game {
     return this.status;
   }
 
-  addPlayer(player: Player) {
+  addPlayer(msg, player: Player) {
     if (!this.getPlayer(player.id)) {
       this.players.push(player);
     }
+	
+    let rtnMsg: string = "";
+    _.map(this.players, (player: Player) => {
+		rtnMsg += player.name + "\n";
+    });
+	
+    this.bot.sendMessage(msg.chat.id, "Player joined: " + rtnMsg);
 	console.log(this.players);
   }
 
@@ -110,7 +117,7 @@ export class Game {
 
     switch (event) {
       case 'view_role': this.viewPlayerRole(player, msg); break;
-	    default: player.originalRole.callbackAbility(this.bot, msg, this.players); break;
+	    default: player.originalRole.callbackAbility(this.bot, msg, this.players, this.table); break;
     }
   }
 
@@ -152,7 +159,7 @@ export class Game {
         }
       );
 
-      setTimeout(() => resolve(), 10000);
+      setTimeout(() => resolve(), 1000);
     });
   }
 
