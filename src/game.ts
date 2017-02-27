@@ -279,9 +279,9 @@ export class Game {
       // sort result
       this.result = _.sortBy(this.result, (result) => result.count);
       const deaths = _.filter(this.result, (result) => result.count === this.result[0].count && result.count >= 2);
-console.log('this.result', this.result);
+
+      console.log('this.result', this.result);
       _.map(deaths, (death: Result) => {
-        console.log('death.target', death.target);
         if (death.target.getOriginalRole() === Role.HUNTER) {
           this.deathPlayers.push(death.target.getKillTarget());
         }
@@ -310,7 +310,7 @@ console.log('this.result', this.result);
       _.map(this.losers, (loser: Player) => {
         result += `${loser.name}\t\t[Role] ${loser.getOriginalRole().name}\t\t >> ${loser.getRole().name}\n`;
       });
-      this.bot.sendMessage(msg.id, result);
+      this.bot.sendMessage(msg.chat.id, result);
       console.log('Result', result);
       resolve();
     });

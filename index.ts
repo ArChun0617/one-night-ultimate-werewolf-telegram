@@ -92,7 +92,7 @@ bot.on('callback_query', (msg) => {
   // find the user and callback the Game on handler
   const game = _.find(games, game => game.getPlayer(msg.from.id));
   if (!game) {
-    bot.answerCallbackQuery(msg.chat.id, `${Emoji.get('middle_finger')}  Hey! Stop doing that!`);
+    bot.answerCallbackQuery(msg.id, `${Emoji.get('middle_finger')}  Hey! Stop doing that!`);
     return;
   }
   game.on(msg.data, msg);
