@@ -378,24 +378,15 @@ export class Game {
     const deathWerewolfs = _.filter(this.deathPlayers, player => player.getRole() === Role.WEREWOLF);
     const deathMinions = _.filter(this.deathPlayers, player => player.getRole() === Role.MINION);
 
-    if (deathWerewolfs) {
-      // has werewolf dead
-      if (deathTanners) {
-        this.addWinners(deathTanners);
-      }
+    this.addWinners(deathTanners);
 
+    if (deathWerewolfs) {
       this.addWinners(this.getNonTannerVillagesTeam());
     } else if (this.hasWerewolfOnTable()) {
-      // has werewolf on table
-      if (deathTanners) {
-        this.addWinners(deathTanners);
-      } else {
-        this.addWinners(this.getWerewolfTeam());
-      }
+      this.addWinners(this.getWerewolfTeam());
     } else {
       // no werewolf on table
       if (deathTanners) {
-        this.addWinners(deathTanners);
         this.addWinners(this.getWerewolfTeam());
       } else {
         this.addWinners(
