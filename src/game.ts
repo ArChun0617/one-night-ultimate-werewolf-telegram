@@ -206,7 +206,7 @@ export class Game {
   private wakeUp(role, msg): Promise<any> {
     if (!this.isExistInCurrentGame(role)) return Promise.resolve();
 
-    this.setWakeUpStatus(role);
+    this.setWakeUpPhase(role);
 
     return new Promise((resolve, reject) => {
       const player = _.find(this.players, (p) => p.getOriginalRole().name === role);
@@ -277,10 +277,11 @@ export class Game {
       }, []);
 
       // sort result
-      this.result = _.reverse(_.sortBy(this.result, (result) => result.count));
+      this.result = _.sortBy(this.result, (result) => result.count);
       const deaths = _.filter(this.result, (result) => result.count === this.result[0].count && result.count >= 2);
-
-      _.map(deaths, (death) => {
+console.log('this.result', this.result);
+      _.map(deaths, (death: Result) => {
+        console.log('death.target', death.target);
         if (death.target.getOriginalRole() === Role.HUNTER) {
           this.deathPlayers.push(death.target.getKillTarget());
         }
@@ -293,7 +294,7 @@ export class Game {
 
   private showResult(msg) {
     this.setPhase(Game.PHASE_END_GAME);
-    // TODO: ...
+
     return new Promise((resolve, reject) => {
       let result = '';
 
@@ -302,12 +303,12 @@ export class Game {
 
       result += '[WINNERS]\n';
       _.map(this.winners, (winner: Player) => {
-        result += `${winner.name} [Original Role] ${winner.getOriginalRole().name} >> [Role] ${winner.getRole().name}\n`;
+        result += `${winner.name}\t\t[Role] ${winner.getOriginalRole().name}\t\t >> ${winner.getRole().name}\n`;
       });
 
       result += '[LOSERS]\n';
-      _.map(this.losers, (winner: Player) => {
-        result += `${winner.name} [Original Role] ${winner.getOriginalRole().name} >> [Role] ${winner.getRole().name}\n`;
+      _.map(this.losers, (loser: Player) => {
+        result += `${loser.name}\t\t[Role] ${loser.getOriginalRole().name}\t\t >> ${loser.getRole().name}\n`;
       });
       this.bot.sendMessage(msg.id, result);
       console.log('Result', result);
@@ -323,7 +324,7 @@ export class Game {
     this.phase = phase;
   }
 
-  private setWakeUpStatus(role) {
+  private setWakeUpPhase(role) {
     switch (role) {
       case Role.DOPPELGANGER: this.setPhase(Game.PHASE_WAKEUP_DOPPELGANGER); break;
       case Role.WEREWOLF: this.setPhase(Game.PHASE_WAKEUP_WEREWOLF); break;
@@ -376,7 +377,9 @@ export class Game {
   private determineWinners() {
     const deathTanners = _.filter(this.deathPlayers, player => player.getRole() === Role.TANNER);
     const deathWerewolfs = _.filter(this.deathPlayers, player => player.getRole() === Role.WEREWOLF);
-    const deathMinions = _.filter(this.deathPlayers, player => player.getRole() === Role.MINION);
+    const deathVillages = _.filter(this.deathPlayers, player => _.indexOf([
+      Role.WEREWOLF, Role.MINION, Role.TANNER
+    ], player.getRole()) < 0);
 
     this.addWinners(deathTanners);
 
@@ -384,20 +387,10 @@ export class Game {
       this.addWinners(this.getNonTannerVillagesTeam());
     } else if (this.hasWerewolfOnTable()) {
       this.addWinners(this.getWerewolfTeam());
-    } else {
-      // no werewolf on table
-      if (deathTanners) {
-        this.addWinners(this.getWerewolfTeam());
-      } else {
-        this.addWinners(
-          _.difference(
-            _.filter(this.players, player => player.getRole() === Role.MINION),
-            deathMinions
-          )
-        );
-
-        this.addWinners(this.getNonTannerVillagesTeam());
-      }
+    } else if (this.deathPlayers.length === 0) {
+      this.addWinners(this.getNonTannerVillagesTeam());
+    } else if (deathVillages.length || deathTanners) {
+      this.addWinners(this.getWerewolfTeam());
     }
   }
 

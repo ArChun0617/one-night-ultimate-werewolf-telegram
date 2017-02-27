@@ -21,7 +21,7 @@ export const DeckFactory = {
    * @returns {Deck}
    */
   generate: (gameRoles: string[]): Deck => {
-    // gameRoles = _.shuffle(gameRoles);
+    gameRoles = _.shuffle(gameRoles);
     const roles:Role[] = [];
 
     _.map(gameRoles, (role) => {
