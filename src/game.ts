@@ -122,7 +122,7 @@ export class Game {
 
     switch (event) {
       case 'view_role': this.viewPlayerRole(player, msg); break;
-	    default: player.originalRole.callbackAbility(this.bot, msg, this.players, this.table); break;
+	    default: player.originalRole.useAbility(this.bot, msg, this.players, this.table); break;
     }
   }
 
