@@ -110,7 +110,7 @@ bot.onText(/\/show/, (msg, match) => {
 });
 
 function killGame(id: number) {
-  _.remove(this.games, (g: Game) => g.id === id);
+  _.remove(games, (game: Game) => game.id === id);
 }
 
 console.log('Server is on ...');

@@ -5,6 +5,7 @@ export class Player {
   name: string;
   originalRole: Role = null;
   role: Role;
+  killTarget: Player;
 
   constructor(options) {
     this.id = options.id;
@@ -32,5 +33,13 @@ export class Player {
 	  
 	  target.setRole(this.getRole());
 	  this.setRole(targetRole);
+  }
+
+  setKillTarget(player: Player) {
+    this.killTarget = player;
+  }
+  
+  getKillTarget(): Player {
+    return this.killTarget
   }
 }
