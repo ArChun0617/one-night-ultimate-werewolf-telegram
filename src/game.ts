@@ -12,24 +12,24 @@ interface Result {
 }
 
 export class Game {
-  public static STATUS_WAITING_PLAYER:string = 'waiting';
-  public static STATUS_START_GAME:string = 'startgame';
-  public static STATUS_PREPARE_DECK:string = 'prepare_deck';
-  public static STATUS_ANNOUNCE_PLAYER_ROLE:string = 'announce_player_role';
-  public static STATUS_START_NIGHT:string = 'start_night';
-  public static STATUS_WAKEUP_DOPPELGANGER:string = 'wakeup_doppelganger';
-  public static STATUS_WAKEUP_WEREWOLF:string = 'wakeup_werewolf';
-  public static STATUS_WAKEUP_MINION:string = 'wakeup_minion';
-  public static STATUS_WAKEUP_MASON:string = 'wakeup_mason';
-  public static STATUS_WAKEUP_SEER:string = 'wakeup_seer';
-  public static STATUS_WAKEUP_ROBBER:string = 'wakeup_robber';
-  public static STATUS_WAKEUP_TROUBLEMAKER:string = 'wakeup_troublemaker';
-  public static STATUS_WAKEUP_DRUNK:string = 'wakeup_drunk';
-  public static STATUS_WAKEUP_INSOMNIAC:string = 'wakeup_insomniac';
-  public static STATUS_CONVERSATION:string = 'conversation';
-  public static STATUS_VOTING:string = 'voting';
-  public static STATUS_KILL_PLAYER:string = 'kill_player';
-  public static STATUS_END_GAME:string = 'endgame';
+  public static PHASE_WAITING_PLAYER:string = 'waiting';
+  public static PHASE_START_GAME:string = 'startgame';
+  public static PHASE_PREPARE_DECK:string = 'prepare_deck';
+  public static PHASE_ANNOUNCE_PLAYER_ROLE:string = 'announce_player_role';
+  public static PHASE_START_NIGHT:string = 'start_night';
+  public static PHASE_WAKEUP_DOPPELGANGER:string = 'wakeup_doppelganger';
+  public static PHASE_WAKEUP_WEREWOLF:string = 'wakeup_werewolf';
+  public static PHASE_WAKEUP_MINION:string = 'wakeup_minion';
+  public static PHASE_WAKEUP_MASON:string = 'wakeup_mason';
+  public static PHASE_WAKEUP_SEER:string = 'wakeup_seer';
+  public static PHASE_WAKEUP_ROBBER:string = 'wakeup_robber';
+  public static PHASE_WAKEUP_TROUBLEMAKER:string = 'wakeup_troublemaker';
+  public static PHASE_WAKEUP_DRUNK:string = 'wakeup_drunk';
+  public static PHASE_WAKEUP_INSOMNIAC:string = 'wakeup_insomniac';
+  public static PHASE_CONVERSATION:string = 'conversation';
+  public static PHASE_VOTING:string = 'voting';
+  public static PHASE_KILL_PLAYER:string = 'kill_player';
+  public static PHASE_END_GAME:string = 'endgame';
 
   id: number;
   players: any[];
@@ -40,7 +40,7 @@ export class Game {
   gameTime: number = process.env.GAME_TIME || 10 * 60 * 1000;
   actionTime: number = process.env.ACTION_TIME || 10 * 1000;
   btnPerLine: number = process.env.BTN_PER_LINE || 3;
-  status: string = Game.STATUS_WAITING_PLAYER;
+  phase: string = Game.PHASE_WAITING_PLAYER;
   result: Result[] = [];
   deathPlayers: Player[] = [];
   winners: Player[] = [];
@@ -59,7 +59,7 @@ export class Game {
   }
 
   start(msg) {
-    this.setStatus(Game.STATUS_START_GAME);
+    this.setPhase(Game.PHASE_START_GAME);
     console.log(`Game started: ${this.id}`);
 
     this.bot.sendMessage(msg.chat.id, `${Emoji.get('game_die')}  Game start`);
@@ -91,11 +91,11 @@ export class Game {
   }
 
   isStarted() {
-    return !(this.getStatus() === Game.STATUS_WAITING_PLAYER);
+    return !(this.getPhase() === Game.PHASE_WAITING_PLAYER);
   }
 
-  getStatus(): string {
-    return this.status;
+  getPhase(): string {
+    return this.phase;
   }
 
   addPlayer(msg, player: Player) {
@@ -119,13 +119,13 @@ export class Game {
   on(event, msg) {
     // status validation
     if (_.indexOf([
-        Game.STATUS_WAITING_PLAYER,
-        Game.STATUS_START_GAME,
-        Game.STATUS_PREPARE_DECK,
-        Game.STATUS_START_NIGHT,
-        Game.STATUS_KILL_PLAYER,
-        Game.STATUS_END_GAME
-      ], this.getStatus()) >= 0) {
+        Game.PHASE_WAITING_PLAYER,
+        Game.PHASE_START_GAME,
+        Game.PHASE_PREPARE_DECK,
+        Game.PHASE_START_NIGHT,
+        Game.PHASE_KILL_PLAYER,
+        Game.PHASE_END_GAME
+      ], this.getPhase()) >= 0) {
       this.sendInvalidActionMessage(msg.id);
       return;
     }
@@ -138,16 +138,16 @@ export class Game {
       return;
     }
 
-    switch (this.getStatus()) {
-      case Game.STATUS_ANNOUNCE_PLAYER_ROLE: this.handleAnnouncePlayerEvent(event, msg, player); break;
-      case Game.STATUS_CONVERSATION: this.handleConversationEvent(event, msg, player); break;
-      case Game.STATUS_VOTING: this.handleVotingEvent(event, msg, player); break;
+    switch (this.getPhase()) {
+      case Game.PHASE_ANNOUNCE_PLAYER_ROLE: this.handleAnnouncePlayerEvent(event, msg, player); break;
+      case Game.PHASE_CONVERSATION: this.handleConversationEvent(event, msg, player); break;
+      case Game.PHASE_VOTING: this.handleVotingEvent(event, msg, player); break;
       default: this.handleWakeUpEvent(event, msg, player); break;
     }
   }
 
   private prepareDeck() {
-    this.setStatus(Game.STATUS_PREPARE_DECK);
+    this.setPhase(Game.PHASE_PREPARE_DECK);
 
     return new Promise((resolve, reject) => {
       this.deck = DeckFactory.generate(this.gameRoles);
@@ -169,7 +169,7 @@ export class Game {
   }
 
   private announcePlayerRole(msg) {
-    this.setStatus(Game.STATUS_ANNOUNCE_PLAYER_ROLE);
+    this.setPhase(Game.PHASE_ANNOUNCE_PLAYER_ROLE);
 
     return new Promise((resolve, reject) => {
       this.bot.sendMessage(
@@ -189,7 +189,7 @@ export class Game {
   }
 
   private startNight(msg) {
-    this.setStatus(Game.STATUS_START_NIGHT);
+    this.setPhase(Game.PHASE_START_NIGHT);
     this.bot.sendMessage(msg.chat.id, `${Emoji.get('crescent_moon')}  Night start, Everyone close your eye.`);
 
     return this.wakeUp(Role.DOPPELGANGER, msg)
@@ -223,7 +223,7 @@ export class Game {
   }
 
   private startConversation(msg) {
-    this.setStatus(Game.STATUS_CONVERSATION);
+    this.setPhase(Game.PHASE_CONVERSATION);
 
     this.bot.sendMessage(
       msg.chat.id,
@@ -236,7 +236,7 @@ export class Game {
   }
 
   private beginVoting(msg: any) {
-    this.setStatus(Game.STATUS_VOTING);
+    this.setPhase(Game.PHASE_VOTING);
 
     return new Promise((resolve, reject) => {
       const key = [];
@@ -262,7 +262,7 @@ export class Game {
   }
 
   private killPlayer() {
-    this.setStatus(Game.STATUS_KILL_PLAYER);
+    this.setPhase(Game.PHASE_KILL_PLAYER);
 
     return new Promise((resolve, reject) => {
       this.result = _.reduce(this.players, (result: any, player: Player) => {
@@ -292,7 +292,7 @@ export class Game {
   }
 
   private showResult(msg) {
-    this.setStatus(Game.STATUS_END_GAME);
+    this.setPhase(Game.PHASE_END_GAME);
     // TODO: ...
     return new Promise((resolve, reject) => {
       let result = '';
@@ -319,21 +319,21 @@ export class Game {
     return _.indexOf(this.gameRoles, role) >= 0;
   }
 
-  private setStatus(status: string) {
-    this.status = status;
+  private setPhase(phase: string) {
+    this.phase = phase;
   }
 
   private setWakeUpStatus(role) {
     switch (role) {
-      case Role.DOPPELGANGER: this.setStatus(Game.STATUS_WAKEUP_DOPPELGANGER); break;
-      case Role.WEREWOLF: this.setStatus(Game.STATUS_WAKEUP_WEREWOLF); break;
-      case Role.MINION: this.setStatus(Game.STATUS_WAKEUP_MINION); break;
-      case Role.MASON: this.setStatus(Game.STATUS_WAKEUP_MASON); break;
-      case Role.SEER: this.setStatus(Game.STATUS_WAKEUP_SEER); break;
-      case Role.ROBBER: this.setStatus(Game.STATUS_WAKEUP_ROBBER); break;
-      case Role.TROUBLEMAKER: this.setStatus(Game.STATUS_WAKEUP_TROUBLEMAKER); break;
-      case Role.DRUNK: this.setStatus(Game.STATUS_WAKEUP_DRUNK); break;
-      case Role.INSOMNIAC: this.setStatus(Game.STATUS_WAKEUP_INSOMNIAC); break;
+      case Role.DOPPELGANGER: this.setPhase(Game.PHASE_WAKEUP_DOPPELGANGER); break;
+      case Role.WEREWOLF: this.setPhase(Game.PHASE_WAKEUP_WEREWOLF); break;
+      case Role.MINION: this.setPhase(Game.PHASE_WAKEUP_MINION); break;
+      case Role.MASON: this.setPhase(Game.PHASE_WAKEUP_MASON); break;
+      case Role.SEER: this.setPhase(Game.PHASE_WAKEUP_SEER); break;
+      case Role.ROBBER: this.setPhase(Game.PHASE_WAKEUP_ROBBER); break;
+      case Role.TROUBLEMAKER: this.setPhase(Game.PHASE_WAKEUP_TROUBLEMAKER); break;
+      case Role.DRUNK: this.setPhase(Game.PHASE_WAKEUP_DRUNK); break;
+      case Role.INSOMNIAC: this.setPhase(Game.PHASE_WAKEUP_INSOMNIAC); break;
     }
   }
 
@@ -353,7 +353,7 @@ export class Game {
   }
 
   private handleWakeUpEvent(event: string, msg: any, player: Player) {
-    if (this.getStatus() !== 'wakeup_' + player.getOriginalRole().name.toLowerCase()) {
+    if (this.getPhase() !== 'wakeup_' + player.getOriginalRole().name.toLowerCase()) {
       return this.sendInvalidActionMessage(msg.id);
     }
 
