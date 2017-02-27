@@ -27,7 +27,7 @@ export class Robber extends Role {
       pos++;
     });
 
-    bot.sendMessage(msg.chat.id, `${this.emoji}${this.name}, wake up.`, {
+    bot.sendMessage(msg.chat.id, `${this.emoji}  ${this.name}, wake up.`, {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {

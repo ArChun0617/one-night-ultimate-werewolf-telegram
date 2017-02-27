@@ -52,6 +52,6 @@ export class Role implements RoleInterface {
   }
 
   notifyRole(bot, msg) {
-    bot.answerCallbackQuery(msg.id, `Your role is ${this.emoji}${this.name}`);
+    bot.answerCallbackQuery(msg.id, `Your role is ${this.emoji}  ${this.name}`);
   }
 }

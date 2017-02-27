@@ -28,13 +28,14 @@ export class Seer extends Role {
       pos++;
     });
 
-    key.push([{ text: "Left & Middle", callback_data: "CARD_AB" }, {
-      text: "Left & Right",
-      callback_data: "CARD_AC"
-    }, { text: "Middle & Right", callback_data: "CARD_BC" }]);
+    key.push([
+      { text: "Left & Middle", callback_data: "CARD_AB" },
+      { text: "Left & Right", callback_data: "CARD_AC" },
+      { text: "Middle & Right", callback_data: "CARD_BC" }
+    ]);
 
-    //bot.sendMessage(msg.chat.id, `${this.emoji}${this.name}, wake up. You may look at another player's card or two of the center cards.`, {
-    bot.sendMessage(msg.chat.id, `${this.emoji}${this.name}, wake up.`, {
+    //bot.sendMessage(msg.chat.id, `${this.emoji}  ${this.name}, wake up. You may look at another player's card or two of the center cards.`, {
+    bot.sendMessage(msg.chat.id, `${this.emoji}  ${this.name}, wake up.`, {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {

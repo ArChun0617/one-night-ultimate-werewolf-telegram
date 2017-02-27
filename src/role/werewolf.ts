@@ -24,8 +24,8 @@ export class Werewolf extends Role {
       }]
     ];
 
-    //bot.sendMessage(msg.chat.id, `${this.emoji}${this.name}, wake up and look for other werewolves. If there is only one Werewolf, you may look at a card from the center.`, {
-    bot.sendMessage(msg.chat.id, `${this.emoji}${this.name}, wake up.`, {
+    //bot.sendMessage(msg.chat.id, `${this.emoji}  ${this.name}, wake up and look for other werewolves. If there is only one Werewolf, you may look at a card from the center.`, {
+    bot.sendMessage(msg.chat.id, `${this.emoji}  ${this.name}, wake up.`, {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {
@@ -47,7 +47,7 @@ export class Werewolf extends Role {
       });
 
       if (rtnMsg.length > 0)
-        rtnMsg = `${this.emoji}${this.name} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
+        rtnMsg = `${this.emoji}  ${this.name} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
     }
     else if ((msg.data == "CARD_A" || msg.data == "CARD_B" || msg.data == "CARD_C") && target.length == 1) {
       rtnMsg = "Centre Card is :\n";

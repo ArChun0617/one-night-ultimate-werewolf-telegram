@@ -17,8 +17,8 @@ export class Mason extends Role {
 
     key.push([{ text: "Wake Up", callback_data: "WAKE_UP" }]);
 
-    //bot.sendMessage(msg.chat.id, `${this.emoji}${this.name}, wake up. '${wolf.emoji}${wolf.name}', stick out your thumb so the Minion can see who you are.`, {
-    bot.sendMessage(msg.chat.id, `${this.emoji}${this.name}, wake up.`, {
+    //bot.sendMessage(msg.chat.id, `${this.emoji}  ${this.name}, wake up. '${wolf.emoji}${wolf.name}', stick out your thumb so the Minion can see who you are.`, {
+    bot.sendMessage(msg.chat.id, `${this.emoji}  ${this.name}, wake up.`, {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {
@@ -39,7 +39,7 @@ export class Mason extends Role {
       });
 
       if (rtnMsg.length > 0)
-        rtnMsg = `${this.emoji}${this.name} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
+        rtnMsg = `${this.emoji}  ${this.name} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
     }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);

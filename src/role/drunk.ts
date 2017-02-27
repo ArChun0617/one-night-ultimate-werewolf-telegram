@@ -21,8 +21,8 @@ export class Drunk extends Role {
       }]
     ];
 
-    //bot.sendMessage(msg.chat.id, `${this.emoji}${this.name}, wake up and look for other werewolves. If there is only one Werewolf, you may look at a card from the center.`, {
-    bot.sendMessage(msg.chat.id, `${this.emoji}${this.name}, wake up.`, {
+    //bot.sendMessage(msg.chat.id, `${this.emoji}  ${this.name}, wake up and look for other werewolves. If there is only one Werewolf, you may look at a card from the center.`, {
+    bot.sendMessage(msg.chat.id, `${this.emoji}  ${this.name}, wake up.`, {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {

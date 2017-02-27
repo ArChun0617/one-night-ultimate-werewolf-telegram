@@ -17,7 +17,7 @@ export class Insomniac extends Role {
       [{ text: "Wake Up", callback_data: "WAKE_UP" }]
     ];
 
-    bot.sendMessage(msg.chat.id, `${this.emoji}${this.name}, wake up.`, {
+    bot.sendMessage(msg.chat.id, `${this.emoji}  ${this.name}, wake up.`, {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {

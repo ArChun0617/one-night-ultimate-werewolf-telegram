@@ -32,7 +32,8 @@ export class Game {
   bot: any;
   deck: Deck;
   gameRoles: string[];
-  gameTime: number = 600000;
+  gameTime: number = 10 * 60 * 1000;
+  actionTime: number = 10 * 1000;
   status: string = Game.STATUS_WAITING_PLAYER;
 
   constructor(id: number, bot: any, players: Player[], roles: string[]) {
@@ -120,9 +121,9 @@ export class Game {
       return;
     }
 
-    switch (event) {
-      case 'view_role': this.viewPlayerRole(player, msg); break;
-	    default: player.originalRole.useAbility(this.bot, msg, this.players, this.table); break;
+    switch (this.getStatus()) {
+      case Game.STATUS_ANNOUNCE_PLAYER_ROLE: this.handleAnnouncePlayerEvent(event, msg, player); break;
+      default: this.handleWakeUpEvent(event, msg, player); break;
     }
   }
 
@@ -164,7 +165,7 @@ export class Game {
         }
       );
 
-      setTimeout(() => resolve(), 1000);
+      setTimeout(() => resolve(), this.actionTime);
     });
   }
 
@@ -198,7 +199,7 @@ export class Game {
         npc.wakeUp(this.bot, msg, this.players, this.table);
       }
 
-      setTimeout(() => resolve(), 1000);
+      setTimeout(() => resolve(), this.actionTime);
     });
   }
 
@@ -249,33 +250,15 @@ export class Game {
 
   private setWakeUpStatus(role) {
     switch (role) {
-      case Role.DOPPELGANGER:
-        this.setStatus(Game.STATUS_WAKEUP_DOPPELGANGER);
-        break;
-      case Role.WEREWOLF:
-        this.setStatus(Game.STATUS_WAKEUP_WEREWOLF);
-        break;
-      case Role.MINION:
-        this.setStatus(Game.STATUS_WAKEUP_MINION);
-        break;
-      case Role.MASON:
-        this.setStatus(Game.STATUS_WAKEUP_MASON);
-        break;
-      case Role.SEER:
-        this.setStatus(Game.STATUS_WAKEUP_SEER);
-        break;
-      case Role.ROBBER:
-        this.setStatus(Game.STATUS_WAKEUP_ROBBER);
-        break;
-      case Role.TROUBLEMAKER:
-        this.setStatus(Game.STATUS_WAKEUP_TROUBLEMAKER);
-        break;
-      case Role.DRUNK:
-        this.setStatus(Game.STATUS_WAKEUP_DRUNK);
-        break;
-      case Role.INSOMNIAC:
-        this.setStatus(Game.STATUS_WAKEUP_INSOMNIAC);
-        break;
+      case Role.DOPPELGANGER: this.setStatus(Game.STATUS_WAKEUP_DOPPELGANGER); break;
+      case Role.WEREWOLF: this.setStatus(Game.STATUS_WAKEUP_WEREWOLF); break;
+      case Role.MINION: this.setStatus(Game.STATUS_WAKEUP_MINION); break;
+      case Role.MASON: this.setStatus(Game.STATUS_WAKEUP_MASON); break;
+      case Role.SEER: this.setStatus(Game.STATUS_WAKEUP_SEER); break;
+      case Role.ROBBER: this.setStatus(Game.STATUS_WAKEUP_ROBBER); break;
+      case Role.TROUBLEMAKER: this.setStatus(Game.STATUS_WAKEUP_TROUBLEMAKER); break;
+      case Role.DRUNK: this.setStatus(Game.STATUS_WAKEUP_DRUNK); break;
+      case Role.INSOMNIAC: this.setStatus(Game.STATUS_WAKEUP_INSOMNIAC); break;
     }
   }
 
@@ -285,5 +268,20 @@ export class Game {
   
   private viewPlayerRole(player, msg) {
     player.getRole().notifyRole(this.bot, msg);
+  }
+
+  private handleAnnouncePlayerEvent(event: string, msg: any, player: Player) {
+    switch (event) {
+      case 'view_role': this.viewPlayerRole(player, msg); break;
+      default: this.sendInvalidActionMessage(msg.id); break;
+    }
+  }
+
+  private handleWakeUpEvent(event: string, msg: any, player: Player) {
+    if (this.getStatus() !== 'wakeup_' + player.getOriginalRole().name.toLowerCase()) {
+      return this.sendInvalidActionMessage(msg.id);
+    }
+
+    player.getOriginalRole().useAbility(this.bot, msg, this.players, this.table);
   }
 }
