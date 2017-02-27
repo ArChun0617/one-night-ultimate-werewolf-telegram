@@ -19,8 +19,6 @@ export class Robber extends Role {
     let btnPerLine = 3;
 
     _.map(players, (player: Player) => {
-      if (player.id == msg.from.id) return true;	// skip robber himself
-
       let row = pos / btnPerLine | 0;
       if (!key[row]) key[row] = [];
       key[row].push({ text: player.name, callback_data: "" + player.id });
