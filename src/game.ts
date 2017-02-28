@@ -231,7 +231,7 @@ export class Game {
     this.setWakeUpPhase(role);
 
     return new Promise((resolve, reject) => {
-      const player = _.find(this.players, (p) => p.getOriginalRole().name === role);
+      const player: Player = _.find(this.players, (p) => p.getOriginalRole().name === role);
 
       if (player) {
         player.getOriginalRole().wakeUp(this.bot, msg, this.players, this.table);
