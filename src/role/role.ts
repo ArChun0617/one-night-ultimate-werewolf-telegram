@@ -17,6 +17,9 @@ export interface RoleOptions {
 export class Role implements RoleInterface {
   emoji: string;
   name: string;
+  get fullName(): string {
+    return this.emoji + this.name;
+  }
 
   public static DOPPELGANGER:string = 'Doppelganger';
   public static WEREWOLF:string = 'Werewolf';
@@ -62,6 +65,6 @@ export class Role implements RoleInterface {
   }
 
   notifyRole(bot, msg) {
-    bot.answerCallbackQuery(msg.id, `Your role is ${this.emoji}  ${this.name}`);
+    bot.answerCallbackQuery(msg.id, `Your role is ${this.fullName}`);
   }
 }

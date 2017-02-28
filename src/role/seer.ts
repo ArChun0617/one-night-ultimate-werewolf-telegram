@@ -35,7 +35,7 @@ export class Seer extends Role implements RoleInterface {
     ]);
 
     //bot.sendMessage(msg.chat.id, `${this.emoji}  ${this.name}, wake up. You may look at another player's card or two of the center cards.`, {
-    bot.sendMessage(msg.chat.id, `${this.emoji}  ${this.name}, wake up.`, {
+    bot.sendMessage(msg.chat.id, `${this.fullName}, wake up.`, {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {
@@ -93,18 +93,18 @@ export class Seer extends Role implements RoleInterface {
 
     if (target) {
       // if target to a specific guy
-      rtnMsg = target.name + " : " + target.getRole().emoji + target.getRole().name;
+      rtnMsg = target.name + " : " + target.getRole().fullName;
     }
     else {
       switch (picked) {
         case 'CARD_AB':
-          rtnMsg = "[" + table.getLeft().emoji + table.getLeft().name + "] [" + table.getCenter().emoji + table.getCenter().name + "] [" + `${Emoji.get('question')}` + "]";
+          rtnMsg = "[" + table.getLeft().fullName + "] [" + table.getCenter().fullName + "] [" + `${Emoji.get('question')}` + "]";
           break;
         case 'CARD_AC':
-          rtnMsg = "[" + table.getLeft().emoji + table.getLeft().name + "] [" + `${Emoji.get('question')}` + "] [" + table.getRight().emoji + table.getRight().name + "]";
+          rtnMsg = "[" + table.getLeft().fullName + "] [" + `${Emoji.get('question')}` + "] [" + table.getRight().fullName + "]";
           break;
         case 'CARD_BC':
-          rtnMsg = "[" + `${Emoji.get('question')}` + "] [" + table.getCenter().emoji + table.getCenter().name + "] [" + table.getRight().emoji + table.getRight().name + "]";
+          rtnMsg = "[" + `${Emoji.get('question')}` + "] [" + table.getCenter().fullName + "] [" + table.getRight().fullName + "]";
           break;
         default:
           break;

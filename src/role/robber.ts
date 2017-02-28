@@ -27,7 +27,7 @@ export class Robber extends Role implements RoleInterface {
       pos++;
     });
 
-    bot.sendMessage(msg.chat.id, `${this.emoji}  ${this.name}, wake up.`, {
+    bot.sendMessage(msg.chat.id, `${this.fullName}, wake up.`, {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {
@@ -80,7 +80,7 @@ export class Robber extends Role implements RoleInterface {
 
     if (host && target) {
       // swap the role
-      rtnMsg = target.name + " : " + target.getRole().emoji + target.getRole().name;
+      rtnMsg = target.name + " : " + target.getRole().fullName;
       host.swapRole(target);
     }
     return rtnMsg;

@@ -23,9 +23,8 @@ export class Drunk extends Role implements RoleInterface {
         { text: "Right", callback_data: "CARD_C" }
       ]
     ];
-
-    //bot.sendMessage(msg.chat.id, `${this.emoji}  ${this.name}, wake up and look for other werewolves. If there is only one Werewolf, you may look at a card from the center.`, {
-    bot.sendMessage(msg.chat.id, `${this.emoji}  ${this.name}, wake up.`, {
+    
+    bot.sendMessage(msg.chat.id, `${this.fullName}, wake up.`, {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {

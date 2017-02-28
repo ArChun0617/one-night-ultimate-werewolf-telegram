@@ -12,13 +12,12 @@ export class Mason extends Role implements RoleInterface {
 
   wakeUp(bot, msg) {
     console.log(`${this.name} wake up called`);
-    // notify werewolf buddies
+    // notify buddies
     const key = [];
 
     key.push([{ text: "Wake Up", callback_data: "WAKE_UP" }]);
 
-    //bot.sendMessage(msg.chat.id, `${this.emoji}  ${this.name}, wake up. '${wolf.emoji}${wolf.name}', stick out your thumb so the Minion can see who you are.`, {
-    bot.sendMessage(msg.chat.id, `${this.emoji}  ${this.name}, wake up.`, {
+    bot.sendMessage(msg.chat.id, `${this.fullName}, wake up.`, {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {
@@ -39,13 +38,24 @@ export class Mason extends Role implements RoleInterface {
       });
 
       if (rtnMsg.length > 0)
-        rtnMsg = `${this.emoji}  ${this.name} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
+        rtnMsg = `${this.fullName} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
     }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
   }
 
   endTurn(bot, msg, players, table) {
+    console.log(`${this.name} endTurn`);
+    let rtnMsg: string = "";
 
+    const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().name == Role.MASON);
+    _.map(target, (player: Player) => {
+      rtnMsg += player.name + ", ";
+    });
+
+    if (rtnMsg.length > 0)
+      rtnMsg = `${this.fullName} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
+
+    bot.answerCallbackQuery(msg.id, rtnMsg);
   }
 }

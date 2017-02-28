@@ -23,20 +23,20 @@ export class Troublemaker extends Role implements RoleInterface {
 
     _.map(players, (playerFrom: Player) => {
       _.map(players, (playerTo: Player) => {
+        col++;
         if (!key[row]) key[row] = [];
         if (playerFrom.id == playerTo.id) return true;
         key[row].push({
-          text: `${(row + 1)}  ${Emoji.get('arrows_counterclockwise')}  ${(col + 1)}`,
+          text: `${(row + 1)}  ${Emoji.get('arrows_counterclockwise')}  ${(col)}`,
           callback_data: playerFrom.id + "_" + playerTo.id
         });
-        col++;
       });
       playerStr += `${(row + 1)}: ${playerFrom.name}\n`;
       col = 0;
       row++;
     });
 
-    bot.sendMessage(msg.chat.id, `${this.emoji}  ${this.name}, wake up.\n\n` + playerStr, {
+    bot.sendMessage(msg.chat.id, `${this.fullName}, wake up.\n\n` + playerStr, {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {

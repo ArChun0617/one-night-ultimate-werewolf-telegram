@@ -27,7 +27,7 @@ export class Werewolf extends Role implements RoleInterface {
     ];
 
     //bot.sendMessage(msg.chat.id, `${this.emoji}  ${this.name}, wake up and look for other werewolves. If there is only one Werewolf, you may look at a card from the center.`, {
-    bot.sendMessage(msg.chat.id, `${this.emoji}  ${this.name}, wake up.`, {
+    bot.sendMessage(msg.chat.id, `${this.fullName}, wake up.`, {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {
@@ -49,7 +49,7 @@ export class Werewolf extends Role implements RoleInterface {
       });
 
       if (rtnMsg.length > 0)
-        rtnMsg = `${this.emoji}  ${this.name} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
+        rtnMsg = `${this.fullName} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
     }
     else if ((msg.data == "CARD_A" || msg.data == "CARD_B" || msg.data == "CARD_C") && target.length == 1) {
       let rtnMsg = '';
@@ -83,7 +83,7 @@ export class Werewolf extends Role implements RoleInterface {
         });
 
         if (rtnMsg.length > 0)
-          rtnMsg = `${this.emoji}  ${this.name} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
+          rtnMsg = `${this.fullName} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
       }
       else if (target.length == 1) {
         this.choice = _.shuffle(["CARD_A", "CARD_B", "CARD_C"])[0];
@@ -103,11 +103,11 @@ export class Werewolf extends Role implements RoleInterface {
     rtnMsg = "Centre Card is :\n";
 
     if (this.choice == "CARD_A")
-      rtnMsg += "[" + table.getLeft().emoji + table.getLeft().name + "] [" + `${Emoji.get('question')}` + "] [" + `${Emoji.get('question')}` + "]";
+      rtnMsg += "[" + table.getLeft().fullName + "] [" + `${Emoji.get('question')}` + "] [" + `${Emoji.get('question')}` + "]";
     else if (this.choice == "CARD_B")
-      rtnMsg += "[" + `${Emoji.get('question')}` + "] [" + table.getCenter().emoji + table.getCenter().name + "] [?]";
+      rtnMsg += "[" + `${Emoji.get('question')}` + "] [" + table.getCenter().fullName + "] [?]";
     else if (this.choice == "CARD_C")
-      rtnMsg += "[" + `${Emoji.get('question')}` + "] [" + `${Emoji.get('question')}` + "] [" + table.getRight().emoji + table.getRight().name + "]";
+      rtnMsg += "[" + `${Emoji.get('question')}` + "] [" + `${Emoji.get('question')}` + "] [" + table.getRight().fullName + "]";
     else
       rtnMsg = "You cannot view the card in centre.";
 

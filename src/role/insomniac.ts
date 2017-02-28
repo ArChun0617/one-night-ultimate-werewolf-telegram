@@ -17,7 +17,7 @@ export class Insomniac extends Role implements RoleInterface {
       [{ text: "Wake Up", callback_data: "WAKE_UP" }]
     ];
 
-    bot.sendMessage(msg.chat.id, `${this.emoji}  ${this.name}, wake up.`, {
+    bot.sendMessage(msg.chat.id, `${this.fullName}, wake up.`, {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {
@@ -34,12 +34,19 @@ export class Insomniac extends Role implements RoleInterface {
     const target: Player = _.find(players, (player: Player) => player.id == msg.from.id);
 
     if (msg.data == "WAKE_UP")
-      rtnMsg = target.name + " is: " + target.getRole().emoji + target.getRole().name;
+      rtnMsg = target.name + " is: " + target.getRole().fullName;
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
   }
 
   endTurn(bot, msg, players, table) {
+    console.log(`${this.name} endTurn`);
+    let rtnMsg: string = "";
+    const target: Player = _.find(players, (player: Player) => player.id == msg.from.id);
 
+    if (msg.data == "WAKE_UP")
+      rtnMsg = target.name + " is: " + target.getRole().fullName;
+
+    bot.answerCallbackQuery(msg.id, rtnMsg);
   }
 }

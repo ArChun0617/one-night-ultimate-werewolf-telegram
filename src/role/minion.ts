@@ -20,7 +20,7 @@ export class Minion extends Role implements RoleInterface {
 
     let wolf: Werewolf = new Werewolf();
     //bot.sendMessage(msg.chat.id, `${this.emoji}  ${this.name}, wake up. '${wolf.emoji}${wolf.name}', stick out your thumb so the Minion can see who you are.`, {
-    bot.sendMessage(msg.chat.id, `${this.emoji}  ${this.name}, wake up.`, {
+    bot.sendMessage(msg.chat.id, `${this.fullName}, wake up.`, {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {
@@ -41,7 +41,7 @@ export class Minion extends Role implements RoleInterface {
     });
 
     if (rtnMsg.length > 0)
-      rtnMsg = `${wolf.emoji}${wolf.name} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
+      rtnMsg = `${wolf.fullName} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
   }

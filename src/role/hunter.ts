@@ -15,10 +15,12 @@ export class Hunter extends Role implements RoleInterface {
   }
 
   useAbility(bot, msg, players, table) {
+    console.log(`${this.name} useAbility:`, msg);
 
   }
 
   endTurn(bot, msg, players, table) {
+    console.log(`${this.name} endTurn`);
 
   }
 }

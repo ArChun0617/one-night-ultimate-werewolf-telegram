@@ -322,12 +322,12 @@ export class Game {
 
       result += '[WINNERS]\n';
       _.map(this.winners, (winner: Player) => {
-        result += `${winner.name}\t\t[Role] ${winner.getOriginalRole().name}\t\t >> ${winner.getRole().name}\n`;
+        result += `${winner.name}\t\t[Role] ${winner.getOriginalRole().fullName}\t\t >> ${winner.getRole().name}\t\t [Vote] ${winner.getKillTarget().name} \n`;
       });
 
       result += '[LOSERS]\n';
       _.map(this.losers, (loser: Player) => {
-        result += `${loser.name}\t\t[Role] ${loser.getOriginalRole().name}\t\t >> ${loser.getRole().name}\n`;
+        result += `${loser.name}\t\t[Role] ${loser.getOriginalRole().name}\t\t >> ${loser.getRole().name}\t\t [Vote] ${loser.getKillTarget().name} \n`;
       });
       this.bot.sendMessage(msg.chat.id, result);
       console.log('Result', result);
