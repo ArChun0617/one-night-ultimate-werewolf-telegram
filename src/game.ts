@@ -242,7 +242,7 @@ export class Game {
 
       setTimeout(() => {
         if (player)
-          player.endTurn(this.bot, msg, this.players, this.table);
+          player.getOriginalRole().endTurn(this.bot, msg, this.players, this.table);
 
         resolve();
       }, this.actionTime);
