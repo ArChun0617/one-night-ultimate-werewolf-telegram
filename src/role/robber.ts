@@ -3,6 +3,8 @@ import { Role, RoleInterface } from "./role";
 import { Player } from "../player/player";
 
 export class Robber extends Role implements RoleInterface {
+  choice: string;
+
   constructor() {
     super({
       emoji: Role.ROBBER_EMOJI,
@@ -19,8 +21,6 @@ export class Robber extends Role implements RoleInterface {
     let btnPerLine = 3;
 
     _.map(players, (player: Player) => {
-      if (player.id == msg.from.id) return true;	// skip robber himself
-
       let row = pos / btnPerLine | 0;
       if (!key[row]) key[row] = [];
       key[row].push({ text: player.name, callback_data: "" + player.id });
@@ -38,18 +38,23 @@ export class Robber extends Role implements RoleInterface {
 
   useAbility(bot, msg, players, table) {
     console.log(`${this.name} useAbility:`, msg);
-
-    let choice = msg.data;
     let rtnMsg = '';
 
-    //if (!choice) choice = msg.data;	//To lock the Seer with only one choice
-    const host: Player = _.find(players, (player: Player) => player.id == parseInt(msg.from.id));
-    const target: Player = _.find(players, (player: Player) => player.id == parseInt(choice));
+    if (this.choice) {
+      rtnMsg = "You already make your choice.";
+    }
+    else {
+      this.choice = msg.data;
 
-    if (host && target) {
-      // swap the role
-      rtnMsg = target.name + " : " + target.getRole().emoji + target.getRole().name;
-      host.swapRole(target);
+      //if (!choice) choice = msg.data;	//To lock the Seer with only one choice
+      const host: Player = _.find(players, (player: Player) => player.id == parseInt(msg.from.id));
+      const target: Player = _.find(players, (player: Player) => player.id == parseInt(this.choice));
+
+      if (host && target) {
+        // swap the role
+        rtnMsg = target.name + " : " + target.getRole().emoji + target.getRole().name;
+        host.swapRole(target);
+      }
     }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);

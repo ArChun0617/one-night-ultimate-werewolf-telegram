@@ -4,6 +4,8 @@ import { Role, RoleInterface } from "./role";
 import { Player } from "../player/player";
 
 export class Seer extends Role implements RoleInterface {
+  choice: string;
+
   constructor() {
     super({
       emoji: Role.SEER_EMOJI,
@@ -20,8 +22,6 @@ export class Seer extends Role implements RoleInterface {
     let btnPerLine = 3;
 
     _.map(players, (player: Player) => {
-      if (player.id == msg.from.id) return true;	// skip seer himself
-
       let row = pos / btnPerLine | 0;
       if (!key[row]) key[row] = [];
       key[row].push({ text: player.name, callback_data: "" + player.id });
@@ -46,31 +46,36 @@ export class Seer extends Role implements RoleInterface {
 
   useAbility(bot, msg, players, table) {
     console.log(`${this.name} useAbility:`, msg);
-
-    // TODO: avoid syntax error for testing first
-    let choice = msg.data;
     let rtnMsg = '';
 
-    //if (!choice) choice = msg.data;	//To lock the Seer with only one choice
-    const target: Player = _.find(players, (player: Player) => player.id == parseInt(choice));
-
-    if (target) {
-      // if target to a specific guy
-      rtnMsg = target.name + " : " + target.getRole().emoji + target.getRole().name;
+    if (this.choice) {
+      rtnMsg = "You already make your choice.";
     }
     else {
-      switch (choice) {
-        case 'CARD_AB':
-          rtnMsg = "[" + table.getLeft().emoji + table.getLeft().name + "] [" + table.getCenter().emoji + table.getCenter().name + "] [" + `${Emoji.get('question')}` + "]";
-          break;
-        case 'CARD_AC':
-          rtnMsg = "[" + table.getLeft().emoji + table.getLeft().name + "] [" + `${Emoji.get('question')}` + "] [" + table.getRight().emoji + table.getRight().name + "]";
-          break;
-        case 'CARD_BC':
-          rtnMsg = "[" + `${Emoji.get('question')}` + "] [" + table.getCenter().emoji + table.getCenter().name + "] [" + table.getRight().emoji + table.getRight().name + "]";
-          break;
-        default:
-          break;
+      // TODO: avoid syntax error for testing first
+      this.choice = msg.data;
+
+      //if (!choice) choice = msg.data;	//To lock the Seer with only one choice
+      const target: Player = _.find(players, (player: Player) => player.id == parseInt(this.choice));
+
+      if (target) {
+        // if target to a specific guy
+        rtnMsg = target.name + " : " + target.getRole().emoji + target.getRole().name;
+      }
+      else {
+        switch (this.choice) {
+          case 'CARD_AB':
+            rtnMsg = "[" + table.getLeft().emoji + table.getLeft().name + "] [" + table.getCenter().emoji + table.getCenter().name + "] [" + `${Emoji.get('question')}` + "]";
+            break;
+          case 'CARD_AC':
+            rtnMsg = "[" + table.getLeft().emoji + table.getLeft().name + "] [" + `${Emoji.get('question')}` + "] [" + table.getRight().emoji + table.getRight().name + "]";
+            break;
+          case 'CARD_BC':
+            rtnMsg = "[" + `${Emoji.get('question')}` + "] [" + table.getCenter().emoji + table.getCenter().name + "] [" + table.getRight().emoji + table.getRight().name + "]";
+            break;
+          default:
+            break;
+        }
       }
     }
 
