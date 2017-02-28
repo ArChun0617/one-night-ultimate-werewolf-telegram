@@ -116,8 +116,8 @@ export class Game {
     return _.find(this.players, player => player.id === id);
   }
 
-  sendVotingList(msgId) {
-    if (this.getPhase() !== Game.PHASE_CONVERSATION || this.getPhase() !== Game.PHASE_VOTING) {
+  sendVotingList(msgId: number) {
+    if (this.getPhase() !== Game.PHASE_CONVERSATION && this.getPhase() !== Game.PHASE_VOTING) {
       return this.sendInvalidActionMessage(msgId);
     }
 
@@ -231,7 +231,7 @@ export class Game {
     this.setWakeUpPhase(role);
 
     return new Promise((resolve, reject) => {
-      const player = _.find(this.players, (p) => p.getOriginalRole().name === role);
+      const player: Player = _.find(this.players, (p) => p.getOriginalRole().name === role);
 
       if (player) {
         player.getOriginalRole().wakeUp(this.bot, msg, this.players, this.table);
@@ -242,7 +242,7 @@ export class Game {
 
       setTimeout(() => {
         if (player)
-          player.endTurn(this.bot, msg, this.players, this.table);
+          player.getOriginalRole().endTurn(this.bot, msg, this.players, this.table);
 
         resolve();
       }, this.actionTime);

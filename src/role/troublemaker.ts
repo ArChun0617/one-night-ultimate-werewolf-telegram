@@ -19,16 +19,19 @@ export class Troublemaker extends Role implements RoleInterface {
     const key = [];
     let col = 0;
     let row = 0;
-    let playerStr = "";
+    let playerStr = '';
 
     _.map(players, (playerFrom: Player) => {
       _.map(players, (playerTo: Player) => {
         if (!key[row]) key[row] = [];
         if (playerFrom.id == playerTo.id) return true;
-        key[row].push({ text: (row + 1) + `${Emoji.get('arrows_counterclockwise')}` + (col + 1), callback_data: playerFrom.id + "_" + playerTo.id });
+        key[row].push({
+          text: `${(row + 1)}  ${Emoji.get('arrows_counterclockwise')}  ${(col + 1)}`,
+          callback_data: playerFrom.id + "_" + playerTo.id
+        });
         col++;
       });
-      playerStr += (row + 1) + " : " + playerFrom.name + "\n";
+      playerStr += `${(row + 1)}: ${playerFrom.name}\n`;
       col = 0;
       row++;
     });
