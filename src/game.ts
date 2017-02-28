@@ -241,7 +241,9 @@ export class Game {
       }
 
       setTimeout(() => {
-        player.endTurn(this.bot, msg, this.players, this.table);
+        if (player)
+          player.endTurn(this.bot, msg, this.players, this.table);
+
         resolve();
       }, this.actionTime);
     });
