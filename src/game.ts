@@ -381,21 +381,23 @@ export class Game {
   }
 
   private handleConversationEvent(event: string, msg: any, player: Player) {
-    // reject to vote himself
-    if (player.id === parseInt(event)) {
+    const id = parseInt(event);
+
+    if (player.id === id) {
       return this.sendInvalidActionMessage(msg.id);
     }
 
-    player.setKillTarget(_.find(this.players, p => p.id === parseInt(event)));
+    this.votePlayer(id, msg, player);
   }
 
   private handleVotingEvent(event: string, msg: any, player: Player) {
-    // reject to vote himself
-    if (player.id === parseInt(event)) {
+    const id = parseInt(event);
+
+    if (player.id === id) {
       return this.sendInvalidActionMessage(msg.id);
     }
 
-    player.setKillTarget(_.find(this.players, p => p.id === parseInt(event)));
+    this.votePlayer(id, msg, player);
   }
 
   private randomVote(player: Player) {
@@ -445,5 +447,11 @@ export class Game {
 
   private hasWerewolfOnTable() {
     return _.filter(this.players, player => player.getRole() === Role.WEREWOLF);
+  }
+
+  private votePlayer(id: number, msg, player) {
+    const target = _.find(this.players, p => p.id === id);
+    player.setKillTarget();
+    this.bot.answerCallbackQuery(msg.id, `${Emoji.get('point_up_2')}  You have vote ${target.name}`);
   }
 }
