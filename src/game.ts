@@ -376,7 +376,12 @@ export class Game {
   }
 
   private handleConversationEvent(event: string, msg: any, player: Player) {
-    
+    // reject to vote himself
+    if (player.id === parseInt(event)) {
+      return this.sendInvalidActionMessage(msg.id);
+    }
+
+    player.setKillTarget(_.find(this.players, p => p.id === parseInt(event)));
   }
 
   private handleVotingEvent(event: string, msg: any, player: Player) {
