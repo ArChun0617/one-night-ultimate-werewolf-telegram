@@ -1,9 +1,9 @@
 import * as Emoji from 'node-emoji';
 import * as _ from 'lodash';
-import { Role } from './role';
+import { Role, RoleInterface } from './role';
 import { Player } from "../player/player";
 
-export class Werewolf extends Role {
+export class Werewolf extends Role implements RoleInterface {
   constructor() {
     super({
       emoji: Role.WEREWOLF_EMOJI,
@@ -66,5 +66,9 @@ export class Werewolf extends Role {
     }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
+  }
+
+  endTurn(bot, msg, players, table) {
+
   }
 }

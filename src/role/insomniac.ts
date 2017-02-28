@@ -1,8 +1,8 @@
 import * as _ from 'lodash';
-import { Role } from "./role";
+import { Role, RoleInterface } from "./role";
 import { Player } from "../player/player";
 
-export class Insomniac extends Role {
+export class Insomniac extends Role implements RoleInterface {
   constructor() {
     super({
       emoji: Role.INSOMNIAC_EMOJI,
@@ -37,5 +37,9 @@ export class Insomniac extends Role {
       rtnMsg = target.name + " is: " + target.getRole().emoji + target.getRole().name;
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
+  }
+
+  endTurn(bot, msg, players, table) {
+
   }
 }

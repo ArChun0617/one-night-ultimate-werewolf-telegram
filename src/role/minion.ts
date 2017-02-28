@@ -1,9 +1,9 @@
 import * as _ from 'lodash';
-import { Role } from "./role";
+import { Role, RoleInterface } from "./role";
 import { Werewolf } from "./werewolf";
 import { Player } from "../player/player";
 
-export class Minion extends Role {
+export class Minion extends Role implements RoleInterface {
   constructor() {
     super({
       emoji: Role.MINION_EMOJI,
@@ -44,5 +44,9 @@ export class Minion extends Role {
       rtnMsg = `${wolf.emoji}${wolf.name} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
+  }
+
+  endTurn(bot, msg, players, table) {
+
   }
 }

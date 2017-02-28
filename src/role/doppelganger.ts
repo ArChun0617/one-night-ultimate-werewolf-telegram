@@ -1,6 +1,6 @@
-import { Role } from "./role";
+import { Role, RoleInterface } from "./role";
 
-export class Doppelganger extends Role {
+export class Doppelganger extends Role implements RoleInterface {
   constructor() {
     super({
       emoji: Role.DOPPELGANGER_EMOJI,
@@ -12,5 +12,13 @@ export class Doppelganger extends Role {
     console.log(`${this.name} wake up called`);
     // clone a user
     // apply that role ability
+  }
+
+  useAbility(bot, msg, players, table) {
+
+  }
+
+  endTurn(bot, msg, players, table) {
+
   }
 }
