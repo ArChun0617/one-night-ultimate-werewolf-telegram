@@ -14,7 +14,7 @@ export interface RoleOptions {
   name: string;
 }
 
-export class Role {
+export class Role implements RoleInterface {
   emoji: string;
   name: string;
 
@@ -47,6 +47,18 @@ export class Role {
   constructor(options: RoleOptions) {
     this.emoji = options.emoji;
     this.name = options.name;
+  }
+
+  wakeUp(bot, msg, players, table) {
+    throw new Error('WakeUp function does not implemented');
+  }
+
+  useAbility(bot, msg, players, table) {
+    throw new Error('UseAbility function does not implemented');
+  }
+
+  endTurn(bot, msg, players, table) {
+    throw new Error('UseAbility function does not implemented');
   }
 
   notifyRole(bot, msg) {
