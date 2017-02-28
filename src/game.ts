@@ -236,8 +236,8 @@ export class Game {
       if (player) {
         player.getOriginalRole().wakeUp(this.bot, msg, this.players, this.table);
       } else {
-        const npc = _.find(this.table.getRoles(), (r: Role) => r.name === role);
-        npc.wakeUp(this.bot, msg, this.players, this.table);
+        const tableCards = _.find(this.table.getRoles(), (r: Role) => r.name === role);
+        tableCards.wakeUp(this.bot, msg, this.players, this.table);
       }
 
       setTimeout(() => {
