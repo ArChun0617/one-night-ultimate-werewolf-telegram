@@ -4,6 +4,8 @@ import { Role } from './role';
 import { Player } from "../player/player";
 
 export class Werewolf extends Role {
+  choice: string;
+
   constructor() {
     super({
       emoji: Role.WEREWOLF_EMOJI,
@@ -50,16 +52,23 @@ export class Werewolf extends Role {
         rtnMsg = `${this.emoji}  ${this.name} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
     }
     else if ((msg.data == "CARD_A" || msg.data == "CARD_B" || msg.data == "CARD_C") && target.length == 1) {
-      rtnMsg = "Centre Card is :\n";
+      let rtnMsg = '';
 
-      if (msg.data == "CARD_A")
-        rtnMsg += "[" + table.getLeft().emoji + table.getLeft().name + "] [" + `${Emoji.get('question')}` + "] [" + `${Emoji.get('question')}` + "]";
-      else if (msg.data == "CARD_B")
-        rtnMsg += "[" + `${Emoji.get('question')}` + "] [" + table.getCenter().emoji + table.getCenter().name + "] [?]";
-      else if (msg.data == "CARD_C")
-        rtnMsg += "[" + `${Emoji.get('question')}` + "] [" + `${Emoji.get('question')}` + "] [" + table.getRight().emoji + table.getRight().name + "]";
-      else
-        rtnMsg = "You cannot view the card in centre.";
+      if (this.choice) {
+        rtnMsg = "You already make your choice.";
+      }
+      else {
+        rtnMsg = "Centre Card is :\n";
+
+        if (msg.data == "CARD_A")
+          rtnMsg += "[" + table.getLeft().emoji + table.getLeft().name + "] [" + `${Emoji.get('question')}` + "] [" + `${Emoji.get('question')}` + "]";
+        else if (msg.data == "CARD_B")
+          rtnMsg += "[" + `${Emoji.get('question')}` + "] [" + table.getCenter().emoji + table.getCenter().name + "] [?]";
+        else if (msg.data == "CARD_C")
+          rtnMsg += "[" + `${Emoji.get('question')}` + "] [" + `${Emoji.get('question')}` + "] [" + table.getRight().emoji + table.getRight().name + "]";
+        else
+          rtnMsg = "You cannot view the card in centre.";
+      }
     }
     else {
       rtnMsg = "You cannot view the card.";
