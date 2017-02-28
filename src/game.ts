@@ -240,7 +240,10 @@ export class Game {
         npc.wakeUp(this.bot, msg, this.players, this.table);
       }
 
-      setTimeout(() => resolve(), this.actionTime);
+      setTimeout(() => {
+        player.endTurn(this.bot, msg, this.players, this.table);
+        resolve();
+      }, this.actionTime);
     });
   }
 
