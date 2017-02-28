@@ -102,18 +102,40 @@ export class Game {
     if (!this.getPlayer(player.id)) {
       this.players.push(player);
     }
-	
-    let rtnMsg: string = "";
+
+    let rtnMsg: string = '';
     _.map(this.players, (player: Player) => {
-		rtnMsg += player.name + "\n";
+      rtnMsg += `${player.name} \n`;
     });
-	
-    this.bot.sendMessage(msg.chat.id, "Player joined: " + rtnMsg);
-	console.log(this.players);
+
+    this.bot.sendMessage(msg.chat.id, `Player joined: \n ${rtnMsg}`);
+    console.log(this.players);
   }
 
   getPlayer(id: number) {
     return _.find(this.players, player => player.id === id);
+  }
+
+  sendVotingList(msgId) {
+    if (this.getPhase() !== Game.PHASE_CONVERSATION || this.getPhase() !== Game.PHASE_VOTING) {
+      return this.sendInvalidActionMessage(msgId);
+    }
+
+    const key = [];
+    let pos = 0;
+
+    _.map(this.players, (player: Player) => {
+      let row = pos / this.btnPerLine | 0;
+      if (!key[row]) key[row] = [];
+      key[row].push({ text: player.name, callback_data: `${player.id}` });
+      pos++;
+    });
+
+    this.bot.sendMessage(msgId,
+      `${Emoji.get('point_up_2')}  Voting list`,
+      {
+        reply_markup: JSON.stringify({ inline_keyboard: key })
+      });
   }
 
   on(event, msg) {
@@ -239,23 +261,9 @@ export class Game {
     this.setPhase(Game.PHASE_VOTING);
 
     return new Promise((resolve, reject) => {
-      const key = [];
-      let pos = 0;
+      this.bot.sendMessage(msg.chat.id,`${Emoji.get('alarm_clock')}  Time\'s up. Everyone please vote.`);
 
-      _.map(this.players, (player: Player) => {
-        if (player.id === msg.from.id) return;	// skip himself
-
-        let row = pos / this.btnPerLine | 0;
-        if (!key[row]) key[row] = [];
-        key[row].push({ text: player.name, callback_data: `${player.id}` });
-        pos++;
-      });
-
-      this.bot.sendMessage(msg.chat.id,
-        `${Emoji.get('point_up_2')}  Time\'s up. Everyone please vote.`,
-        {
-          reply_markup: JSON.stringify({ inline_keyboard: key })
-        });
+      this.sendVotingList(msg.chat.id);
 
       setTimeout(() => {
         // make sure every vote a player, random vote if needed
@@ -347,7 +355,7 @@ export class Game {
   private sendInvalidActionMessage(msgId) {
     return this.bot.answerCallbackQuery(msgId, `${Emoji.get('middle_finger')}  Hey! Stop doing that!`);
   }
-  
+
   private viewPlayerRole(player, msg) {
     player.getRole().notifyRole(this.bot, msg);
   }
@@ -372,6 +380,11 @@ export class Game {
   }
 
   private handleVotingEvent(event: string, msg: any, player: Player) {
+    // reject to vote himself
+    if (player.id === parseInt(event)) {
+      return this.sendInvalidActionMessage(msg.id);
+    }
+
     player.setKillTarget(_.find(this.players, p => p.id === parseInt(event)));
   }
 
