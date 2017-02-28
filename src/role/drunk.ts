@@ -1,5 +1,4 @@
 import * as _ from 'lodash';
-import { Role } from "./role";
 import { Role, RoleInterface } from "./role";
 import { Player } from "../player/player";
 
