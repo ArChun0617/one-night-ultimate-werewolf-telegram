@@ -251,6 +251,12 @@ export class Game {
         pos++;
       });
 
+      this.bot.sendMessage(msg.chat.id,
+        `${Emoji.get('point_up_2')}  Time\'s up. Everyone please vote.`,
+        {
+          reply_markup: JSON.stringify({ inline_keyboard: key })
+        });
+
       setTimeout(() => {
         // make sure every vote a player, random vote if needed
         _.map(this.players, (player) => {
