@@ -6,7 +6,7 @@ import { Role } from "./src/role/role";
 import { Player } from "./src/player/player";
 
 const games = [];
-const token = process.env.BOT_TOKEN || '331592410:AAHy9uA7PLWBHmIcNcyNt78hT6XLarrOjHM';
+const token = process.env.BOT_TOKEN || '312958690:AAHFt5195080aCBqF3P4Hi89ShnfKe862JI';
 const bot = new TelegramBot(token, { polling: true });
 
 bot.onText(/\/newgame/, (msg) => {
