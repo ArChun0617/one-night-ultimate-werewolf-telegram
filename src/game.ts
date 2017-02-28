@@ -116,8 +116,8 @@ export class Game {
     return _.find(this.players, player => player.id === id);
   }
 
-  sendVotingList(msgId) {
-    if (this.getPhase() !== Game.PHASE_CONVERSATION || this.getPhase() !== Game.PHASE_VOTING) {
+  sendVotingList(msgId: number) {
+    if (this.getPhase() !== Game.PHASE_CONVERSATION && this.getPhase() !== Game.PHASE_VOTING) {
       return this.sendInvalidActionMessage(msgId);
     }
 
