@@ -56,12 +56,11 @@ export class Drunk extends Role implements RoleInterface {
     bot.answerCallbackQuery(msg.id, rtnMsg);
   }
 
-  endTurn(bot, msg, players, table) {
+  endTurn(bot, msg, players, table, host) {
     console.log(`${this.name} endTurn`);
     let rtnMsg = "";
 
     if (!this.choice) {
-      const host: Player = _.find(players, (player: Player) => player.id == parseInt(msg.from.id));
       this.choice = _.shuffle(["CARD_A", "CARD_B", "CARD_C"])[0];
       rtnMsg = this.swapTable(this.choice, host, table);
 

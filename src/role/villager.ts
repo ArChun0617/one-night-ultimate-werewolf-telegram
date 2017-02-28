@@ -18,7 +18,7 @@ export class Villager extends Role implements RoleInterface {
     
   }
 
-  endTurn(bot, msg, players, table) {
+  endTurn(bot, msg, players, table, host) {
     console.log(`${this.name} endTurn`);
 
   }

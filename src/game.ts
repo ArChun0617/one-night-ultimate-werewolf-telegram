@@ -242,7 +242,7 @@ export class Game {
 
       setTimeout(() => {
         if (player)
-          player.getOriginalRole().endTurn(this.bot, msg, this.players, this.table);
+          player.getOriginalRole().endTurn(this.bot, msg, this.players, this.table, player);
 
         resolve();
       }, this.actionTime);
@@ -399,8 +399,7 @@ export class Game {
   }
 
   private randomVote(player: Player) {
-    const id: number = _.random(0, this.players.length - 1);
-    player.setKillTarget(_.find(this.players, p => p.id === id));
+    player.setKillTarget(this.players[_.random(0, this.players.length - 1)]);
   }
 
   private determineWinners() {

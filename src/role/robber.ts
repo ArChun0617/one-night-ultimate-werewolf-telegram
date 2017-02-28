@@ -54,12 +54,11 @@ export class Robber extends Role implements RoleInterface {
     bot.answerCallbackQuery(msg.id, rtnMsg);
   }
 
-  endTurn(bot, msg, players, table) {
+  endTurn(bot, msg, players, table, host) {
     console.log(`${this.name} endTurn`);
     let rtnMsg = "";
 
     if (!this.choice) {
-      const host: Player = _.find(players, (player: Player) => player.id == parseInt(msg.from.id));
       const key = [];
       _.map(players, (player: Player) => {
         if (player.id !== host.id)

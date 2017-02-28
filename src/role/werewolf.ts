@@ -69,7 +69,7 @@ export class Werewolf extends Role implements RoleInterface {
     bot.answerCallbackQuery(msg.id, rtnMsg);
   }
 
-  endTurn(bot, msg, players, table) {
+  endTurn(bot, msg, players, table, host) {
     // TODO: avoid syntax error for testing first
     console.log(`${this.name} endTurn`);
     let rtnMsg = "";

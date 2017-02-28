@@ -39,13 +39,12 @@ export class Insomniac extends Role implements RoleInterface {
     bot.answerCallbackQuery(msg.id, rtnMsg);
   }
 
-  endTurn(bot, msg, players, table) {
+  endTurn(bot, msg, players, table, host) {
     console.log(`${this.name} endTurn`);
     let rtnMsg: string = "";
-    const target: Player = _.find(players, (player: Player) => player.id == msg.from.id);
 
     if (msg.data == "WAKE_UP")
-      rtnMsg = target.name + " is: " + target.getRole().fullName;
+      rtnMsg = host.name + " is: " + host.getRole().fullName;
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
   }

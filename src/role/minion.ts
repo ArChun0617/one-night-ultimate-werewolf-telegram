@@ -46,7 +46,7 @@ export class Minion extends Role implements RoleInterface {
     bot.answerCallbackQuery(msg.id, rtnMsg);
   }
 
-  endTurn(bot, msg, players, table) {
+  endTurn(bot, msg, players, table, host) {
 
   }
 }

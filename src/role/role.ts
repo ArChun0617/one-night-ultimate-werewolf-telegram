@@ -1,11 +1,13 @@
 import * as Emoji from 'node-emoji';
+import { Player } from "../player/player";
+import { Table } from "../npc/table";
 
 export interface RoleInterface {
   emoji: string;
   name: string;
-  wakeUp(bot, msg, players, table);
-  useAbility(bot, msg, players, table);
-  endTurn(bot, msg, players, table);
+  wakeUp(bot, msg, players: Player[], table: Table);
+  useAbility(bot, msg, players: Player[], table: Table);
+  endTurn(bot, msg, players: Player[], table, host: Player);
   notifyRole(bot, msg);
 }
 
@@ -60,7 +62,7 @@ export class Role implements RoleInterface {
     throw new Error('UseAbility function does not implemented');
   }
 
-  endTurn(bot, msg, players, table) {
+  endTurn(bot, msg, players, table, host) {
     throw new Error('UseAbility function does not implemented');
   }
 
