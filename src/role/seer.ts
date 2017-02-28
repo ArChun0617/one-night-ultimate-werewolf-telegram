@@ -1,9 +1,9 @@
 import * as Emoji from 'node-emoji';
 import * as _ from 'lodash';
-import { Role } from "./role";
+import { Role, RoleInterface } from "./role";
 import { Player } from "../player/player";
 
-export class Seer extends Role {
+export class Seer extends Role implements RoleInterface {
   choice: string;
 
   constructor() {
@@ -80,5 +80,9 @@ export class Seer extends Role {
     }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
+  }
+
+  endTurn(bot, msg, players, table) {
+
   }
 }

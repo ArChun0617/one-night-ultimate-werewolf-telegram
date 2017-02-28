@@ -45,28 +45,28 @@ bot.onText(/\/newgame/, (msg) => {
 });
 
 bot.onText(/\/join/, (msg) => {
-  const game = _.find(games, (g) => g.id === msg.chat.id);
+  const game = getGame(msg.chat.id);
+
+  if (!game) return askForCreateNewGame(msg.chat.id);
+
+  // validation game isStarted
+  if (game.isStarted()) return bot.sendMessage(
+    msg.chat.id,
+    `${Emoji.get('no_entry_sign')}  Sorry. The game has been started, please wait until next game`
+  );
+
   const player = new Player({
     id: msg.from.id,
     name: msg.from.first_name
   });
-  
-  if (!game) {
-    bot.sendMessage(msg.chat.id, `${Emoji.get('bomb')}  Sorry. Please create a new game (/newgame)`);
-    return;
-  }
 
-  // validation game isStarted
   game.addPlayer(msg, player);
 });
 
 bot.onText(/\/start/, (msg) => {
-  const game = _.find(games, (g) => g.id === msg.chat.id);
+  const game = getGame(msg.chat.id);
 
-  if (!game) {
-    bot.sendMessage(msg.chat.id, `${Emoji.get('bomb')}  Sorry. Please create a new game (/newgame)`);
-    return;
-  }
+  if (!game) return askForCreateNewGame(msg.chat.id);
 
   // TODO: hardcode to add dummy players
   if (game.players.length < 6)
@@ -88,23 +88,27 @@ bot.onText(/\/killgame/, (msg) => {
   killGame(msg.chat.id);
 });
 
+bot.onText(/\/vote/, (msg) => {
+  const game = _.find(games, (g) => g.id === msg.chat.id);
+
+  if (!game) return askForCreateNewGame(msg.chat.id);
+
+  game.sendVotingList(msg.chat.id);
+});
+
 bot.on('callback_query', (msg) => {
   // find the user and callback the Game on handler
-  const game = _.find(games, game => game.getPlayer(msg.from.id));
-  if (!game) {
-    bot.answerCallbackQuery(msg.id, `${Emoji.get('middle_finger')}  Hey! Stop doing that!`);
-    return;
-  }
+  const game = getGame(msg.message.chat.id);
+
+  if (!game) return askForCreateNewGame(msg.message.chat.id);
+
   game.on(msg.data, msg);
 });
 
 bot.onText(/\/show/, (msg, match) => {
-  const game = _.find(games, (g) => g.id === msg.chat.id);
+  const game = getGame(msg.chat.id);
 
-  if (!game) {
-    bot.sendMessage(msg.chat.id, `${Emoji.get('bomb')}  Sorry. Please create a new game (/newgame)`);
-    return;
-  }
+  if (!game) return askForCreateNewGame(msg.chat.id);
 
   game.show();
 });
@@ -113,59 +117,12 @@ function killGame(id: number) {
   _.remove(games, (game: Game) => game.id === id);
 }
 
-console.log('Server is on ...');
+function getGame(id: number) {
+  return _.find(games, (game) => game.id === id);
+}
 
-// bot.onText(/\/show/, (msg, match) => {
-//   const options = {
-//     reply_markup: JSON.stringify({
-//       inline_keyboard: [
-//         [{ text: 'Some button text 1', callback_data: '1' }],
-//         [{ text: 'Some button text 2', callback_data: '2' }],
-//         [{ text: 'Some button text 3', callback_data: '3' }]
-//       ]
-//     })
-//   };
-//   bot.sendMessage(msg.chat.id, 'Some text giving three inline buttons', options)
-//     .then((sended) => {
-//       // `sended` is the sent message.
-//       console.log('sended', sended);
-//     });
-// });
+function askForCreateNewGame(msgId: number) {
+  return bot.sendMessage(msgId, `${Emoji.get('bomb')}  Sorry. Please create a new game (/newgame)`);
+}
 
-// Inline button callback queries
-// bot.on('callback_query', (msg) => {
-//   console.log(msg); // msg.data refers to the callback_data
-//   bot.answerCallbackQuery(msg.chat.id, 'Ok, here ya go!');
-// });
-
-//收到/cal開頭的訊息時會觸發這段程式
-// bot.onText(/\/cal (.+)/, (msg, match) => {
-//   const fromId = msg.from.id; //用戶的ID
-//   let resp = match[1].replace(/[^-()\d/*+.]/g, '');
-//
-//   console.log(fromId + ":" + resp);
-//
-//   // match[1]的意思是 /cal 後面的所有內容
-//   resp = '計算結果為: ' + eval(resp);
-//   // eval是用作執行計算的function
-//   bot.sendMessage(fromId, resp); //發送訊息的function
-// });
-
-// bot.onText(/(.+)/, (msg, match) => {
-//   const fromId = msg.from.id; //用戶的ID	
-//   console.log(fromId + ":" + match[1]);
-//   bot.sendMessage(fromId, match[1]); //發送訊息的function
-// });
-
-// bot.on("inline_query", (query) => {
-//   bot.answerInlineQuery(query.id, [
-//     {
-//       type: "article",
-//       id: "testarticle",
-//       title: "Hello world",
-//       input_message_content: {
-//         message_text: "Hello, world! This was sent from my super cool inline bot."
-//       }
-//     }
-//   ]);
-// });
+console.log(`${Emoji.get('robot_face')}  Hi! I am up`);

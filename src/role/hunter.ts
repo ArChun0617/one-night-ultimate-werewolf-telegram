@@ -1,6 +1,6 @@
-import { Role } from "./role";
+import { Role, RoleInterface } from "./role";
 
-export class Hunter extends Role {
+export class Hunter extends Role implements RoleInterface {
   constructor() {
     super({
       emoji: Role.HUNTER_EMOJI,
@@ -12,5 +12,13 @@ export class Hunter extends Role {
     console.log(`${this.name} wake up called`);
     // use only on vote phrase
     // kill the people when user vote
+  }
+
+  useAbility(bot, msg, players, table) {
+
+  }
+
+  endTurn(bot, msg, players, table) {
+
   }
 }

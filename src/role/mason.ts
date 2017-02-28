@@ -1,8 +1,8 @@
 import * as _ from 'lodash';
-import { Role } from "./role";
+import { Role, RoleInterface } from "./role";
 import { Player } from "../player/player";
 
-export class Mason extends Role {
+export class Mason extends Role implements RoleInterface {
   constructor() {
     super({
       emoji: Role.MASON_EMOJI,
@@ -43,5 +43,9 @@ export class Mason extends Role {
     }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
+  }
+
+  endTurn(bot, msg, players, table) {
+
   }
 }

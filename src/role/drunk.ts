@@ -1,8 +1,9 @@
 import * as _ from 'lodash';
 import { Role } from "./role";
+import { Role, RoleInterface } from "./role";
 import { Player } from "../player/player";
 
-export class Drunk extends Role {
+export class Drunk extends Role implements RoleInterface {
   choice: string;
 
   constructor() {
@@ -79,5 +80,9 @@ export class Drunk extends Role {
     }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
+  }
+
+  endTurn(bot, msg, players, table) {
+
   }
 }
