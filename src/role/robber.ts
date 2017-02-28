@@ -48,19 +48,41 @@ export class Robber extends Role implements RoleInterface {
 
       //if (!choice) choice = msg.data;	//To lock the Seer with only one choice
       const host: Player = _.find(players, (player: Player) => player.id == parseInt(msg.from.id));
-      const target: Player = _.find(players, (player: Player) => player.id == parseInt(this.choice));
-
-      if (host && target) {
-        // swap the role
-        rtnMsg = target.name + " : " + target.getRole().emoji + target.getRole().name;
-        host.swapRole(target);
-      }
+      rtnMsg = this.swapPlayer(this.choice, host, players);
     }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
   }
 
   endTurn(bot, msg, players, table) {
+    console.log(`${this.name} endTurn`);
+    let rtnMsg = "";
 
+    if (!this.choice) {
+      const host: Player = _.find(players, (player: Player) => player.id == parseInt(msg.from.id));
+      const key = [];
+      _.map(players, (player: Player) => {
+        if (player.id !== host.id)
+          key.push({ text: player.name, callback_data: "" + player.id });
+      });
+
+      this.choice = _.shuffle(key)[0];
+      rtnMsg = this.swapPlayer(this.choice, host, players);
+
+      bot.answerCallbackQuery(msg.id, rtnMsg);
+    }
+  }
+
+  private swapPlayer(picked: string, host, players) {
+    let tableRole: Role;
+    let rtnMsg = "";
+    const target: Player = _.find(players, (player: Player) => player.id == parseInt(this.choice));
+
+    if (host && target) {
+      // swap the role
+      rtnMsg = target.name + " : " + target.getRole().emoji + target.getRole().name;
+      host.swapRole(target);
+    }
+    return rtnMsg;
   }
 }

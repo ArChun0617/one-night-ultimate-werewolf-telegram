@@ -52,28 +52,52 @@ export class Troublemaker extends Role implements RoleInterface {
     else {
       this.choice = msg.data;
       let chosenPlayer = this.choice.split('_');
-      let rtnMsg = '';
 
-      if (msg.from.id == parseInt(chosenPlayer[0]) || msg.from.id == parseInt(chosenPlayer[1])) {
+      if (msg.from.id == parseInt(chosenPlayer[0]) || msg.from.id == parseInt(chosenPlayer[1]))
         rtnMsg = "Buddy, You cannot choose yourself.";
-      }
-      else {
-        //if (!choice) choice = msg.data;	//To lock the Seer with only one choice
-        const host: Player = _.find(players, (player: Player) => player.id == parseInt(chosenPlayer[0]));
-        const target: Player = _.find(players, (player: Player) => player.id == parseInt(chosenPlayer[1]));
-
-        if (host && target) {
-          // swap the role
-          rtnMsg = host.name + `${Emoji.get('arrows_counterclockwise')}` + target.name;
-          host.swapRole(target);
-        }
-      }
+      else
+        rtnMsg = this.swapPlayers(this.choice, players);
     }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
   }
 
   endTurn(bot, msg, players, table) {
+    console.log(`${this.name} endTurn`);
+    let rtnMsg = "";
 
+    if (!this.choice) {
+      const key = [];
+      _.map(players, (playerFrom: Player) => {
+        if (playerFrom.id == parseInt(msg.from.id)) return true;
+        _.map(players, (playerTo: Player) => {
+          if (playerTo.id == parseInt(msg.from.id)) return true;
+          if (playerFrom.id == playerTo.id) return true;
+          key.push(playerFrom.id + "_" + playerTo.id);
+        });
+      });
+
+      this.choice = _.shuffle(key)[0];
+      rtnMsg = this.swapPlayers(this.choice, players);
+
+      bot.answerCallbackQuery(msg.id, rtnMsg);
+    }
+  }
+
+  private swapPlayers(picked: string, players) {
+    let tableRole: Role;
+    let rtnMsg = "";
+    let chosenPlayer = picked.split('_');
+
+    //if (!choice) choice = msg.data;	//To lock the Seer with only one choice
+    const host: Player = _.find(players, (player: Player) => player.id == parseInt(chosenPlayer[0]));
+    const target: Player = _.find(players, (player: Player) => player.id == parseInt(chosenPlayer[1]));
+
+    if (host && target) {
+      // swap the role
+      rtnMsg = host.name + `${Emoji.get('arrows_counterclockwise')}` + target.name;
+      host.swapRole(target);
+    }
+    return rtnMsg;
   }
 }

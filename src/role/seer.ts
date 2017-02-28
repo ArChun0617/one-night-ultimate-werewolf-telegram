@@ -54,35 +54,63 @@ export class Seer extends Role implements RoleInterface {
     else {
       // TODO: avoid syntax error for testing first
       this.choice = msg.data;
-
-      //if (!choice) choice = msg.data;	//To lock the Seer with only one choice
-      const target: Player = _.find(players, (player: Player) => player.id == parseInt(this.choice));
-
-      if (target) {
-        // if target to a specific guy
-        rtnMsg = target.name + " : " + target.getRole().emoji + target.getRole().name;
-      }
-      else {
-        switch (this.choice) {
-          case 'CARD_AB':
-            rtnMsg = "[" + table.getLeft().emoji + table.getLeft().name + "] [" + table.getCenter().emoji + table.getCenter().name + "] [" + `${Emoji.get('question')}` + "]";
-            break;
-          case 'CARD_AC':
-            rtnMsg = "[" + table.getLeft().emoji + table.getLeft().name + "] [" + `${Emoji.get('question')}` + "] [" + table.getRight().emoji + table.getRight().name + "]";
-            break;
-          case 'CARD_BC':
-            rtnMsg = "[" + `${Emoji.get('question')}` + "] [" + table.getCenter().emoji + table.getCenter().name + "] [" + table.getRight().emoji + table.getRight().name + "]";
-            break;
-          default:
-            break;
-        }
-      }
+      rtnMsg = this.watchRole(this.choice, players, table);
     }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
   }
 
   endTurn(bot, msg, players, table) {
+    console.log(`${this.name} endTurn`);
+    let rtnMsg = "";
+    const host: Player = _.find(players, (player: Player) => player.id == parseInt(msg.from.id));
 
+    if (!this.choice) {
+      const key = [];
+
+      _.map(players, (player: Player) => {
+        if (player.id !== host.id)
+          key.push({ text: player.name, callback_data: "" + player.id });
+      });
+
+      key.push([
+        { text: "Left & Middle", callback_data: "CARD_AB" },
+        { text: "Left & Right", callback_data: "CARD_AC" },
+        { text: "Middle & Right", callback_data: "CARD_BC" }
+      ]);
+
+      this.choice = _.shuffle(key)[0];
+      rtnMsg = this.watchRole(this.choice, players, table);
+
+      bot.answerCallbackQuery(msg.id, rtnMsg);
+    }
+  }
+
+  private watchRole(picked: string, players, table) {
+    let rtnMsg = "";
+
+    const target: Player = _.find(players, (player: Player) => player.id == parseInt(picked));
+
+    if (target) {
+      // if target to a specific guy
+      rtnMsg = target.name + " : " + target.getRole().emoji + target.getRole().name;
+    }
+    else {
+      switch (picked) {
+        case 'CARD_AB':
+          rtnMsg = "[" + table.getLeft().emoji + table.getLeft().name + "] [" + table.getCenter().emoji + table.getCenter().name + "] [" + `${Emoji.get('question')}` + "]";
+          break;
+        case 'CARD_AC':
+          rtnMsg = "[" + table.getLeft().emoji + table.getLeft().name + "] [" + `${Emoji.get('question')}` + "] [" + table.getRight().emoji + table.getRight().name + "]";
+          break;
+        case 'CARD_BC':
+          rtnMsg = "[" + `${Emoji.get('question')}` + "] [" + table.getCenter().emoji + table.getCenter().name + "] [" + table.getRight().emoji + table.getRight().name + "]";
+          break;
+        default:
+          break;
+      }
+    }
+
+    return rtnMsg;
   }
 }

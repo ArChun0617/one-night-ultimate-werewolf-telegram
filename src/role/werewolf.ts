@@ -58,16 +58,8 @@ export class Werewolf extends Role implements RoleInterface {
         rtnMsg = "You already make your choice.";
       }
       else {
-        rtnMsg = "Centre Card is :\n";
-
-        if (msg.data == "CARD_A")
-          rtnMsg += "[" + table.getLeft().emoji + table.getLeft().name + "] [" + `${Emoji.get('question')}` + "] [" + `${Emoji.get('question')}` + "]";
-        else if (msg.data == "CARD_B")
-          rtnMsg += "[" + `${Emoji.get('question')}` + "] [" + table.getCenter().emoji + table.getCenter().name + "] [?]";
-        else if (msg.data == "CARD_C")
-          rtnMsg += "[" + `${Emoji.get('question')}` + "] [" + `${Emoji.get('question')}` + "] [" + table.getRight().emoji + table.getRight().name + "]";
-        else
-          rtnMsg = "You cannot view the card in centre.";
+        this.choice = msg.data;
+        rtnMsg = this.watchTable(this.choice, table);
       }
     }
     else {
@@ -78,6 +70,47 @@ export class Werewolf extends Role implements RoleInterface {
   }
 
   endTurn(bot, msg, players, table) {
+    // TODO: avoid syntax error for testing first
+    console.log(`${this.name} endTurn`);
+    let rtnMsg = "";
 
+    if (!this.choice) {
+      const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().name == Role.WEREWOLF);
+
+      if (target.length > 1) {
+        _.map(target, (player: Player) => {
+          rtnMsg += player.name + ", ";
+        });
+
+        if (rtnMsg.length > 0)
+          rtnMsg = `${this.emoji}  ${this.name} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
+      }
+      else if (target.length == 1) {
+        this.choice = _.shuffle(["CARD_A", "CARD_B", "CARD_C"])[0];
+        rtnMsg = this.watchTable(this.choice, table);
+      }
+      else {
+        // unreachable for no wolf
+      }
+
+      bot.answerCallbackQuery(msg.id, rtnMsg);
+    }
+  }
+
+  private watchTable(picked: string, table) {
+    let rtnMsg: string = "";
+
+    rtnMsg = "Centre Card is :\n";
+
+    if (this.choice == "CARD_A")
+      rtnMsg += "[" + table.getLeft().emoji + table.getLeft().name + "] [" + `${Emoji.get('question')}` + "] [" + `${Emoji.get('question')}` + "]";
+    else if (this.choice == "CARD_B")
+      rtnMsg += "[" + `${Emoji.get('question')}` + "] [" + table.getCenter().emoji + table.getCenter().name + "] [?]";
+    else if (this.choice == "CARD_C")
+      rtnMsg += "[" + `${Emoji.get('question')}` + "] [" + `${Emoji.get('question')}` + "] [" + table.getRight().emoji + table.getRight().name + "]";
+    else
+      rtnMsg = "You cannot view the card in centre.";
+
+    return rtnMsg;
   }
 }
