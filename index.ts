@@ -75,8 +75,8 @@ bot.onText(/\/start/, (msg) => {
 
   game.start(msg)
     .then(() => {
-      console.log('Kill Game', game.id);
-      killGame(game.id);
+      console.log('Kill Game', msg.chat.id);
+      killGame(msg.chat.id);
     })
     .catch((error) => {
       console.log(`Error ${error}`);
@@ -135,7 +135,7 @@ console.log('Server is on ...');
 // Inline button callback queries
 // bot.on('callback_query', (msg) => {
 //   console.log(msg); // msg.data refers to the callback_data
-//   bot.answerCallbackQuery(msg.id, 'Ok, here ya go!');
+//   bot.answerCallbackQuery(msg.chat.id, 'Ok, here ya go!');
 // });
 
 //收到/cal開頭的訊息時會觸發這段程式
