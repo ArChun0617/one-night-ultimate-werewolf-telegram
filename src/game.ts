@@ -71,10 +71,18 @@ export class Game {
     return this.prepareDeck()
       .then(() => console.log(`Announce player role`))
       .then(() => this.announcePlayerRole(msg))
+      .then(() => {
+        // debug
+        console.log('[announcePlayerRole]');
+        console.log('[Deck]', this.deck);
+        console.log('[Table]', this.table);
+        console.log('[Players]', this.players);
+      })
       .then(() => console.log(`Start night`))
       .then(() => this.startNight(msg))
       .then(() => {
         // debug
+        console.log('[startDay]');
         console.log('[Deck]', this.deck);
         console.log('[Table]', this.table);
         console.log('[Players]', this.players);
@@ -254,7 +262,7 @@ export class Game {
 
     this.bot.sendMessage(
       msg.chat.id,
-      `${Emoji.get('hourglass_flowing_sand')}  Everyone wake up, you have 10mins to discuss ...`
+      `${Emoji.get('hourglass_flowing_sand')}  Everyone wake up, you have ${this.gameTime/60/1000}mins to discuss ...`
     );
 
     return new Promise((resolve, reject) => {
@@ -296,7 +304,7 @@ export class Game {
       }, []);
 
       // sort result
-      this.result = _.sortBy(this.result, (result) => result.count);
+      this.result = _.reverse(_.sortBy(this.result, (result) => result.count));
       const deaths = _.filter(this.result, (result) => result.count === this.result[0].count && result.count >= 2);
 
       console.log('this.result', this.result);
@@ -400,8 +408,14 @@ export class Game {
     this.votePlayer(id, msg, player);
   }
 
-  private randomVote(player: Player) {
-    player.setKillTarget(this.players[_.random(0, this.players.length - 1)]);
+  private randomVote(host: Player) {
+    let targetPlayer: Player[] = [];
+
+    _.map(this.players, (player: Player) => {
+      if (player.id != host.id) targetPlayer.push(player);
+    });
+
+    host.setKillTarget(_.shuffle(targetPlayer)[0]);
   }
 
   private determineWinners() {

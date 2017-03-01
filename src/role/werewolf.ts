@@ -74,6 +74,7 @@ export class Werewolf extends Role implements RoleInterface {
     console.log(`${this.name} endTurn`);
     let rtnMsg = "";
 
+    console.log(`${this.name} endTurn:choice ${this.choice}`);
     if (!this.choice) {
       const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().name == Role.WEREWOLF);
 
@@ -87,6 +88,7 @@ export class Werewolf extends Role implements RoleInterface {
       }
       else if (target.length == 1) {
         this.choice = _.shuffle(["CARD_A", "CARD_B", "CARD_C"])[0];
+        console.log(`${this.name} endTurn:choice_Shuffle ${this.choice}`);
         rtnMsg = this.watchTable(this.choice, table);
       }
       else {

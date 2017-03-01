@@ -58,14 +58,15 @@ export class Robber extends Role implements RoleInterface {
     console.log(`${this.name} endTurn`);
     let rtnMsg = "";
 
+    console.log(`${this.name} endTurn:choice ${this.choice}`);
     if (!this.choice) {
       const key = [];
       _.map(players, (player: Player) => {
-        if (player.id !== host.id)
-          key.push({ text: player.name, callback_data: "" + player.id });
+          key.push(player.id+"");
       });
 
       this.choice = _.shuffle(key)[0];
+      console.log(`${this.name} endTurn:choice_Shuffle ${this.choice}`);
       rtnMsg = this.swapPlayer(this.choice, host, players);
 
       bot.answerCallbackQuery(msg.id, rtnMsg);
@@ -80,7 +81,7 @@ export class Robber extends Role implements RoleInterface {
     if (host && target) {
       // swap the role
       rtnMsg = target.name + " : " + target.getRole().fullName;
-      host.swapRole(target);
+      if (host.id != target.id) host.swapRole(target);
     }
     return rtnMsg;
   }

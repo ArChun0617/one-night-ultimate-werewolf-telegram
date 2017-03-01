@@ -64,21 +64,17 @@ export class Seer extends Role implements RoleInterface {
     console.log(`${this.name} endTurn`);
     let rtnMsg = "";
 
+    console.log(`${this.name} endTurn:choice ${this.choice}`);
     if (!this.choice) {
-      const key = [];
+      const key = ["CARD_AB", "CARD_AC", "CARD_BC"];
 
       _.map(players, (player: Player) => {
         if (player.id !== host.id)
-          key.push({ text: player.name, callback_data: "" + player.id });
+          key.push(player.id+"");
       });
 
-      key.push([
-        { text: "Left & Middle", callback_data: "CARD_AB" },
-        { text: "Left & Right", callback_data: "CARD_AC" },
-        { text: "Middle & Right", callback_data: "CARD_BC" }
-      ]);
-
       this.choice = _.shuffle(key)[0];
+      console.log(`${this.name} endTurn:choice_Shuffle ${this.choice}`);
       rtnMsg = this.watchRole(this.choice, players, table);
 
       bot.answerCallbackQuery(msg.id, rtnMsg);
