@@ -30,6 +30,14 @@ const roles = [
 ];
 
 bot.onText(/\/setting/, (msg) => {
+  const game = getGame(msg.chat.id);
+
+  // validation game isStarted
+  if (game && game.isStarted()) return bot.sendMessage(
+    msg.chat.id,
+    `${Emoji.get('no_entry_sign')}  Sorry. The game has been started, please wait until next game`
+  );
+
   const btnPerLine = 3;
   const key = [];
   let pos = 0;
