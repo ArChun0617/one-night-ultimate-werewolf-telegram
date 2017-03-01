@@ -24,7 +24,7 @@ export class Mason extends Role implements RoleInterface {
     })
       .then((sended) => {
         // `sended` is the sent message.
-        console.log('sended', sended);
+        console.log(`${this.name} sended >> MessageID:${sended.message_id} Text:${sended.text}`);
       });
   }
 

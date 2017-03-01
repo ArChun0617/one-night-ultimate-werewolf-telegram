@@ -1,3 +1,4 @@
+const util = require('util')
 import * as Emoji from 'node-emoji';
 import * as _ from 'lodash';
 import { DeckFactory } from "./deck/deckFactory";
@@ -42,7 +43,7 @@ export class Game {
   btnPerLine: number = process.env.BTN_PER_LINE || 3;
   phase: string = Game.PHASE_WAITING_PLAYER;
   result: Result[] = [];
-  deathPlayers: Player[] = [];
+  deathPlayers: any[] = [];
   winners: Player[] = [];
   losers: Player[] = [];
 
@@ -306,13 +307,13 @@ export class Game {
       // sort result
       this.result = _.reverse(_.sortBy(this.result, (result) => result.count));
       const deaths = _.filter(this.result, (result) => result.count >= this.result[0].count && result.count >= 2);
-
-      console.log('this.result', this.result);
+      
+      console.log('this.result', util.inspect(this.result, false, 3));
       _.map(deaths, (death: Result) => {
         if (death.target.getOriginalRole() === Role.HUNTER) {
-          this.deathPlayers.push(death.target.getKillTarget());
+          this.deathPlayers.push(_.assignIn(death.target.getKillTarget(), {"count": "HUNTER"}));
         }
-        this.deathPlayers.push(death.target);
+        this.deathPlayers.push(_.assignIn(death.target, { "count": death.count }));
       });
 
       resolve();
@@ -328,14 +329,19 @@ export class Game {
       this.determineWinners();
       this.losers = _.difference(this.players, this.winners);
 
+      result += '[DEATHS]\n';
+      _.map(this.deathPlayers, (death) => {
+        result += `${death.name}\t\t[Role] ${death.getOriginalRole().fullName}\t\t >> ${death.getRole().fullName}\t\t [Vote Count] ${death.count} \n`;
+      });
+
       result += '[WINNERS]\n';
       _.map(this.winners, (winner: Player) => {
-        result += `${winner.name}\t\t[Role] ${winner.getOriginalRole().fullName}\t\t >> ${winner.getRole().name}\t\t [Vote] ${winner.getKillTarget().name} \n`;
+        result += `${winner.name}\t\t[Role] ${winner.getOriginalRole().fullName}\t\t >> ${winner.getRole().fullName}\t\t [Vote] ${winner.getKillTarget().name} \n`;
       });
 
       result += '[LOSERS]\n';
       _.map(this.losers, (loser: Player) => {
-        result += `${loser.name}\t\t[Role] ${loser.getOriginalRole().name}\t\t >> ${loser.getRole().name}\t\t [Vote] ${loser.getKillTarget().name} \n`;
+        result += `${loser.name}\t\t[Role] ${loser.getOriginalRole().fullName}\t\t >> ${loser.getRole().fullName}\t\t [Vote] ${loser.getKillTarget().name} \n`;
       });
       this.bot.sendMessage(msg.chat.id, result);
       console.log('Result', result);
