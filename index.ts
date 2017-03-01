@@ -34,7 +34,13 @@ bot.onText(/\/setting/, (msg) => {
   const key = [];
   let pos = 0;
 
-  gameSettings.push({ id: msg.chat.id, roles: []});
+  const gameSetting = _.find(gameSettings, setting => setting.id === msg.chat.id);
+  if (gameSetting) {
+    gameSetting.roles = []; 
+  } else {
+    gameSettings.push({ id: msg.chat.id, roles: []});
+  }
+
   _.map(roles, (role) => {
     let row = pos / btnPerLine | 0;
     if (!key[row]) key[row] = [];
