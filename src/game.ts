@@ -12,24 +12,24 @@ interface Result {
 }
 
 export class Game {
-  public static PHASE_WAITING_PLAYER:string = 'waiting';
-  public static PHASE_START_GAME:string = 'startgame';
-  public static PHASE_PREPARE_DECK:string = 'prepare_deck';
-  public static PHASE_ANNOUNCE_PLAYER_ROLE:string = 'announce_player_role';
-  public static PHASE_START_NIGHT:string = 'start_night';
-  public static PHASE_WAKEUP_DOPPELGANGER:string = 'wakeup_doppelganger';
-  public static PHASE_WAKEUP_WEREWOLF:string = 'wakeup_werewolf';
-  public static PHASE_WAKEUP_MINION:string = 'wakeup_minion';
-  public static PHASE_WAKEUP_MASON:string = 'wakeup_mason';
-  public static PHASE_WAKEUP_SEER:string = 'wakeup_seer';
-  public static PHASE_WAKEUP_ROBBER:string = 'wakeup_robber';
-  public static PHASE_WAKEUP_TROUBLEMAKER:string = 'wakeup_troublemaker';
-  public static PHASE_WAKEUP_DRUNK:string = 'wakeup_drunk';
-  public static PHASE_WAKEUP_INSOMNIAC:string = 'wakeup_insomniac';
-  public static PHASE_CONVERSATION:string = 'conversation';
-  public static PHASE_VOTING:string = 'voting';
-  public static PHASE_KILL_PLAYER:string = 'kill_player';
-  public static PHASE_END_GAME:string = 'endgame';
+  public static PHASE_WAITING_PLAYER: string = 'waiting';
+  public static PHASE_START_GAME: string = 'startgame';
+  public static PHASE_PREPARE_DECK: string = 'prepare_deck';
+  public static PHASE_ANNOUNCE_PLAYER_ROLE: string = 'announce_player_role';
+  public static PHASE_START_NIGHT: string = 'start_night';
+  public static PHASE_WAKEUP_DOPPELGANGER: string = 'wakeup_doppelganger';
+  public static PHASE_WAKEUP_WEREWOLF: string = 'wakeup_werewolf';
+  public static PHASE_WAKEUP_MINION: string = 'wakeup_minion';
+  public static PHASE_WAKEUP_MASON: string = 'wakeup_mason';
+  public static PHASE_WAKEUP_SEER: string = 'wakeup_seer';
+  public static PHASE_WAKEUP_ROBBER: string = 'wakeup_robber';
+  public static PHASE_WAKEUP_TROUBLEMAKER: string = 'wakeup_troublemaker';
+  public static PHASE_WAKEUP_DRUNK: string = 'wakeup_drunk';
+  public static PHASE_WAKEUP_INSOMNIAC: string = 'wakeup_insomniac';
+  public static PHASE_CONVERSATION: string = 'conversation';
+  public static PHASE_VOTING: string = 'voting';
+  public static PHASE_KILL_PLAYER: string = 'kill_player';
+  public static PHASE_END_GAME: string = 'endgame';
 
   id: number;
   players: any[];
@@ -52,10 +52,10 @@ export class Game {
     this.gameRoles = roles;
     this.players = players;
   }
-  
+
   show() {
-	console.log('[Table]', this.table);
-	console.log('[Players]', this.players);
+    console.log('[Table]', this.table);
+    console.log('[Players]', this.players);
   }
 
   start(msg) {
@@ -71,10 +71,18 @@ export class Game {
     return this.prepareDeck()
       .then(() => console.log(`Announce player role`))
       .then(() => this.announcePlayerRole(msg))
+      .then(() => {
+        // debug
+        console.log('[announcePlayerRole]');
+        console.log('[Deck]', this.deck);
+        console.log('[Table]', this.table);
+        console.log('[Players]', this.players);
+      })
       .then(() => console.log(`Start night`))
       .then(() => this.startNight(msg))
       .then(() => {
         // debug
+        console.log('[startDay]');
         console.log('[Deck]', this.deck);
         console.log('[Table]', this.table);
         console.log('[Players]', this.players);
@@ -141,13 +149,13 @@ export class Game {
   on(event, msg) {
     // status validation
     if (_.indexOf([
-        Game.PHASE_WAITING_PLAYER,
-        Game.PHASE_START_GAME,
-        Game.PHASE_PREPARE_DECK,
-        Game.PHASE_START_NIGHT,
-        Game.PHASE_KILL_PLAYER,
-        Game.PHASE_END_GAME
-      ], this.getPhase()) >= 0) {
+      Game.PHASE_WAITING_PLAYER,
+      Game.PHASE_START_GAME,
+      Game.PHASE_PREPARE_DECK,
+      Game.PHASE_START_NIGHT,
+      Game.PHASE_KILL_PLAYER,
+      Game.PHASE_END_GAME
+    ], this.getPhase()) >= 0) {
       this.sendInvalidActionMessage(msg.id);
       return;
     }
@@ -254,7 +262,7 @@ export class Game {
 
     this.bot.sendMessage(
       msg.chat.id,
-      `${Emoji.get('hourglass_flowing_sand')}  Everyone wake up, you have 10mins to discuss ...`
+      `${Emoji.get('hourglass_flowing_sand')}  Everyone wake up, you have ${this.gameTime / 60 / 1000}mins to discuss ...`
     );
 
     return new Promise((resolve, reject) => {
@@ -266,7 +274,7 @@ export class Game {
     this.setPhase(Game.PHASE_VOTING);
 
     return new Promise((resolve, reject) => {
-      this.bot.sendMessage(msg.chat.id,`${Emoji.get('alarm_clock')}  Time\'s up. Everyone please vote.`);
+      this.bot.sendMessage(msg.chat.id, `${Emoji.get('alarm_clock')}  Time\'s up. Everyone please vote.`);
 
       this.sendVotingList(msg.chat.id);
 
@@ -414,10 +422,10 @@ export class Game {
     ], player.getRole().name) < 0);
 
     this.addWinners(deathTanners);
-console.log('this.deathPlayers', this.deathPlayers);
-console.log('deathTanners', deathTanners);
-console.log('deathWerewolfs', deathWerewolfs);
-console.log('deathVillages', deathVillages);
+    console.log('this.deathPlayers', this.deathPlayers);
+    console.log('deathTanners', deathTanners);
+    console.log('deathWerewolfs', deathWerewolfs);
+    console.log('deathVillages', deathVillages);
 
     if (deathWerewolfs) {
       this.addWinners(this.getNonTannerVillagesTeam());
@@ -440,7 +448,7 @@ console.log('deathVillages', deathVillages);
       Role.WEREWOLF,
       Role.MINION,
       Role.TANNER,
-    ], player.getRole().name) < 0 ));
+    ], player.getRole().name) < 0));
   }
 
   private getWerewolfTeam() {
