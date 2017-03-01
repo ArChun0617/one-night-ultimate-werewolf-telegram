@@ -69,6 +69,7 @@ export class Troublemaker extends Role implements RoleInterface {
     console.log(`${this.name} endTurn`);
     let rtnMsg = "";
 
+    console.log(`${this.name} endTurn:choice ${this.choice}`);
     if (!this.choice) {
       const key = [];
       _.map(players, (playerFrom: Player) => {
@@ -81,6 +82,7 @@ export class Troublemaker extends Role implements RoleInterface {
       });
 
       this.choice = _.shuffle(key)[0];
+      console.log(`${this.name} endTurn:choice_Shuffle ${this.choice}`);
       rtnMsg = this.swapPlayers(this.choice, players);
 
       bot.answerCallbackQuery(msg.id, rtnMsg);

@@ -3,6 +3,8 @@ import { Role, RoleInterface } from "./role";
 import { Player } from "../player/player";
 
 export class Mason extends Role implements RoleInterface {
+  choice: string;
+
   constructor() {
     super({
       emoji: Role.MASON_EMOJI,
@@ -37,8 +39,10 @@ export class Mason extends Role implements RoleInterface {
         rtnMsg += player.name + ", ";
       });
 
-      if (rtnMsg.length > 0)
+      if (rtnMsg.length > 0) {
+        this.choice = rtnMsg.substr(0, rtnMsg.length - 2);
         rtnMsg = `${this.fullName} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
+      }
     }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
@@ -53,8 +57,10 @@ export class Mason extends Role implements RoleInterface {
       rtnMsg += player.name + ", ";
     });
 
-    if (rtnMsg.length > 0)
+    if (rtnMsg.length > 0) {
+      this.choice = rtnMsg.substr(0, rtnMsg.length - 2);
       rtnMsg = `${this.fullName} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
+    }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
   }

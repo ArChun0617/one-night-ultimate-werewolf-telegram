@@ -4,6 +4,8 @@ import { Werewolf } from "./werewolf";
 import { Player } from "../player/player";
 
 export class Minion extends Role implements RoleInterface {
+  choice: string;
+
   constructor() {
     super({
       emoji: Role.MINION_EMOJI,
@@ -40,13 +42,30 @@ export class Minion extends Role implements RoleInterface {
       rtnMsg += player.name + ", ";
     });
 
-    if (rtnMsg.length > 0)
+    if (rtnMsg.length > 0) {
+      this.choice = rtnMsg.substr(0, rtnMsg.length - 2);
       rtnMsg = `${wolf.fullName} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
+    }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
   }
 
   endTurn(bot, msg, players, table, host) {
+    console.log(`${this.name} endTurn`);
 
+    const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().name == Role.WEREWOLF);
+    let wolf: Werewolf = new Werewolf();
+    let rtnMsg: string = "";
+
+    _.map(target, (player: Player) => {
+      rtnMsg += player.name + ", ";
+    });
+
+    if (rtnMsg.length > 0) {
+      this.choice = rtnMsg.substr(0, rtnMsg.length - 2);
+      rtnMsg = `${wolf.fullName} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
+    }
+
+    bot.answerCallbackQuery(msg.id, rtnMsg);
   }
 }

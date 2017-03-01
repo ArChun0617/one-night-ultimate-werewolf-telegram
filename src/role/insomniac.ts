@@ -3,6 +3,8 @@ import { Role, RoleInterface } from "./role";
 import { Player } from "../player/player";
 
 export class Insomniac extends Role implements RoleInterface {
+  choice: string;
+
   constructor() {
     super({
       emoji: Role.INSOMNIAC_EMOJI,
@@ -33,8 +35,10 @@ export class Insomniac extends Role implements RoleInterface {
     let rtnMsg: string = "";
     const target: Player = _.find(players, (player: Player) => player.id == msg.from.id);
 
-    if (msg.data == "WAKE_UP")
+    if (msg.data == "WAKE_UP") {
       rtnMsg = target.name + " is: " + target.getRole().fullName;
+      this.choice = target.getRole().name;
+    }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
   }
@@ -42,10 +46,8 @@ export class Insomniac extends Role implements RoleInterface {
   endTurn(bot, msg, players, table, host) {
     console.log(`${this.name} endTurn`);
     let rtnMsg: string = "";
-
-    if (msg.data == "WAKE_UP")
-      rtnMsg = host.name + " is: " + host.getRole().fullName;
-
+    rtnMsg = host.name + " is: " + host.getRole().fullName;
+    this.choice = host.getRole().name;
     bot.answerCallbackQuery(msg.id, rtnMsg);
   }
 }
