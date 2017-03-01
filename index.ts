@@ -125,9 +125,11 @@ bot.onText(/\/start/, (msg) => {
   }
 
   // TODO: hardcode to add dummy players
-  if (game.players.length < gameSetting.roles.length)
-    for(let i = game.players.length; i < gameSetting.roles.length; i++)
+  if (game.players.length < gameSetting.roles.length - 3)
+    for(let i = game.players.length; i < gameSetting.roles.length - 3; i++)
       game.players.push(new Player({ id: i, name: 'Player'+i }));
+
+  console.log('gameSetting.roles', gameSetting.roles);
 
   game.start(msg)
     .then(() => {
