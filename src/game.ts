@@ -418,8 +418,8 @@ console.log('this.deathPlayers', this.deathPlayers);
 console.log('deathTanners', deathTanners);
 console.log('deathWerewolfs', deathWerewolfs);
 console.log('deathVillages', deathVillages);
-
-    if (deathWerewolfs) {
+console.log('hasWerewolfOnTable()', this.hasWerewolfOnTable());
+    if (deathWerewolfs.length > 0) {
       this.addWinners(this.getNonTannerVillagesTeam());
     } else if (this.hasWerewolfOnTable()) {
       this.addWinners(this.getWerewolfTeam());
@@ -431,7 +431,7 @@ console.log('deathVillages', deathVillages);
   }
 
   private addWinners(players: Player[]) {
-    this.winners = _.merge(this.winners, players);
+    this.winners = _.concat(this.winners, players);
   }
 
   private getNonTannerVillagesTeam() {
@@ -452,7 +452,7 @@ console.log('deathVillages', deathVillages);
   }
 
   private hasWerewolfOnTable() {
-    const werewolfs = _.filter(this.players, player => player.getRole().name === Role.WEREWOLF)
+    const werewolfs = _.filter(this.players, player => player.getRole().name === Role.WEREWOLF);
     return werewolfs.length > 0;
   }
 
