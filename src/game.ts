@@ -296,8 +296,8 @@ export class Game {
       }, []);
 
       // sort result
-      this.result = _.sortBy(this.result, (result) => result.count);
-      const deaths = _.filter(this.result, (result) => result.count === this.result[0].count && result.count >= 2);
+      this.result = _.reverse(_.sortBy(this.result, (result) => result.count));
+      const deaths = _.filter(this.result, (result) => result.count >= this.result[0].count && result.count >= 2);
 
       console.log('this.result', this.result);
       _.map(deaths, (death: Result) => {
@@ -401,17 +401,23 @@ export class Game {
   }
 
   private randomVote(player: Player) {
-    player.setKillTarget(this.players[_.random(0, this.players.length - 1)]);
+    const targets = _.filter(this.players, p => p.id !== player.id);
+    const pos = _.random(0, targets.length - 1);
+    player.setKillTarget(targets[pos]);
   }
 
   private determineWinners() {
-    const deathTanners = _.filter(this.deathPlayers, player => player.getRole() === Role.TANNER);
-    const deathWerewolfs = _.filter(this.deathPlayers, player => player.getRole() === Role.WEREWOLF);
+    const deathTanners = _.filter(this.deathPlayers, player => player.getRole().name === Role.TANNER);
+    const deathWerewolfs = _.filter(this.deathPlayers, player => player.getRole().name === Role.WEREWOLF);
     const deathVillages = _.filter(this.deathPlayers, player => _.indexOf([
       Role.WEREWOLF, Role.MINION, Role.TANNER
-    ], player.getRole()) < 0);
+    ], player.getRole().name) < 0);
 
     this.addWinners(deathTanners);
+console.log('this.deathPlayers', this.deathPlayers);
+console.log('deathTanners', deathTanners);
+console.log('deathWerewolfs', deathWerewolfs);
+console.log('deathVillages', deathVillages);
 
     if (deathWerewolfs) {
       this.addWinners(this.getNonTannerVillagesTeam());
@@ -442,11 +448,12 @@ export class Game {
       Role.DOPPELGANGER,
       Role.WEREWOLF,
       Role.MINION
-    ], player.getRole().name) < 0 ));
+    ], player.getRole().name) >= 0 ));
   }
 
   private hasWerewolfOnTable() {
-    return _.filter(this.players, player => player.getRole() === Role.WEREWOLF);
+    const werewolfs = _.filter(this.players, player => player.getRole().name === Role.WEREWOLF)
+    return werewolfs.length > 0;
   }
 
   private votePlayer(id: number, msg, player) {
