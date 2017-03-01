@@ -246,8 +246,13 @@ export class Game {
       if (player) {
         player.getOriginalRole().wakeUp(this.bot, msg, this.players, this.table, player);
       } else {
-        const tableCards = _.find(this.table.getRoles(), (r: Role) => r.name === role);
-        tableCards.wakeUp(this.bot, msg, this.players, this.table, player);
+        let roleCard = _.find(this.table.getRoles(), (r: Role) => r.name === role);
+
+        if (!roleCard) {
+          roleCard = _.find(this.players, (p: Player) => p.getRole() === role);
+        }
+
+        roleCard.wakeUp(this.bot, msg, this.players, this.table, player);
       }
 
       setTimeout(() => {
