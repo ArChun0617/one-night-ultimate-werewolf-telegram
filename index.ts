@@ -33,10 +33,10 @@ bot.onText(/\/setting/, (msg) => {
   const game = getGame(msg.chat.id);
 
   // validation game isStarted
-  if (game && game.isStarted()) return bot.sendMessage(
-    msg.chat.id,
-    `${Emoji.get('no_entry_sign')}  Sorry. The game has been started, please wait until next game`
-  );
+  if (game && game.isStarted()) {
+    sendGameHasBeenStartedMessage(msg.chat.id);
+    return;
+  }
 
   const btnPerLine = 3;
   const key = [];
@@ -79,9 +79,7 @@ bot.onText(/\/newgame/, (msg) => {
   const gameSetting = _.find(gameSettings, setting => setting.id === msg.chat.id);
   
   if (!gameSetting) {
-    bot.sendMessage(msg.chat.id,
-      `${Emoji.get('no_entry_sign')}  Sorry. Please set the game setting before making a new game`
-    );
+    sendAskForSettingMessage(msg.chat.id);
     return;
   }
 
@@ -117,12 +115,12 @@ bot.onText(/\/start/, (msg) => {
   const gameSetting = _.find(gameSettings, setting => setting.id === msg.chat.id);
   const game = getGame(msg.chat.id);
 
-  if (!game) return askForCreateNewGame(msg.chat.id);
   if (!gameSetting) {
-    bot.sendMessage(msg.message.chat.id, `${Emoji.get('no_entry_sign')}  Sorry. Please run /setting first`);
-
+    sendAskForSettingMessage(msg.chat.id);
     return;
   }
+
+  if (!game) return askForCreateNewGame(msg.chat.id);
 
   // TODO: hardcode to add dummy players
   if (game.players.length < gameSetting.roles.length - 3)
@@ -158,8 +156,7 @@ bot.on('callback_query', (msg) => {
   const gameSetting = _.find(gameSettings, setting => setting.id === msg.message.chat.id);
   
   if (!gameSetting) {
-    bot.sendMessage(msg.message.chat.id, `${Emoji.get('no_entry_sign')}  Sorry. Please run /setting first`);
-
+    sendAskForSettingMessage(msg.message.chat.id);
     return;
   }
 
@@ -221,6 +218,14 @@ function getGame(id: number) {
 
 function askForCreateNewGame(msgId: number) {
   return bot.sendMessage(msgId, `${Emoji.get('bomb')}  Sorry. Please create a new game (/newgame)`);
+}
+
+function sendGameHasBeenStartedMessage(msgId) {
+  bot.sendMessage(msgId, `${Emoji.get('no_entry_sign')}  Sorry. The game has been started, please wait until next game`);
+}
+
+function sendAskForSettingMessage(msgId) {
+  bot.sendMessage(msgId, `${Emoji.get('no_entry_sign')}  Sorry. Please run /setting first`);
 }
 
 console.log(`${Emoji.get('robot_face')}  Hi! I am up`);
