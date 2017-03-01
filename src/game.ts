@@ -472,7 +472,15 @@ console.log('hasWerewolfOnTable()', this.hasWerewolfOnTable());
 
   private votePlayer(id: number, msg, player) {
     const target = _.find(this.players, p => p.id === id);
-    player.setKillTarget();
-    this.bot.answerCallbackQuery(msg.id, `${Emoji.get('point_up_2')}  You have vote ${target.name}`);
+    let rtnMsg = "";
+    if (target) {
+      player.setKillTarget(target);
+      rtnMsg = `${Emoji.get('point_up_2')}  You have vote ${target.name}`;
+    }
+    else {
+      rtnMsg = `Invalid player selected !`;
+    }
+
+    this.bot.answerCallbackQuery(msg.id, rtnMsg);
   }
 }
