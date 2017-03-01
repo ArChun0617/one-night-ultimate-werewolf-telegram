@@ -240,19 +240,19 @@ export class Game {
     this.setWakeUpPhase(role);
 
     return new Promise((resolve, reject) => {
-      const host: Player = _.find(this.players, (p) => p.getOriginalRole().name === role);
-      const player: Player = _.find(this.players, (p) => p.getRole().name === role);
+      // const host: Player = _.find(this.players, (p) => p.getOriginalRole().name === role);
+      const player: Player = _.find(this.players, (p) => p.getOriginalRole().name === role);
 
       if (player) {
-        player.getRole().wakeUp(this.bot, msg, this.players, this.table, host);
+        player.getOriginalRole().wakeUp(this.bot, msg, this.players, this.table, player);
       } else {
         const tableCards = _.find(this.table.getRoles(), (r: Role) => r.name === role);
-        tableCards.wakeUp(this.bot, msg, this.players, this.table, host);
+        tableCards.wakeUp(this.bot, msg, this.players, this.table, player);
       }
 
       setTimeout(() => {
-        if (host)
-          host.getOriginalRole().endTurn(this.bot, msg, this.players, this.table, host);
+        if (player)
+          player.getOriginalRole().endTurn(this.bot, msg, this.players, this.table, player);
 
         resolve();
       }, this.actionTime);
