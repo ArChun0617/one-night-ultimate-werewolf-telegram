@@ -100,7 +100,7 @@ bot.onText(/\/join/, (msg) => {
 });
 
 bot.onText(/\/start/, (msg) => {
-  const gameSetting = _.find(gameSettings, setting => setting.id === msg.message.chat.id);
+  const gameSetting = _.find(gameSettings, setting => setting.id === msg.chat.id);
   const game = getGame(msg.chat.id);
 
   if (!game) return askForCreateNewGame(msg.chat.id);
