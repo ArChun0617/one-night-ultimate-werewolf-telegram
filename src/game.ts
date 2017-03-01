@@ -240,7 +240,6 @@ export class Game {
     this.setWakeUpPhase(role);
 
     return new Promise((resolve, reject) => {
-      // const host: Player = _.find(this.players, (p) => p.getOriginalRole().name === role);
       const player: Player = _.find(this.players, (p) => p.getOriginalRole().name === role);
 
       if (player) {
