@@ -73,14 +73,15 @@ export class Troublemaker extends Role implements RoleInterface {
     if (!this.choice) {
       const key = [];
       _.map(players, (playerFrom: Player) => {
-        if (playerFrom.id == parseInt(msg.from.id)) return true;
+        if (playerFrom.id == parseInt(host.id)) return true;
         _.map(players, (playerTo: Player) => {
-          if (playerTo.id == parseInt(msg.from.id)) return true;
+          if (playerTo.id == parseInt(host.id)) return true;
           if (playerFrom.id == playerTo.id) return true;
           key.push(playerFrom.id + "_" + playerTo.id);
         });
       });
 
+      console.log(`${this.name} key:`, key);
       this.choice = _.shuffle(key)[0];
       console.log(`${this.name} endTurn:choice_Shuffle ${this.choice}`);
       rtnMsg = this.swapPlayers(this.choice, players);
