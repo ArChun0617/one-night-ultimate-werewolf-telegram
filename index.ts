@@ -140,7 +140,7 @@ bot.onText(/\/start/, (msg) => {
     });
 });
 
-bot.onText(/\/killgame/, (msg) => {
+bot.onText(/\/delgame/, (msg) => {
   killGame(msg.chat.id);
 });
 
