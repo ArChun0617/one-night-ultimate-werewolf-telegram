@@ -440,7 +440,7 @@ console.log('deathVillages', deathVillages);
 console.log('hasWerewolfOnTable()', this.hasWerewolfOnTable());
     if (deathWerewolfs.length > 0) {
       this.addWinners(this.getNonTannerVillagesTeam());
-    } else if (this.hasWerewolfOnTable()) {
+    } else if (this.hasWerewolfOnTable() && deathTanners.length === 0) {
       this.addWinners(this.getWerewolfTeam());
     } else if (this.deathPlayers.length === 0) {
       this.addWinners(this.getNonTannerVillagesTeam());
