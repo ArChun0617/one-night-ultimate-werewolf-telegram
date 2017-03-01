@@ -5,8 +5,8 @@ import { Table } from "../npc/table";
 export interface RoleInterface {
   emoji: string;
   name: string;
-  wakeUp(bot, msg, players: Player[], table: Table);
-  useAbility(bot, msg, players: Player[], table: Table);
+  wakeUp(bot, msg, players: Player[], table: Table, host: Player);
+  useAbility(bot, msg, players: Player[], table: Table, host: Player);
   endTurn(bot, msg, players: Player[], table, host: Player);
   notifyRole(bot, msg);
 }
@@ -54,11 +54,11 @@ export class Role implements RoleInterface {
     this.name = options.name;
   }
 
-  wakeUp(bot, msg, players, table) {
+  wakeUp(bot, msg, players, table, host) {
     throw new Error('WakeUp function does not implemented');
   }
 
-  useAbility(bot, msg, players, table) {
+  useAbility(bot, msg, players, table, host) {
     throw new Error('UseAbility function does not implemented');
   }
 

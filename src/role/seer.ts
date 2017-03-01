@@ -13,7 +13,7 @@ export class Seer extends Role implements RoleInterface {
     });
   }
 
-  wakeUp(bot, msg, players, table) {
+  wakeUp(bot, msg, players, table, host) {
     console.log(`${this.name} wake up called`);
     // sendMessage [AB] [BC] [AC] [Player1] [Player2] ...
     // lock the option when callback_query
@@ -44,7 +44,7 @@ export class Seer extends Role implements RoleInterface {
       });
   }
 
-  useAbility(bot, msg, players, table) {
+  useAbility(bot, msg, players, table, host) {
     console.log(`${this.name} useAbility:`, msg);
     let rtnMsg = '';
 

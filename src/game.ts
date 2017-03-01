@@ -240,18 +240,19 @@ export class Game {
     this.setWakeUpPhase(role);
 
     return new Promise((resolve, reject) => {
-      const player: Player = _.find(this.players, (p) => p.getOriginalRole().name === role);
+      const host: Player = _.find(this.players, (p) => p.getOriginalRole().name === role);
+      const player: Player = _.find(this.players, (p) => p.getRole().name === role);
 
       if (player) {
-        player.getOriginalRole().wakeUp(this.bot, msg, this.players, this.table);
+        player.getRole().wakeUp(this.bot, msg, this.players, this.table, host);
       } else {
         const tableCards = _.find(this.table.getRoles(), (r: Role) => r.name === role);
-        tableCards.wakeUp(this.bot, msg, this.players, this.table);
+        tableCards.wakeUp(this.bot, msg, this.players, this.table, host);
       }
 
       setTimeout(() => {
-        if (player)
-          player.getOriginalRole().endTurn(this.bot, msg, this.players, this.table, player);
+        if (host)
+          host.getOriginalRole().endTurn(this.bot, msg, this.players, this.table, host);
 
         resolve();
       }, this.actionTime);
@@ -391,7 +392,7 @@ export class Game {
       return this.sendInvalidActionMessage(msg.id);
     }
 
-    player.getOriginalRole().useAbility(this.bot, msg, this.players, this.table);
+    player.getOriginalRole().useAbility(this.bot, msg, this.players, this.table, player);
   }
 
   private handleConversationEvent(event: string, msg: any, player: Player) {

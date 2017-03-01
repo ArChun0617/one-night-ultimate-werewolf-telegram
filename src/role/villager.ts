@@ -8,12 +8,12 @@ export class Villager extends Role implements RoleInterface {
     });
   }
 
-  wakeUp(bot, msg, players, table) {
+  wakeUp(bot, msg, players, table, host) {
     console.log(`${this.name} wake up called`);
 
   }
 
-  useAbility(bot, msg, players, table) {
+  useAbility(bot, msg, players, table, host) {
     console.log(`${this.name} useAbility:`, msg);
     
   }

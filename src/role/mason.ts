@@ -12,7 +12,7 @@ export class Mason extends Role implements RoleInterface {
     });
   }
 
-  wakeUp(bot, msg) {
+  wakeUp(bot, msg, players, table, host) {
     console.log(`${this.name} wake up called`);
     // notify buddies
     const key = [];
@@ -28,7 +28,7 @@ export class Mason extends Role implements RoleInterface {
       });
   }
 
-  useAbility(bot, msg, players) {
+  useAbility(bot, msg, players, table, host) {
     console.log(`${this.name} useAbility:`, msg);
 
     const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().name == Role.MASON);

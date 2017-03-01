@@ -12,7 +12,7 @@ export class Insomniac extends Role implements RoleInterface {
     });
   }
 
-  wakeUp(bot, msg) {
+  wakeUp(bot, msg, players, table, host) {
     console.log(`${this.name} wake up called`);
     // sendMessage [view] click to know the final role
     const key = [
@@ -28,16 +28,15 @@ export class Insomniac extends Role implements RoleInterface {
       });
   }
 
-  useAbility(bot, msg, players, table) {
+  useAbility(bot, msg, players, table, host) {
     // TODO: avoid syntax error for testing first
     console.log(`${this.name} useAbility:`, msg);
 
     let rtnMsg: string = "";
-    const target: Player = _.find(players, (player: Player) => player.id == msg.from.id);
 
     if (msg.data == "WAKE_UP") {
-      rtnMsg = target.name + " is: " + target.getRole().fullName;
-      this.choice = target.getRole().name;
+      rtnMsg = host.name + " is: " + host.getRole().fullName;
+      this.choice = host.getRole().name;
     }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);

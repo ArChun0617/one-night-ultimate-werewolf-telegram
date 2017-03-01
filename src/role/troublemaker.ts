@@ -13,7 +13,7 @@ export class Troublemaker extends Role implements RoleInterface {
     });
   }
 
-  wakeUp(bot, msg, players, table) {
+  wakeUp(bot, msg, players, table, host) {
     console.log(`${this.name} wake up called`);
     // sendMessage [Player1 <> Player2] [Player1 <> Player3] ...
     const key = [];
@@ -45,7 +45,7 @@ export class Troublemaker extends Role implements RoleInterface {
       });
   }
 
-  useAbility(bot, msg, players, table) {
+  useAbility(bot, msg, players, table, host) {
     console.log(`${this.name} useAbility:`, msg);
     let rtnMsg = '';
 

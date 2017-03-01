@@ -12,7 +12,7 @@ export class Robber extends Role implements RoleInterface {
     });
   }
 
-  wakeUp(bot, msg, players, table) {
+  wakeUp(bot, msg, players, table, host) {
     console.log(`${this.name} wake up called`);
     // sendMessage [Player1] [Player2] [DO NOTHING] ...
     // lock the option when callback_query to notify the new role
@@ -36,7 +36,7 @@ export class Robber extends Role implements RoleInterface {
       });
   }
 
-  useAbility(bot, msg, players, table) {
+  useAbility(bot, msg, players, table, host) {
     console.log(`${this.name} useAbility:`, msg);
     let rtnMsg = '';
 
@@ -47,7 +47,7 @@ export class Robber extends Role implements RoleInterface {
       this.choice = msg.data;
 
       //if (!choice) choice = msg.data;	//To lock the Seer with only one choice
-      const host: Player = _.find(players, (player: Player) => player.id == parseInt(msg.from.id));
+      // const host: Player = _.find(players, (player: Player) => player.id == parseInt(msg.from.id));
       rtnMsg = this.swapPlayer(this.choice, host, players);
     }
 

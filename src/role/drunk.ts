@@ -12,7 +12,7 @@ export class Drunk extends Role implements RoleInterface {
     });
   }
 
-  wakeUp(bot, msg, players, table) {
+  wakeUp(bot, msg, players, table, host) {
     console.log(`${this.name} wake up called`);
     // sendMessage [left] [center] [right], choose one of the center card to exchange
 
@@ -33,7 +33,7 @@ export class Drunk extends Role implements RoleInterface {
       });
   }
 
-  useAbility(bot, msg, players, table) {
+  useAbility(bot, msg, players, table, host) {
     // TODO: avoid syntax error for testing first
     console.log(`${this.name} useAbility:`, msg);
     let rtnMsg = '';
