@@ -1,3 +1,4 @@
+import * as Emoji from 'node-emoji';
 import * as _ from 'lodash';
 import { Role, RoleInterface } from "./role";
 import { Player } from "../player/player";
@@ -16,7 +17,7 @@ export class Insomniac extends Role implements RoleInterface {
     console.log(`${this.name} wake up called`);
     // sendMessage [view] click to know the final role
     const key = [
-      [{ text: "Wake Up", callback_data: "WAKE_UP" }]
+      [{ text: `Wake Up${Emoji.get('eyes')}`, callback_data: "WAKE_UP" }]
     ];
 
     bot.sendMessage(msg.chat.id, `${this.fullName}, wake up.`, {

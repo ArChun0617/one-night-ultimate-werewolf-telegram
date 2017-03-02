@@ -1,3 +1,4 @@
+import * as Emoji from 'node-emoji';
 import * as _ from 'lodash';
 import { Role, RoleInterface } from "./role";
 import { Player } from "../player/player";
@@ -18,9 +19,9 @@ export class Drunk extends Role implements RoleInterface {
 
     const key = [
       [
-        { text: "Left", callback_data: "CARD_A" },
-        { text: "Middle", callback_data: "CARD_B" },
-        { text: "Right", callback_data: "CARD_C" }
+        { text: `${this.emoji}${Emoji.get('question')}${Emoji.get('question')}`, callback_data: "CARD_A" },
+        { text: `${Emoji.get('question')}${this.emoji}${Emoji.get('question')}`, callback_data: "CARD_B" },
+        { text: `${Emoji.get('question')}${Emoji.get('question')}${this.emoji}`, callback_data: "CARD_C" }
       ]
     ];
     

@@ -334,19 +334,19 @@ export class Game {
       this.determineWinners();
       this.losers = _.difference(this.players, this.winners);
 
-      result += '[DEATHS]\n';
+      result += `${Emoji.get('skull')}\n`;
       _.map(this.deathPlayers, (death) => {
-        result += `${death.name}\t\t[Role] ${death.getOriginalRole().fullName}\t\t >> ${death.getRole().fullName}\t\t [Vote Count] ${death.count} \n`;
+        result += `${death.name} ${death.getOriginalRole().emoji} ${Emoji.get('arrow_right')} ${death.getRole().emoji}  ${Emoji.get('point_left')} ${death.count} \n`;
       });
 
-      result += '[WINNERS]\n';
+      result += `\n${Emoji.get('trophy')}${Emoji.get('full_moon_with_face')}\n`;
       _.map(this.winners, (winner: Player) => {
-        result += `${winner.name}\t\t[Role] ${winner.getOriginalRole().fullName}\t\t >> ${winner.getRole().fullName}\t\t [Vote] ${winner.getKillTarget().name} \n`;
+        result += `${winner.name} ${winner.getOriginalRole().emoji} ${Emoji.get('arrow_right')} ${winner.getRole().emoji}  ${Emoji.get('point_right')} ${winner.getKillTarget().name} \n`;
       });
 
-      result += '[LOSERS]\n';
+      result += `\n${Emoji.get('new_moon_with_face')}\n`;
       _.map(this.losers, (loser: Player) => {
-        result += `${loser.name}\t\t[Role] ${loser.getOriginalRole().fullName}\t\t >> ${loser.getRole().fullName}\t\t [Vote] ${loser.getKillTarget().name} \n`;
+        result += `${loser.name} ${loser.getOriginalRole().emoji} ${Emoji.get('arrow_right')} ${loser.getRole().emoji}  ${Emoji.get('point_right')} ${loser.getKillTarget().name} \n`;
       });
       this.bot.sendMessage(msg.chat.id, result);
       console.log('Result', result);

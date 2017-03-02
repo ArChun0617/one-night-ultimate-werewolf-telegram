@@ -19,11 +19,11 @@ export class Werewolf extends Role implements RoleInterface {
     // IF single wolf, sendMessage Three buttons to choose
     // on callback_query lock the card
     const key = [
-      [{ text: "Wake Up", callback_data: "WAKE_UP" }],
-      [{ text: "Left", callback_data: "CARD_A" }, { text: "Middle", callback_data: "CARD_B" }, {
-        text: "Right",
-        callback_data: "CARD_C"
-      }]
+      [
+        { text: `${this.emoji}${Emoji.get('question')}${Emoji.get('question')}`, callback_data: "CARD_A" },
+        { text: `${Emoji.get('question')}${this.emoji}${Emoji.get('question')}`, callback_data: "CARD_B" },
+        { text: `${Emoji.get('question')}${Emoji.get('question')}${this.emoji}`, callback_data: "CARD_C" }
+      ]
     ];
 
     //bot.sendMessage(msg.chat.id, `${this.emoji}  ${this.name}, wake up and look for other werewolves. If there is only one Werewolf, you may look at a card from the center.`, {

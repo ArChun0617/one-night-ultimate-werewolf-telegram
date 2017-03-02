@@ -1,3 +1,4 @@
+import * as Emoji from 'node-emoji';
 import * as _ from 'lodash';
 import { Role, RoleInterface } from "./role";
 import { Werewolf } from "./werewolf";
@@ -16,9 +17,9 @@ export class Minion extends Role implements RoleInterface {
   wakeUp(bot, msg, players, table, host) {
     console.log(`${this.name} wake up called`);
     // notify werewolf buddies
-    const key = [];
-
-    key.push([{ text: "Wake Up", callback_data: "WAKE_UP" }]);
+    const key = [
+      [{ text: `Wake Up${Emoji.get('eyes')}`, callback_data: "WAKE_UP" }]
+    ];
 
     let wolf: Werewolf = new Werewolf();
     //bot.sendMessage(msg.chat.id, `${this.emoji}  ${this.name}, wake up. '${wolf.emoji}${wolf.name}', stick out your thumb so the Minion can see who you are.`, {

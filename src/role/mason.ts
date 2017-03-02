@@ -1,3 +1,4 @@
+import * as Emoji from 'node-emoji';
 import * as _ from 'lodash';
 import { Role, RoleInterface } from "./role";
 import { Player } from "../player/player";
@@ -15,9 +16,9 @@ export class Mason extends Role implements RoleInterface {
   wakeUp(bot, msg, players, table, host) {
     console.log(`${this.name} wake up called`);
     // notify buddies
-    const key = [];
-
-    key.push([{ text: "Wake Up", callback_data: "WAKE_UP" }]);
+    const key = [
+      [{ text: `Wake Up${Emoji.get('eyes')}`, callback_data: "WAKE_UP" }]
+    ];
 
     bot.sendMessage(msg.chat.id, `${this.fullName}, wake up.`, {
       reply_markup: JSON.stringify({ inline_keyboard: key })
