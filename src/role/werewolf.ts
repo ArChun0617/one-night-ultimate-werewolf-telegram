@@ -19,6 +19,7 @@ export class Werewolf extends Role implements RoleInterface {
     // IF single wolf, sendMessage Three buttons to choose
     // on callback_query lock the card
     const key = [
+      [{ text: `Wake Up${Emoji.get('eyes')}`, callback_data: "WAKE_UP" }],
       [
         { text: `${this.emoji}${Emoji.get('question')}${Emoji.get('question')}`, callback_data: "CARD_A" },
         { text: `${Emoji.get('question')}${this.emoji}${Emoji.get('question')}`, callback_data: "CARD_B" },
@@ -40,6 +41,7 @@ export class Werewolf extends Role implements RoleInterface {
     // TODO: avoid syntax error for testing first
     console.log(`${this.name} useAbility:`, msg);
 
+    console.log(`${this.name} useAbility:choice ${this.choice}`);
     let rtnMsg: string = "";
     const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().name == Role.WEREWOLF);
 
