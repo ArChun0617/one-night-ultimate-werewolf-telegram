@@ -141,6 +141,7 @@ bot.onText(/\/start/, (msg) => {
 });
 
 bot.onText(/\/delgame/, (msg) => {
+  console.log('Kill Game', msg.chat.id);
   killGame(msg.chat.id);
 });
 

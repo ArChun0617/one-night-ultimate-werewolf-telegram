@@ -44,13 +44,10 @@ export class Drunk extends Role implements RoleInterface {
     else {
       this.choice = msg.data
 
-      if (_.some(["CARD_A", "CARD_B", "CARD_C"], this.choice)) {
-        const host: Player = _.find(players, (player: Player) => player.id == parseInt(msg.from.id));
+      if (_.some(["CARD_A", "CARD_B", "CARD_C"], this.choice))
         rtnMsg = this.swapTable(this.choice, host, table);
-      }
-      else {
+      else
         rtnMsg = "Invalid action";
-      }
     }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
