@@ -54,8 +54,6 @@ export class Werewolf extends Role implements RoleInterface {
         rtnMsg = `${this.fullName} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
     }
     else if ((msg.data == "CARD_A" || msg.data == "CARD_B" || msg.data == "CARD_C") && target.length == 1) {
-      let rtnMsg = '';
-
       if (this.choice) {
         rtnMsg = "You already make your choice.";
       }
@@ -106,11 +104,11 @@ export class Werewolf extends Role implements RoleInterface {
 
     rtnMsg = "Centre Card is :\n";
 
-    if (this.choice == "CARD_A")
+    if (picked == "CARD_A")
       rtnMsg += "[" + table.getLeft().fullName + "] [" + `${Emoji.get('question')}` + "] [" + `${Emoji.get('question')}` + "]";
-    else if (this.choice == "CARD_B")
+    else if (picked == "CARD_B")
       rtnMsg += "[" + `${Emoji.get('question')}` + "] [" + table.getCenter().fullName + "] [?]";
-    else if (this.choice == "CARD_C")
+    else if (picked == "CARD_C")
       rtnMsg += "[" + `${Emoji.get('question')}` + "] [" + `${Emoji.get('question')}` + "] [" + table.getRight().fullName + "]";
     else
       rtnMsg = "You cannot view the card in centre.";
