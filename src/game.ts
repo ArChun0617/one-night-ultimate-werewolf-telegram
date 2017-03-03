@@ -107,6 +107,10 @@ export class Game {
     return !(this.getPhase() === Game.PHASE_WAITING_PLAYER);
   }
 
+  isEnded() {
+    return (this.getPhase() === Game.PHASE_END_GAME);
+  }
+
   getPhase(): string {
     return this.phase;
   }
