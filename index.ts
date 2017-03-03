@@ -4,6 +4,7 @@ import * as Emoji from 'node-emoji';
 import { Game } from './src/game';
 import { Role } from "./src/role/role";
 import { Player } from "./src/player/player";
+import { GameEndError } from "./src/error/gameend";
 
 interface GameSetting {
   id: string;
@@ -136,6 +137,14 @@ bot.onText(/\/start/, (msg) => {
     })
     .catch((error) => {
       console.log(`Error ${error}`);
+      // crazy I don't know why it is not instanceof GameEndError
+      console.log('error instanceof GameEndError', error instanceof GameEndError);
+      // shit way to catch the error
+      if (error.message === 'This game is end') {
+        console.log('Catch game is ended');
+        return;
+      }
+
       bot.sendMessage(msg.chat.id, `${Emoji.get('bomb')}  Error: ${error}.`);
     });
 });
@@ -211,8 +220,13 @@ bot.onText(/\/show/, (msg, match) => {
 
 function killGame(id: number) {
   const game: Game = getGame(id);
-  game.end();
-  _.remove(games, (game: Game) => game.id === id);
+
+  if (game) {
+    game.end();
+    _.remove(games, (game: Game) => game.id === id);
+  }
+  
+  console.log('games', games);
 }
 
 function getGame(id: number) {

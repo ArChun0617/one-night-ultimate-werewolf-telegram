@@ -1,4 +1,5 @@
-const util = require('util')
+import { GameEndError } from "./error/gameend";
+const util = require('util');
 import * as Emoji from 'node-emoji';
 import * as _ from 'lodash';
 import { DeckFactory } from "./deck/deckFactory";
@@ -95,8 +96,7 @@ export class Game {
       .then(() => console.log(`Kill player`))
       .then(() => this.killPlayer())
       .then(() => console.log(`Show result`))
-      .then(() => this.showResult(msg))
-      .catch(err => console.log(err));
+      .then(() => this.showResult(msg));
   }
 
   end() {
@@ -368,7 +368,7 @@ export class Game {
 
   private setPhase(phase: string) {
     if (this.phase === Game.PHASE_END_GAME) {
-      throw new Error('This game is end');
+      throw new GameEndError();
     }
 
     this.phase = phase;
