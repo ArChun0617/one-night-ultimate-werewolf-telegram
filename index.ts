@@ -210,6 +210,8 @@ bot.onText(/\/show/, (msg, match) => {
 });
 
 function killGame(id: number) {
+  const game: Game = getGame(id);
+  game.end();
   _.remove(games, (game: Game) => game.id === id);
 }
 

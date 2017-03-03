@@ -99,8 +99,16 @@ export class Game {
       .catch(err => console.log(err));
   }
 
+  end() {
+    this.setPhase(Game.PHASE_END_GAME);
+  }
+
   isStarted() {
     return !(this.getPhase() === Game.PHASE_WAITING_PLAYER);
+  }
+
+  isEnded() {
+    return (this.getPhase() === Game.PHASE_END_GAME);
   }
 
   getPhase(): string {
@@ -367,6 +375,10 @@ export class Game {
   }
 
   private setPhase(phase: string) {
+    if (this.phase === Game.PHASE_END_GAME) {
+      throw new Error('This game is end');
+    }
+
     this.phase = phase;
   }
 
