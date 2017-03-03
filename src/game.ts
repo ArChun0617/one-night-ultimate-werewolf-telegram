@@ -114,10 +114,10 @@ export class Game {
 
     let rtnMsg: string = '';
     _.map(this.players, (player: Player) => {
-      rtnMsg += `${player.name} \n`;
+      rtnMsg += `${player.name}\n`;
     });
 
-    this.bot.sendMessage(msg.chat.id, `Player joined: \n ${rtnMsg}`);
+    this.bot.sendMessage(msg.chat.id, `Player joined:\n${rtnMsg}`);
     console.log(this.players);
   }
 
@@ -203,9 +203,17 @@ export class Game {
     this.setPhase(Game.PHASE_ANNOUNCE_PLAYER_ROLE);
 
     return new Promise((resolve, reject) => {
+      let role = [];
+      _.map(this.players, (p: Player) => {
+        role.push(p.getOriginalRole().fullName);
+      });
+      _.map(this.table.getRoles(), (r: Role) => {
+        role.push(r.fullName);
+      });
+
       this.bot.sendMessage(
         msg.chat.id,
-        `${Emoji.get('eyeglasses')}  Everyone, please check your role`,
+        `${Emoji.get('eyeglasses')}  Everyone, please check your role. The game has below role\n` + _.sortBy(role).join("\n"),
         {
           reply_markup: JSON.stringify({
             inline_keyboard: [
@@ -221,9 +229,9 @@ export class Game {
 
   private startNight(msg) {
     this.setPhase(Game.PHASE_START_NIGHT);
-    this.bot.sendMessage(msg.chat.id, `${Emoji.get('crescent_moon')}  Night start, Everyone close your eye.`);
 
-    return this.wakeUp(Role.DOPPELGANGER, msg)
+    return this.bot.sendMessage(msg.chat.id, `${Emoji.get('crescent_moon')}  Night start, Everyone close your eye.`)
+      .then(() => this.wakeUp(Role.DOPPELGANGER, msg))
       .then(() => this.wakeUp(Role.WEREWOLF, msg))
       .then(() => this.wakeUp(Role.MINION, msg))
       .then(() => this.wakeUp(Role.MASON, msg))
