@@ -9,7 +9,8 @@ export class Troublemaker extends Role implements RoleInterface {
   constructor() {
     super({
       emoji: Role.TROUBLEMAKER_EMOJI,
-      name: Role.TROUBLEMAKER
+      name: Role.TROUBLEMAKER,
+      ordering: 70
     });
   }
 

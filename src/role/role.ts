@@ -14,11 +14,13 @@ export interface RoleInterface {
 export interface RoleOptions {
   emoji: string;
   name: string;
+  ordering: number;
 }
 
 export class Role implements RoleInterface {
   emoji: string;
   name: string;
+  ordering: number;
   get fullName(): string {
     return this.emoji + this.name;
   }
@@ -52,6 +54,7 @@ export class Role implements RoleInterface {
   constructor(options: RoleOptions) {
     this.emoji = options.emoji;
     this.name = options.name;
+    this.ordering = options.ordering;
   }
 
   wakeUp(bot, msg, players, table, host) {

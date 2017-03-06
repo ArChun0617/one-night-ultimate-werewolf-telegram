@@ -9,7 +9,8 @@ export class Mason extends Role implements RoleInterface {
   constructor() {
     super({
       emoji: Role.MASON_EMOJI,
-      name: Role.MASON
+      name: Role.MASON,
+      ordering: 40
     });
   }
 

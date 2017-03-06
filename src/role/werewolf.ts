@@ -9,7 +9,8 @@ export class Werewolf extends Role implements RoleInterface {
   constructor() {
     super({
       emoji: Role.WEREWOLF_EMOJI,
-      name: Role.WEREWOLF
+      name: Role.WEREWOLF,
+      ordering: 20
     });
   }
 

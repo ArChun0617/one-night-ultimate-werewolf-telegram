@@ -4,7 +4,8 @@ export class Villager extends Role implements RoleInterface {
   constructor() {
     super({
       emoji: Role.VILLAGER_EMOJI,
-      name: Role.VILLAGER
+      name: Role.VILLAGER,
+      ordering: 999
     });
   }
 

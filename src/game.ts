@@ -211,17 +211,22 @@ export class Game {
     this.setPhase(Game.PHASE_ANNOUNCE_PLAYER_ROLE);
 
     return new Promise((resolve, reject) => {
-      let role = [];
+      let roles: Role[] = [];
+      let role: string[] = [];
       _.map(this.players, (p: Player) => {
-        role.push(p.getOriginalRole().fullName);
+        roles.push(p.getOriginalRole());
       });
       _.map(this.table.getRoles(), (r: Role) => {
+        roles.push(r);
+      });
+
+      _.map(_.sortBy(roles, (r:Role) => r.ordering), (r: Role) => {
         role.push(r.fullName);
       });
 
       this.bot.sendMessage(
         msg.chat.id,
-        `${Emoji.get('eyeglasses')}  Everyone, please check your role. The game has below role\n` + _.sortBy(role).join("\n"),
+        `${Emoji.get('eyeglasses')}  Everyone, please check your role. The game has below role\n  ` + role.join("\n  "),
         {
           reply_markup: JSON.stringify({
             inline_keyboard: [

@@ -9,7 +9,8 @@ export class Seer extends Role implements RoleInterface {
   constructor() {
     super({
       emoji: Role.SEER_EMOJI,
-      name: Role.SEER
+      name: Role.SEER,
+      ordering: 50
     });
   }
 

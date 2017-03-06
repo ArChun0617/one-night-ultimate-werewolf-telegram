@@ -4,7 +4,8 @@ export class Hunter extends Role implements RoleInterface {
   constructor() {
     super({
       emoji: Role.HUNTER_EMOJI,
-      name: Role.HUNTER
+      name: Role.HUNTER,
+      ordering: 998
     });
   }
 

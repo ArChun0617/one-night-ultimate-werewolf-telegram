@@ -4,7 +4,8 @@ export class Tanner extends Role implements RoleInterface {
   constructor() {
     super({
       emoji: Role.TANNER_EMOJI,
-      name: Role.TANNER
+      name: Role.TANNER,
+      ordering: 997
     });
   }
 

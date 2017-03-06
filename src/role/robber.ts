@@ -8,7 +8,8 @@ export class Robber extends Role implements RoleInterface {
   constructor() {
     super({
       emoji: Role.ROBBER_EMOJI,
-      name: Role.ROBBER
+      name: Role.ROBBER,
+      ordering: 60
     });
   }
 

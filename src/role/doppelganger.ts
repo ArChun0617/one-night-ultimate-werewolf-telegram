@@ -4,7 +4,8 @@ export class Doppelganger extends Role implements RoleInterface {
   constructor() {
     super({
       emoji: Role.DOPPELGANGER_EMOJI,
-      name: Role.DOPPELGANGER
+      name: Role.DOPPELGANGER,
+      ordering: 10
     });
   }
 

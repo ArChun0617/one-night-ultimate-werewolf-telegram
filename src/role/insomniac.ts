@@ -9,7 +9,8 @@ export class Insomniac extends Role implements RoleInterface {
   constructor() {
     super({
       emoji: Role.INSOMNIAC_EMOJI,
-      name: Role.INSOMNIAC
+      name: Role.INSOMNIAC,
+      ordering: 90
     });
   }
 

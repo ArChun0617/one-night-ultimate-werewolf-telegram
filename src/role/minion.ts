@@ -10,7 +10,8 @@ export class Minion extends Role implements RoleInterface {
   constructor() {
     super({
       emoji: Role.MINION_EMOJI,
-      name: Role.MINION
+      name: Role.MINION,
+      ordering: 30
     });
   }
 

@@ -9,7 +9,8 @@ export class Drunk extends Role implements RoleInterface {
   constructor() {
     super({
       emoji: Role.DRUNK_EMOJI,
-      name: Role.DRUNK
+      name: Role.DRUNK,
+      ordering: 80
     });
   }
 
