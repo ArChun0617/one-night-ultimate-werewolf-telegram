@@ -374,7 +374,7 @@ export class Game {
   }
 
   private setPhase(phase: string) {
-    if (this.phase === Game.PHASE_END_GAME) {
+    if (this.phase === Game.PHASE_END_GAME && phase != Game.PHASE_END_GAME) {
       throw new GameEndError();
     }
 
