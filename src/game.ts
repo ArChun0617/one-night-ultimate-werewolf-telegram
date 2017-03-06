@@ -296,17 +296,16 @@ export class Game {
     this.setPhase(Game.PHASE_VOTING);
 
     return new Promise((resolve, reject) => {
-      this.bot.sendMessage(msg.chat.id, `${Emoji.get('alarm_clock')}  Time\'s up. Everyone please vote.`);
 
-      this.sendVotingList(msg.chat.id);
-
-      setTimeout(() => {
-        // make sure every vote a player, random vote if needed
-        _.map(this.players, (player) => {
-          if (!player.getKillTarget()) this.randomVote(player);
-        });
-        resolve();
-      }, this.actionTime);
+      this.bot.sendMessage(msg.chat.id, `${Emoji.get('alarm_clock')}  Time\'s up. Everyone please vote.`)
+        .then(this.sendVotingList(msg.chat.id))
+        .then(setTimeout(() => {
+          // make sure every vote a player, random vote if needed
+          _.map(this.players, (player) => {
+            if (!player.getKillTarget()) this.randomVote(player);
+          });
+          resolve();
+        }, this.actionTime));
     });
   }
 

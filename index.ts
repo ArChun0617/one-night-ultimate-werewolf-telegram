@@ -132,7 +132,6 @@ bot.onText(/\/start/, (msg) => {
 
   game.start(msg)
     .then(() => {
-      console.log('Kill Game', msg.chat.id);
       killGame(msg.chat.id);
     })
     .catch((error) => {
@@ -150,7 +149,6 @@ bot.onText(/\/start/, (msg) => {
 });
 
 bot.onText(/\/delgame/, (msg) => {
-  console.log('Kill Game', msg.chat.id);
   killGame(msg.chat.id);
 });
 
@@ -219,11 +217,13 @@ bot.onText(/\/show/, (msg, match) => {
 });
 
 function killGame(id: number) {
+  console.log('Kill Game', id);
   const game: Game = getGame(id);
+  console.log('Kill Game (found game): ', (game ? "true" : "false"));
 
   if (game) {
-    game.end();
     _.remove(games, (game: Game) => game.id === id);
+    game.end();
   }
   
   console.log('games', games);
