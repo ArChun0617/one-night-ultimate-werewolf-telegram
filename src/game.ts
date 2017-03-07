@@ -148,6 +148,8 @@ export class Game {
       pos++;
     });
 
+    key.push([{ text: "Blank vote", callback_data: `-1` }]);
+
     this.bot.sendMessage(msgId,
       `${Emoji.get('point_up_2')}  Voting list`,
       {
@@ -351,7 +353,7 @@ export class Game {
     return new Promise((resolve, reject) => {
       let result = '';
 
-      this.determineWinners();
+      this.winners = this.determineWinners(this.deathPlayers);
       this.losers = _.difference(this.players, this.winners);
 
       result += `${Emoji.get('skull')}\n`;
@@ -449,34 +451,41 @@ export class Game {
     player.setKillTarget(targets[pos]);
   }
 
-  private determineWinners() {
-    const deathTanners = _.filter(this.deathPlayers, player => player.getRole().name === Role.TANNER);
-    const deathWerewolfs = _.filter(this.deathPlayers, player => player.getRole().name === Role.WEREWOLF);
-    const deathVillages = _.filter(this.deathPlayers, player => _.indexOf([
+  private determineWinners(deathPlayers: Player[]) {
+    let winners: Player[] = [];
+
+    const deathTanners = _.filter(deathPlayers, player => player.getRole().name === Role.TANNER);
+    const deathWerewolfs = _.filter(deathPlayers, player => player.getRole().name === Role.WEREWOLF);
+    const deathVillages = _.filter(deathPlayers, player => _.indexOf([
       Role.WEREWOLF, Role.MINION, Role.TANNER
     ], player.getRole().name) < 0);
 
-    this.addWinners(deathTanners);
-console.log('this.deathPlayers', this.deathPlayers);
-console.log('deathTanners', deathTanners);
-console.log('deathWerewolfs', deathWerewolfs);
-console.log('deathVillages', deathVillages);
-console.log('hasWerewolfOnTable()', this.hasWerewolfOnTable());
-    if (deathWerewolfs.length > 0) {
-      this.addWinners(this.getNonTannerVillagesTeam());
-    } else if (this.hasWerewolfOnTable()) {
-      if (deathTanners.length === 0) {
-        this.addWinners(this.getWerewolfTeam());
-      }
-    } else if (this.deathPlayers.length === 0) {
-      this.addWinners(this.getNonTannerVillagesTeam());
-    } else if (deathVillages.length || deathTanners) {
-      this.addWinners(this.getWerewolfTeam());
-    }
-  }
+    console.log('this.deathPlayers', deathPlayers);
+    console.log('deathTanners', deathTanners);
+    console.log('deathWerewolfs', deathWerewolfs);
+    console.log('deathVillages', deathVillages);
+    console.log('hasWerewolfOnTable()', this.hasWerewolfOnTable());
 
-  private addWinners(players: Player[]) {
-    this.winners = _.concat(this.winners, players);
+    // Tanner always win when he die
+    winners = _.concat(this.winners, deathTanners);
+
+    if (deathWerewolfs.length > 0) {
+      // If any wolf is die, all Village win
+      winners = _.concat(this.winners, this.getNonTannerVillagesTeam());
+    } else if (this.hasWerewolfOnTable()) {
+      // If no wolf is die, but tanner is alive, wolf win
+      if (deathTanners.length === 0) {
+        winners = _.concat(this.winners, this.getWerewolfTeam());
+      }
+    } else if (deathPlayers.length === 0) {
+      // If no one die and there is no wolf, Village win
+      winners = _.concat(this.winners, this.getNonTannerVillagesTeam());
+    } else if (deathVillages.length || deathTanners) {
+      // If no wolf + Village/Tanner die, Minion will win
+      winners = _.concat(this.winners, this.getWerewolfTeam());
+    }
+
+    return winners;
   }
 
   private getNonTannerVillagesTeam() {
@@ -502,7 +511,8 @@ console.log('hasWerewolfOnTable()', this.hasWerewolfOnTable());
   }
 
   private votePlayer(id: number, msg, player) {
-    const target = _.find(this.players, p => p.id === id);
+    let target = _.find(this.players, p => p.id === id);
+    if (id == -1) target = new Player({id: -1, name: ""});
     let rtnMsg = "";
     if (target) {
       player.setKillTarget(target);
