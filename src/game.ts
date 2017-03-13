@@ -271,7 +271,7 @@ export class Game {
         let roleCard = _.find(this.table.getRoles(), (r: Role) => r.checkRole(role, false));
 
         if (!roleCard) {
-          roleCard = _.find(this.players, (p: Player) => p.getRole() === role);
+          roleCard = _.find(this.players, (p: Player) => p.getRole().checkRole(role, false));
         }
 
         roleCard.wakeUp(this.bot, msg, this.players, this.table, player);
