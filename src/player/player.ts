@@ -20,11 +20,11 @@ export class Player {
     this.role = role;
   }
 
-  getRole(): any {
+  getRole(): Role {
     return this.role;
   }
 
-  getOriginalRole(): any {
+  getOriginalRole(): Role {
     return this.originalRole;
   }
   

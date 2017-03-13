@@ -43,63 +43,66 @@ export class Doppelganger extends Role implements RoleInterface {
         { text: `${Emoji.get('question')}${Emoji.get('question')}${this.emoji}`, callback_data: "CARD_C" }
     ]);
 
-    bot.sendMessage(msg.chat.id, `${this.fullName}, wake up.`, {
+    bot.sendMessage(msg.chat.id, `${this.fullName}, wake up. Choose a player to copy his role.\n If you are ${Role.SEER_EMOJI}${Role.ROBBER_EMOJI}${Role.TROUBLEMAKER_EMOJI}${Role.DRUNK_EMOJI}, do your action now.\nIf you are ${Role.WEREWOLF_EMOJI}${Role.MINION_EMOJI}${Role.MASON_EMOJI}${Role.INSOMNIAC_EMOJI}, wait until their turn.`, {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {
         // `sended` is the sent message.
-        console.log(`${this.name} sended >> MessageID:${sended.message_id} Text:${sended.text}`);
+        //console.log(`${this.name} sended >> MessageID:${sended.message_id} Text:${sended.text}`);
       });
   }
 
   useAbility(bot, msg, players, table, host) {
     let rtnMsg = '';
     let target:any;
-    console.log(`${this.name} useAbility:`, msg);
-    console.log(`${this.name} useAbility:shadowChoice ${this.shadowChoice}`);
+    console.log(`${this.name} useAbility.msg.data: ${msg.data}`);
+    console.log(`${this.name} useAbility.shadowChoice: ${this.shadowChoice}`);
+    console.log(`${this.name} useAbility.choice: ${this.choice}`);
 
     if (this.choice) {
       rtnMsg = "You already make your choice.";
     }
     else {
+      console.log(`${this.name} useAbility.${this.shadowChoice}: ${msg.data}`);
+
       switch (this.shadowChoice) {
         case Role.WEREWOLF:
-          target = _.filter(players, (player: Player) => player.getOriginalRole().name == Role.WEREWOLF || (player.getOriginalRole().shadowChoice && player.getOriginalRole().shadowChoice == Role.WEREWOLF));
+          target = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(Role.WEREWOLF));
           if (msg.data == "WAKE_UP") {
             _.map(target, (player: Player) => {
               rtnMsg += player.name + ", ";
             });
 
             if (rtnMsg.length > 0)
-              rtnMsg = `${this.fullName} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
+              rtnMsg = `${Role.WEREWOLF_EMOJI} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
           }
           break;
         case Role.MINION:
-          target = _.filter(players, (player: Player) => player.getOriginalRole().name == Role.WEREWOLF || (player.getOriginalRole().shadowChoice && player.getOriginalRole().shadowChoice == Role.WEREWOLF));
+          target = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(Role.WEREWOLF));
           if (msg.data == "WAKE_UP") {
             _.map(target, (player: Player) => {
               rtnMsg += player.name + ", ";
             });
 
             if (rtnMsg.length > 0)
-              rtnMsg = `${this.fullName} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
+              rtnMsg = `${Role.WEREWOLF_EMOJI} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
           }
           break;
         case Role.MASON:
-          target = _.filter(players, (player: Player) => player.getOriginalRole().name == Role.MASON || (player.getOriginalRole().shadowChoice && player.getOriginalRole().shadowChoice == Role.MASON));
+          target = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(Role.MASON));
           if (msg.data == "WAKE_UP") {
             _.map(target, (player: Player) => {
               rtnMsg += player.name + ", ";
             });
 
             if (rtnMsg.length > 0)
-              rtnMsg = `${this.fullName} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
+              rtnMsg = `${Role.MASON_EMOJI} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
           }
           break;
         case Role.SEER:
-          if (/^\d+$/.test(msg.data) || _.some(["CARD_AB", "CARD_AC", "CARD_BC"], msg.data)) {
+          if (/^\d+$/.test(msg.data) || _.includes(["CARD_AB", "CARD_AC", "CARD_BC"], msg.data)) {
             this.choice = msg.data;
-            rtnMsg = this.swapTable(this.choice, host, table);
+            rtnMsg = this.watchRole(this.choice, host, table);
           }
           break;
         case Role.ROBBER:
@@ -133,13 +136,13 @@ export class Doppelganger extends Role implements RoleInterface {
             }
             else {
               this.choice = msg.data;
-              const target: Player = _.find(players, (player: Player) => player.id == msg.data);
+              const target: Player = _.find(players, (player: Player) => player.id == parseInt(this.choice));
               rtnMsg = `You have choose ${target.name}, choose 1 more player to swap.`;
             }
           }
           break;
         case Role.DRUNK:
-          if (_.some(["CARD_A", "CARD_B", "CARD_C"], this.choice)) {
+          if (_.includes(["CARD_A", "CARD_B", "CARD_C"], msg.data)) {
             this.choice = msg.data;
             rtnMsg = this.swapTable(this.choice, host, table);
           }
@@ -154,6 +157,7 @@ export class Doppelganger extends Role implements RoleInterface {
           target = _.find(players, (player: Player) => player.id == parseInt(msg.data));
           if (target) {
             this.shadowChoice = target.getRole().name;
+            console.log(`${this.name} useAbility.Assign: ${this.shadowChoice}`);
             rtnMsg = target.name + " : " + target.getRole().fullName;
           }
           break;
@@ -169,8 +173,20 @@ export class Doppelganger extends Role implements RoleInterface {
     // do nothing
   }
 
+  checkRole(roleName, chkDoppleGanger: boolean = true) {
+     //chkShadow is deduce use shadowChoice or real role(DoppleGanger)
+
+    if (!(roleName instanceof Array) && roleName.toUpperCase() == Role.DOPPELGANGER.toUpperCase())// If role checked is DoppleGanger, always true for this
+      return true;
+    else if (roleName instanceof Array) // Otherwise check depends on chkShadow
+      return _.includes(_.map(roleName, (r) => r.toUpperCase()), (chkDoppleGanger ? this.shadowChoice : this.name).toUpperCase());
+    else
+      return (chkDoppleGanger ? this.shadowChoice : this.name).toUpperCase() == roleName.toUpperCase();
+  }
+
   // Seer Handler
   private watchRole(picked: string, players, table) {
+    console.log(`${this.name} watchRole: ${picked}`);
     let rtnMsg = "";
 
     const target: Player = _.find(players, (player: Player) => player.id == parseInt(picked));
@@ -200,6 +216,7 @@ export class Doppelganger extends Role implements RoleInterface {
 
   // Robber Handler
   private swapPlayer(picked: string, host, players) {
+    console.log(`${this.name} swapPlayer: ${picked}`);
     let tableRole: Role;
     let rtnMsg = "";
     const target: Player = _.find(players, (player: Player) => player.id == parseInt(this.choice));
@@ -214,6 +231,7 @@ export class Doppelganger extends Role implements RoleInterface {
 
   // Troublemaker Handler
   private swapPlayers(picked: string, players) {
+    console.log(`${this.name} swapPlayers: ${picked}`);
     let tableRole: Role;
     let rtnMsg = "";
     let chosenPlayer = picked.split('_');
@@ -232,38 +250,41 @@ export class Doppelganger extends Role implements RoleInterface {
 
   // Drunk Handler
   private swapTable(picked: string, host, table) {
+    console.log(`${this.name} swapTable: ${picked}`);
+
     let tableRole: Role;
     let rtnMsg = "";
 
-    if (this.choice == "CARD_A" || this.choice == "CARD_B" || this.choice == "CARD_C") {
-      rtnMsg = "You have swapped with ";
-      let targetRole: Role;
+    rtnMsg = "You have swapped with ";
+    let targetRole: Role;
 
-      if (this.choice == "CARD_A") {
+    switch (picked) {
+      case "CARD_A":
         tableRole = table.getLeft();
         table.setLeft(host.getRole());
         host.setRole(tableRole);
 
         rtnMsg += "left";
-      }
-      else if (this.choice == "CARD_B") {
+        break;
+      case "CARD_B":
         tableRole = table.getCenter();
         table.setCenter(host.getRole());
         host.setRole(tableRole);
 
         rtnMsg += "centre";
-      }
-      else if (this.choice == "CARD_C") {
+        break;
+      case "CARD_C":
         tableRole = table.getRight();
         table.setRight(host.getRole());
         host.setRole(tableRole);
 
         rtnMsg += "right";
-      }
-      else {
+        break;
+      default:
         rtnMsg = "Invalid action";
-      }
+        break;
     }
+
     return rtnMsg;
   }
 }

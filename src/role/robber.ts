@@ -38,7 +38,7 @@ export class Robber extends Role implements RoleInterface {
   }
 
   useAbility(bot, msg, players, table, host) {
-    console.log(`${this.name} useAbility:`, msg);
+    console.log(`${this.name} useAbility.msg.data: ${msg.data}`);
     let rtnMsg = '';
 
     if (this.choice) {

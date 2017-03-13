@@ -31,9 +31,9 @@ export class Mason extends Role implements RoleInterface {
   }
 
   useAbility(bot, msg, players, table, host) {
-    console.log(`${this.name} useAbility:`, msg);
+    console.log(`${this.name} useAbility.msg.data: ${msg.data}`);
 
-    const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().name == Role.MASON || (player.getOriginalRole().shadowChoice && player.getOriginalRole().shadowChoice == Role.MASON));
+    const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(Role.MASON));
     let rtnMsg: string = "";
 
     if (msg.data == "WAKE_UP") {
@@ -54,7 +54,7 @@ export class Mason extends Role implements RoleInterface {
     console.log(`${this.name} endTurn`);
     let rtnMsg: string = "";
 
-    const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().name == Role.MASON || (player.getOriginalRole().shadowChoice && player.getOriginalRole().shadowChoice == Role.MASON));
+    const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(Role.MASON));
     _.map(target, (player: Player) => {
       rtnMsg += player.name + ", ";
     });

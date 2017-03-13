@@ -37,14 +37,14 @@ export class Drunk extends Role implements RoleInterface {
 
   useAbility(bot, msg, players, table, host) {
     // TODO: avoid syntax error for testing first
-    console.log(`${this.name} useAbility:`, msg);
+    console.log(`${this.name} useAbility.msg.data: ${msg.data}`);
     let rtnMsg = '';
 
     if (this.choice) {
       rtnMsg = "You already make your choice.";
     }
     else {
-      if (!_.some(["CARD_A", "CARD_B", "CARD_C"], this.choice))
+      if (!_.includes(["CARD_A", "CARD_B", "CARD_C"], msg.data))
         rtnMsg = "Invalid action";
       else {
         this.choice = msg.data;
@@ -73,35 +73,33 @@ export class Drunk extends Role implements RoleInterface {
     let tableRole: Role;
     let rtnMsg = "";
 
-    if (this.choice == "CARD_A" || this.choice == "CARD_B" || this.choice == "CARD_C") {
-      rtnMsg = "You have swapped with ";
-      let targetRole: Role;
-
-      if (this.choice == "CARD_A") {
+    switch (picked) {
+      case "CARD_A":
         tableRole = table.getLeft();
         table.setLeft(host.getRole());
         host.setRole(tableRole);
 
         rtnMsg += "left";
-      }
-      else if (this.choice == "CARD_B") {
+        break;
+      case "CARD_B":
         tableRole = table.getCenter();
         table.setCenter(host.getRole());
         host.setRole(tableRole);
 
         rtnMsg += "centre";
-      }
-      else if (this.choice == "CARD_C") {
+        break;
+      case "CARD_C":
         tableRole = table.getRight();
         table.setRight(host.getRole());
         host.setRole(tableRole);
 
         rtnMsg += "right";
-      }
-      else {
+        break;
+      default:
         rtnMsg = "Invalid action";
-      }
+        break;
     }
+
     return rtnMsg;
   }
 }

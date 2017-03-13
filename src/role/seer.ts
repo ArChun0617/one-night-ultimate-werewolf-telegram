@@ -46,14 +46,14 @@ export class Seer extends Role implements RoleInterface {
   }
 
   useAbility(bot, msg, players, table, host) {
-    console.log(`${this.name} useAbility:`, msg);
+    console.log(`${this.name} useAbility.msg.data: ${msg.data}`);
     let rtnMsg = '';
 
     if (this.choice) {
       rtnMsg = "You already make your choice.";
     }
     else {
-      if (!/^\d+$/.test(msg.data) && !_.some(["CARD_AB", "CARD_AC", "CARD_BC"], msg.data))
+      if (!/^\d+$/.test(msg.data) && !_.includes(["CARD_AB", "CARD_AC", "CARD_BC"], msg.data))
         rtnMsg = "Invalid action";
       else {
         // TODO: avoid syntax error for testing first

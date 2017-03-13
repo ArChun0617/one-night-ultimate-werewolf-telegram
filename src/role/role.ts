@@ -1,4 +1,5 @@
 import * as Emoji from 'node-emoji';
+import * as _ from 'lodash';
 import { Player } from "../player/player";
 import { Table } from "../npc/table";
 
@@ -9,6 +10,7 @@ export interface RoleInterface {
   useAbility(bot, msg, players: Player[], table: Table, host: Player);
   endTurn(bot, msg, players: Player[], table, host: Player);
   notifyRole(bot, msg);
+  checkRole(roleName);
 }
 
 export interface RoleOptions {
@@ -71,5 +73,12 @@ export class Role implements RoleInterface {
 
   notifyRole(bot, msg) {
     bot.answerCallbackQuery(msg.id, `Your role is ${this.fullName}`);
+  }
+
+  checkRole(roleName, chkShadow: boolean = true) {  //chkShadow is used for doppleganger, for other role no difference
+    if (roleName instanceof Array)
+      return _.includes(_.map(roleName, (r: string) => r.toUpperCase()), this.name.toUpperCase());
+    else
+      return this.name.toUpperCase() == roleName.toUpperCase();
   }
 }

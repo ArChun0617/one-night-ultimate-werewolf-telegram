@@ -61,7 +61,7 @@ export class Troublemaker extends Role implements RoleInterface {
   }
 
   useAbility(bot, msg, players, table, host) {
-    console.log(`${this.name} useAbility:`, msg);
+    console.log(`${this.name} useAbility.msg.data: ${msg.data}`);
     let rtnMsg = '';
 
     const regex = new RegExp(/^\d+_\d+/);

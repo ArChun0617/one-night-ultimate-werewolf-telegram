@@ -172,7 +172,7 @@ export class Game {
     }
 
     const player = this.getPlayer(msg.from.id);
-    console.log(`Callback_query Called [Game]: ${this.id} | [Event]: ${event} | [Player] ${player ? player.name + "(" + player.getRole().name + ")" : 'Nan'}`);
+    //console.log(`Callback_query Called [Game]: ${this.id} | [Event]: ${event} | [Player] ${player ? player.name + "(" + player.getRole().name + ")" : 'Nan'}`);
 
     if (!player) {
       this.sendInvalidActionMessage(msg.id);
@@ -263,12 +263,12 @@ export class Game {
     this.setWakeUpPhase(role);
 
     return new Promise((resolve, reject) => {
-      const player: Player = _.find(this.players, (p) => p.getOriginalRole().name === role);
+      const player: Player = _.find(this.players, (p) => p.getOriginalRole().checkRole(role, false));
 
       if (player) {
         player.getOriginalRole().wakeUp(this.bot, msg, this.players, this.table, player);
       } else {
-        let roleCard = _.find(this.table.getRoles(), (r: Role) => r.name === role);
+        let roleCard = _.find(this.table.getRoles(), (r: Role) => r.checkRole(role, false));
 
         if (!roleCard) {
           roleCard = _.find(this.players, (p: Player) => p.getRole() === role);
@@ -337,7 +337,7 @@ export class Game {
       
       console.log('this.result', util.inspect(this.result, false, 3));
       _.map(deaths, (death: Result) => {
-        if (death.target.getOriginalRole() === Role.HUNTER) {
+        if (death.target.getOriginalRole().checkRole(Role.HUNTER)) {
           this.deathPlayers.push(_.assignIn(death.target.getKillTarget(), {"count": "HUNTER"}));
         }
         this.deathPlayers.push(_.assignIn(death.target, { "count": death.count }));
@@ -418,14 +418,17 @@ export class Game {
   }
 
   private handleWakeUpEvent(event: string, msg: any, player: Player) {
-    if (this.getPhase() !== 'wakeup_' + player.getOriginalRole().name.toLowerCase() &&
-        !(player.getOriginalRole().name == Role.DOPPELGANGER
-          && this.getPhase() == 'wakeup_' + player.getOriginalRole().shadowChoice.toLowerCase()
-          && _.some([Role.WEREWOLF, Role.MINION, Role.MASON, Role.INSOMNIAC], player.getOriginalRole().shadowChoice))) {  //Some role for doppleganger is action together with others (Werewolf, Minion, Mason, Insomniac)
-      return this.sendInvalidActionMessage(msg.id);
+    if (player.getOriginalRole().checkRole(Role.DOPPELGANGER)) { // The player is Doppleganger
+      if (player.getOriginalRole().checkRole([Role.WEREWOLF, Role.MINION, Role.MASON, Role.INSOMNIAC]) || this.getPhase() == 'wakeup_' + Role.DOPPELGANGER.toLowerCase()) // Hard-coded to allow (Werewolf, Minion, Mason, Insomniac) since others should act in DoopleGanger phase
+        if (player.getOriginalRole().checkRole(this.getPhase().substring("wakeup_".length)))  // The phase is action for the role
+          return player.getOriginalRole().useAbility(this.bot, msg, this.players, this.table, player);
+        else
+          return this.sendInvalidActionMessage(msg.id);
     }
-
-    player.getOriginalRole().useAbility(this.bot, msg, this.players, this.table, player);
+    else if (this.getPhase() !== 'wakeup_' + player.getOriginalRole().name.toLowerCase())
+      return this.sendInvalidActionMessage(msg.id);
+    else
+      return player.getOriginalRole().useAbility(this.bot, msg, this.players, this.table, player);
   }
 
   private handleConversationEvent(event: string, msg: any, player: Player) {
@@ -457,8 +460,8 @@ export class Game {
   private determineWinners(deathPlayers: Player[]) {
     let winners: Player[] = [];
 
-    const deathTanners = _.filter(deathPlayers, player => player.getRole().name === Role.TANNER);
-    const deathWerewolfs = _.filter(deathPlayers, player => player.getRole().name === Role.WEREWOLF);
+    const deathTanners = _.filter(deathPlayers, player => player.getRole().checkRole(Role.TANNER));
+    const deathWerewolfs = _.filter(deathPlayers, player => player.getRole().checkRole(Role.WEREWOLF));
     const deathVillages = _.filter(deathPlayers, player => _.indexOf([
       Role.WEREWOLF, Role.MINION, Role.TANNER
     ], player.getRole().name) < 0);
@@ -492,24 +495,15 @@ export class Game {
   }
 
   private getNonTannerVillagesTeam() {
-    return _.filter(this.players, player => (_.indexOf([
-      Role.DOPPELGANGER,
-      Role.WEREWOLF,
-      Role.MINION,
-      Role.TANNER,
-    ], player.getRole().name) < 0));
+    return _.filter(this.players, player => !(player.getRole().checkRole([Role.WEREWOLF, Role.MINION, Role.TANNER])));
   }
 
   private getWerewolfTeam() {
-    return _.filter(this.players, player => (_.indexOf([
-      Role.DOPPELGANGER,
-      Role.WEREWOLF,
-      Role.MINION
-    ], player.getRole().name) >= 0 ));
+    return _.filter(this.players, player => player.getRole().checkRole([Role.WEREWOLF, Role.MINION]));
   }
 
   private hasWerewolfOnTable() {
-    const werewolfs = _.filter(this.players, player => player.getRole().name === Role.WEREWOLF);
+    const werewolfs = _.filter(this.players, player => player.getRole().checkRole(Role.WEREWOLF));
     return werewolfs.length > 0;
   }
 

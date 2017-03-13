@@ -32,7 +32,7 @@ export class Insomniac extends Role implements RoleInterface {
 
   useAbility(bot, msg, players, table, host) {
     // TODO: avoid syntax error for testing first
-    console.log(`${this.name} useAbility:`, msg);
+    console.log(`${this.name} useAbility.msg.data: ${msg.data}`);
 
     let rtnMsg: string = "";
 
