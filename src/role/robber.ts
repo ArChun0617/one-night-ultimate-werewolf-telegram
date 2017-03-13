@@ -45,11 +45,12 @@ export class Robber extends Role implements RoleInterface {
       rtnMsg = "You already make your choice.";
     }
     else {
-      this.choice = msg.data;
-
-      //if (!choice) choice = msg.data;	//To lock the Seer with only one choice
-      // const host: Player = _.find(players, (player: Player) => player.id == parseInt(msg.from.id));
-      rtnMsg = this.swapPlayer(this.choice, host, players);
+      if (!/^\d+$/.test(msg.data))
+        rtnMsg = "Invalid action";
+      else {
+        this.choice = msg.data;
+        rtnMsg = this.swapPlayer(this.choice, host, players);
+      }
     }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);

@@ -72,48 +72,39 @@ export class Troublemaker extends Role implements RoleInterface {
       rtnMsg = "You already make your choice.";
     }
     else if (this.choice) {
-      //Chose only 1 player
-      if (host.id == parseInt(msg.data)) {
-        rtnMsg = "Buddy, You cannot choose yourself.";
-      }
-      else if (this.choice == msg.data) {
-        this.choice = "";
-        rtnMsg = "You have cancelled, choose 2 players to swap.";
-      }
+      if (!/^\d+$/.test(msg.data))
+        rtnMsg = "Invalid action";
       else {
-        this.choice += "_" + msg.data;
-        rtnMsg = this.swapPlayers(this.choice, players);
+        //Chose only 1 player
+        if (host.id == parseInt(msg.data)) {
+          rtnMsg = "Buddy, You cannot choose yourself.";
+        }
+        else if (this.choice == msg.data) {
+          this.choice = "";
+          rtnMsg = "You have cancelled, choose 2 players to swap.";
+        }
+        else {
+          this.choice += "_" + msg.data;
+          rtnMsg = this.swapPlayers(this.choice, players);
+        }
       }
     }
     else {
-      //Both not yet chose, now set the first player.
-      if (host.id == parseInt(msg.data)) {
-        rtnMsg = "Buddy, You cannot choose yourself.";
-      }
+      if (!/^\d+$/.test(msg.data))
+        rtnMsg = "Invalid action";
       else {
-        this.choice = msg.data;
-        const target: Player = _.find(players, (player: Player) => player.id == msg.data);
-        rtnMsg = `You have choose ${target.name}, choose 1 more player to swap.`;
+        //Both not yet chose, now set the first player.
+        if (host.id == parseInt(msg.data)) {
+          rtnMsg = "Buddy, You cannot choose yourself.";
+        }
+        else {
+          this.choice = msg.data;
+          const target: Player = _.find(players, (player: Player) => player.id == msg.data);
+          rtnMsg = `You have choose ${target.name}, choose 1 more player to swap.`;
+        }
       }
     }
     bot.answerCallbackQuery(msg.id, rtnMsg);
-
-    /*let rtnMsg = '';
-
-    if (this.choice) {
-      rtnMsg = "You already make your choice.";
-    }
-    else {
-      this.choice = msg.data;
-      let chosenPlayer = this.choice.split('_');
-
-      if (host.id == parseInt(chosenPlayer[0]) || host.id == parseInt(chosenPlayer[1]))
-        rtnMsg = "Buddy, You cannot choose yourself.";
-      else
-        rtnMsg = this.swapPlayers(this.choice, players);
-    }
-
-    bot.answerCallbackQuery(msg.id, rtnMsg);*/
   }
 
   endTurn(bot, msg, players: Player[], table, host: Player) {

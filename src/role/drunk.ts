@@ -44,12 +44,12 @@ export class Drunk extends Role implements RoleInterface {
       rtnMsg = "You already make your choice.";
     }
     else {
-      this.choice = msg.data
-
-      if (_.some(["CARD_A", "CARD_B", "CARD_C"], this.choice))
-        rtnMsg = this.swapTable(this.choice, host, table);
-      else
+      if (!_.some(["CARD_A", "CARD_B", "CARD_C"], this.choice))
         rtnMsg = "Invalid action";
+      else {
+        this.choice = msg.data;
+        rtnMsg = this.swapTable(this.choice, host, table);
+      }
     }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);

@@ -53,9 +53,13 @@ export class Seer extends Role implements RoleInterface {
       rtnMsg = "You already make your choice.";
     }
     else {
-      // TODO: avoid syntax error for testing first
-      this.choice = msg.data;
-      rtnMsg = this.watchRole(this.choice, players, table);
+      if (!/^\d+$/.test(msg.data) && !_.some(["CARD_AB", "CARD_AC", "CARD_BC"], msg.data))
+        rtnMsg = "Invalid action";
+      else {
+        // TODO: avoid syntax error for testing first
+        this.choice = msg.data;
+        rtnMsg = this.watchRole(this.choice, players, table);
+      }
     }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
