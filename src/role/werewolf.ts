@@ -44,7 +44,7 @@ export class Werewolf extends Role implements RoleInterface {
 
     console.log(`${this.name} useAbility:choice ${this.choice}`);
     let rtnMsg: string = "";
-    const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().name == Role.WEREWOLF);
+    const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().name == Role.WEREWOLF || (player.getOriginalRole().shadowChoice && player.getOriginalRole().shadowChoice == Role.WEREWOLF));
 
     if (msg.data == "WAKE_UP") {
       _.map(target, (player: Player) => {
@@ -77,7 +77,7 @@ export class Werewolf extends Role implements RoleInterface {
 
     console.log(`${this.name} endTurn:choice ${this.choice}`);
     if (!this.choice) {
-      const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().name == Role.WEREWOLF);
+      const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().name == Role.WEREWOLF || (player.getOriginalRole().shadowChoice && player.getOriginalRole().shadowChoice == Role.WEREWOLF));
 
       if (target.length > 1) {
         _.map(target, (player: Player) => {

@@ -36,7 +36,7 @@ export class Minion extends Role implements RoleInterface {
   useAbility(bot, msg, players, table, host) {
     console.log(`${this.name} useAbility:`, msg);
 
-    const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().name == Role.WEREWOLF);
+    const target: Player[] = _.filter(players, (player: Player) => (player.getOriginalRole().name == Role.WEREWOLF || (player.getOriginalRole().shadowChoice && player.getOriginalRole().shadowChoice == Role.WEREWOLF)));
     let wolf: Werewolf = new Werewolf();
     let rtnMsg: string = "";
 
@@ -55,7 +55,7 @@ export class Minion extends Role implements RoleInterface {
   endTurn(bot, msg, players, table, host) {
     console.log(`${this.name} endTurn`);
 
-    const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().name == Role.WEREWOLF);
+    const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().name == Role.WEREWOLF || (player.getOriginalRole().shadowChoice && player.getOriginalRole().shadowChoice == Role.WEREWOLF));
     let wolf: Werewolf = new Werewolf();
     let rtnMsg: string = "";
 

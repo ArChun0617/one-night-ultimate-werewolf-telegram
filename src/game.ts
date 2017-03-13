@@ -282,7 +282,7 @@ export class Game {
           player.getOriginalRole().endTurn(this.bot, msg, this.players, this.table, player);
 
         resolve();
-      }, this.actionTime);
+      }, this.actionTime * (role == Role.DOPPELGANGER ? 2 : 1));  // 2x action time for DoppelGanger
     });
   }
 
@@ -418,7 +418,10 @@ export class Game {
   }
 
   private handleWakeUpEvent(event: string, msg: any, player: Player) {
-    if (this.getPhase() !== 'wakeup_' + player.getOriginalRole().name.toLowerCase()) {
+    if (this.getPhase() !== 'wakeup_' + player.getOriginalRole().name.toLowerCase() &&
+        !(player.getOriginalRole().name == Role.DOPPELGANGER
+          && this.getPhase() == 'wakeup_' + player.getOriginalRole().shadowChoice.toLowerCase()
+          && _.some([Role.WEREWOLF, Role.MINION, Role.MASON, Role.INSOMNIAC], player.getOriginalRole().shadowChoice))) {  //Some role for doppleganger is action together with others (Werewolf, Minion, Mason, Insomniac)
       return this.sendInvalidActionMessage(msg.id);
     }
 
