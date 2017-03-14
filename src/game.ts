@@ -271,9 +271,12 @@ export class Game {
         let roleCard = _.find(this.table.getRoles(), (r: Role) => r.checkRole(role, false));
 
         if (!roleCard) {
-          roleCard = _.find(this.players, (p: Player) => p.getRole().checkRole(role, false));
-        }
-
+          let tempPlayer = _.find(this.players, (p: Player) => p.getRole().checkRole(role, false));
+          if (!tempPlayer)
+            throw new TypeError(`${role} is not found in both Table & Player !`);
+          else
+            roleCard = tempPlayer.getRole();
+        }        
         roleCard.wakeUp(this.bot, msg, this.players, this.table, player);
       }
 
@@ -335,7 +338,7 @@ export class Game {
       this.result = _.reverse(_.sortBy(this.result, (result) => result.count));
       const deaths = _.filter(this.result, (result) => result.count >= this.result[0].count && result.count >= 2);
       
-      console.log('this.result', util.inspect(this.result, false, 3));
+      //console.log('this.result', util.inspect(this.result, false, 3));
       _.map(deaths, (death: Result) => {
         if (death.target.getOriginalRole().checkRole(Role.HUNTER)) {
           this.deathPlayers.push(_.assignIn(death.target.getKillTarget(), {"count": "HUNTER"}));
