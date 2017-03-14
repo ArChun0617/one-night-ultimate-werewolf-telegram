@@ -4,7 +4,7 @@ import { Role, RoleInterface } from "./role";
 import { Player } from "../player/player";
 
 export class Doppelganger extends Role implements RoleInterface {
-  shadowChoice: string = "";
+  shadowChoice: Role;
   choice: string;
 
   constructor() {
@@ -65,7 +65,7 @@ export class Doppelganger extends Role implements RoleInterface {
     else {
       console.log(`${this.name} useAbility.${this.shadowChoice}: ${msg.data}`);
 
-      switch (this.shadowChoice) {
+      switch (this.shadowChoice ? this.shadowChoice.name : "") {
         case Role.WEREWOLF:
           target = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(Role.WEREWOLF));
           if (msg.data == "WAKE_UP") {
@@ -155,9 +155,13 @@ export class Doppelganger extends Role implements RoleInterface {
           break;
         case "":
           target = _.find(players, (player: Player) => player.id == parseInt(msg.data));
+          //console.log(`${this.name} useAbility.target:`, target);
           if (target) {
-            this.shadowChoice = target.getRole().name;
-            console.log(`${this.name} useAbility.Assign: ${this.shadowChoice}`);
+            this.shadowChoice = _.clone(target.getRole());
+            //console.log(`${this.name} useAbility.target.getRole():`, target.getRole());
+            //console.log(`${this.name} useAbility.shadowChoice:`, this.shadowChoice);
+            console.log(`${this.name} useAbility.Assign: ${this.shadowChoice.name}`);
+            this.emoji += this.shadowChoice.emoji;
             rtnMsg = target.name + " : " + target.getRole().fullName;
           }
           break;
@@ -170,7 +174,78 @@ export class Doppelganger extends Role implements RoleInterface {
   }
 
   endTurn(bot, msg, players, table, host) {
-    // do nothing
+    console.log(`${this.name} endTurn`);
+    let rtnMsg = "";
+
+    console.log(`${this.shadowChoice} endTurn:shadowChoice ${(this.shadowChoice ? this.shadowChoice.name : "undefined")}`);
+    console.log(`${this.name} endTurn:choice ${this.choice}`);
+    if (this.shadowChoice) {
+      switch (this.shadowChoice ? this.shadowChoice.name : "") {
+        case Role.WEREWOLF:
+          //do nothing
+          break;
+        case Role.MINION:
+          //do nothing
+          break;
+        case Role.MASON:
+          //do nothing
+          break;
+        case Role.SEER:
+          //do nothing
+          break;
+        case Role.ROBBER:
+          if (!this.choice) {
+            const key = _.map(players, (player: Player) => player.id + "");
+            this.choice = _.shuffle(key)[0];
+            console.log(`${this.name} endTurn:choice_Shuffle ${this.choice}`);
+            rtnMsg = this.swapPlayer(this.choice, host, players);
+          }
+          break;
+        case Role.TROUBLEMAKER:
+          const regex = new RegExp(/^\d_\d/);
+          let targets: string[];
+          if (regex.test(this.choice)) {
+            //Already chose both player
+            //do nothing
+          }
+          else if (this.choice) {
+            const key = _.map(players, (player: Player) => player.id + "");
+            //Random second player
+            targets = _.filter(key, (k) => k !== host.id); // not host
+            this.choice += "_" + _.shuffle(targets)[0];
+
+            console.log(`${this.name} endTurn:choice_Shuffle ${this.choice}`);
+            rtnMsg = this.swapPlayers(this.choice, players);
+          }
+          else {
+            const key = _.map(players, (player: Player) => player.id + "");
+            targets = _.filter(key, (k) => k !== host.id); // not host
+            targets = _.shuffle(targets);
+            this.choice = targets.pop() + "_" + targets.pop();
+
+            console.log(`${this.name} endTurn:choice_Shuffle ${this.choice}`);
+            rtnMsg = this.swapPlayers(this.choice, players);
+          }
+          break;
+        case Role.DRUNK:
+          if (!this.choice) {
+            this.choice = _.shuffle(["CARD_A", "CARD_B", "CARD_C"])[0];
+            console.log(`${this.name} endTurn:choice_Shuffle ${this.choice}`);
+            rtnMsg = this.swapTable(this.choice, host, table);
+          }
+          break;
+        case Role.INSOMNIAC:
+          //do nothing
+          break;
+        case "":
+          //do nothing
+          break;
+        default:
+          break;
+      }
+
+      bot.answerCallbackQuery(msg.id, rtnMsg);
+    }
   }
 
   checkRole(roleName, chkDoppleGanger: boolean = true) {
@@ -179,9 +254,9 @@ export class Doppelganger extends Role implements RoleInterface {
     if (!(roleName instanceof Array) && roleName.toUpperCase() == Role.DOPPELGANGER.toUpperCase())// If role checked is DoppleGanger, always true for this
       return true;
     else if (roleName instanceof Array) // Otherwise check depends on chkShadow
-      return _.includes(_.map(roleName, (r) => r.toUpperCase()), (chkDoppleGanger ? this.shadowChoice : this.name).toUpperCase());
+      return _.includes(_.map(roleName, (r) => r.toUpperCase()), (chkDoppleGanger ? (this.shadowChoice ? this.shadowChoice.name : this.name) : this.name).toUpperCase());
     else
-      return (chkDoppleGanger ? this.shadowChoice : this.name).toUpperCase() == roleName.toUpperCase();
+      return (chkDoppleGanger ? (this.shadowChoice ? this.shadowChoice.name : this.name) : this.name).toUpperCase() == roleName.toUpperCase();
   }
 
   // Seer Handler

@@ -62,11 +62,7 @@ export class Robber extends Role implements RoleInterface {
 
     console.log(`${this.name} endTurn:choice ${this.choice}`);
     if (!this.choice) {
-      const key = [];
-      _.map(players, (player: Player) => {
-          key.push(player.id+"");
-      });
-
+      const key = _.map(players, (player: Player) => player.id+"");
       this.choice = _.shuffle(key)[0];
       console.log(`${this.name} endTurn:choice_Shuffle ${this.choice}`);
       rtnMsg = this.swapPlayer(this.choice, host, players);

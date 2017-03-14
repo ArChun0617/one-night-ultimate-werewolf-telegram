@@ -454,10 +454,22 @@ export class Game {
     this.votePlayer(id, msg, player);
   }
 
-  private randomVote(player: Player) {
-    const targets = _.filter(this.players, p => p.id !== player.id);
+  private randomVote(host: Player) {
+    const targets = _.filter(this.players, player => player.id !== host.id);
     const pos = _.random(0, targets.length - 1);
-    player.setKillTarget(targets[pos]);
+    host.setKillTarget(targets[pos]);
+
+    /*console.log("randomVote.player: " + host.id);
+    let target;
+    if (host.id % 2 == 0) {
+      target = _.filter(this.players, player => player.getRole().checkRole(Role.TANNER))[0];
+    }
+    else {
+      target = _.filter(this.players, player => player.getRole().checkRole(Role.WEREWOLF))[0];
+    }
+    console.log("randomVote.target: " + target.id);
+
+    host.setKillTarget(target);*/
   }
 
   private determineWinners(deathPlayers: Player[]) {
@@ -476,22 +488,22 @@ export class Game {
     console.log('hasWerewolfOnTable()', this.hasWerewolfOnTable());
 
     // Tanner always win when he die
-    winners = _.concat(this.winners, deathTanners);
+    winners = _.concat(winners, deathTanners);
 
     if (deathWerewolfs.length > 0) {
       // If any wolf is die, all Village win
-      winners = _.concat(this.winners, this.getNonTannerVillagesTeam());
+      winners = _.concat(winners, this.getNonTannerVillagesTeam());
     } else if (this.hasWerewolfOnTable()) {
       // If no wolf is die, but tanner is alive, wolf win
       if (deathTanners.length === 0) {
-        winners = _.concat(this.winners, this.getWerewolfTeam());
+        winners = _.concat(winners, this.getWerewolfTeam());
       }
     } else if (deathPlayers.length === 0) {
       // If no one die and there is no wolf, Village win
-      winners = _.concat(this.winners, this.getNonTannerVillagesTeam());
+      winners = _.concat(winners, this.getNonTannerVillagesTeam());
     } else if (deathVillages.length || deathTanners) {
       // If no wolf + Village/Tanner die, Minion will win
-      winners = _.concat(this.winners, this.getWerewolfTeam());
+      winners = _.concat(winners, this.getWerewolfTeam());
     }
 
     return winners;
