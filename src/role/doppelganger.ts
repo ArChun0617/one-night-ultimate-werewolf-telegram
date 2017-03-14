@@ -54,7 +54,8 @@ export class Doppelganger extends Role implements RoleInterface {
 
   useAbility(bot, msg, players, table, host) {
     let rtnMsg = '';
-    let target:any;
+    let target: any;
+    let actionEvt: any;
     console.log(`${this.name} useAbility.${(this.shadowChoice ? this.shadowChoice.name : this.name)}: ${msg.data}`);
     console.log(`${this.name} useAbility.choice: ${this.choice}`);
 
@@ -82,6 +83,7 @@ export class Doppelganger extends Role implements RoleInterface {
           if (/^\d+$/.test(msg.data) || _.includes(["CARD_AB", "CARD_AC", "CARD_BC"], msg.data)) {
             this.choice = msg.data;
             rtnMsg = this.watchRole(this.choice, host, table);
+            actionEvt = this.actionLog("useAbility", host, this.choice, "watched card " + rtnMsg);
           }
         }
         else
@@ -91,6 +93,7 @@ export class Doppelganger extends Role implements RoleInterface {
         if (!this.choice) {
           this.choice = msg.data;
           rtnMsg = this.swapPlayer(this.choice, host, players);
+          actionEvt = this.actionLog("useAbility", host, this.choice, "swapped card " + rtnMsg);
         }
         else
           rtnMsg = "You already make your choice.";
@@ -113,6 +116,7 @@ export class Doppelganger extends Role implements RoleInterface {
           else {
             this.choice += "_" + msg.data;
             rtnMsg = this.swapPlayers(this.choice, players);
+            actionEvt = this.actionLog("useAbility", host, this.choice, "swapped card " + rtnMsg);
           }
         }
         else {
@@ -132,6 +136,7 @@ export class Doppelganger extends Role implements RoleInterface {
           if (_.includes(["CARD_A", "CARD_B", "CARD_C"], msg.data)) {
             this.choice = msg.data;
             rtnMsg = this.swapTable(this.choice, host, table);
+            actionEvt = this.actionLog("useAbility", host, this.choice, "swapped card " + rtnMsg);
           }
         }
         else
@@ -160,11 +165,13 @@ export class Doppelganger extends Role implements RoleInterface {
     }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
+    return (actionEvt || this.actionLog("useAbility", host, this.choice, ""));
   }
 
   endTurn(bot, msg, players, table, host) {
     console.log(`${this.name} endTurn`);
     let rtnMsg = "";
+    let actionEvt: any;
 
     console.log(`${this.name} endTurn:shadowChoice ${(this.shadowChoice ? this.shadowChoice.name : "undefined")}`);
     console.log(`${this.name} endTurn:choice ${this.choice}`);
@@ -188,6 +195,7 @@ export class Doppelganger extends Role implements RoleInterface {
             this.choice = _.shuffle(key)[0];
             console.log(`${this.name} endTurn:choice_Shuffle ${this.choice}`);
             rtnMsg = this.swapPlayer(this.choice, host, players);
+            actionEvt = this.actionLog("endTurn", host, this.choice, "donzed, God swapped card " + rtnMsg);
           }
           break;
         case Role.TROUBLEMAKER:
@@ -205,6 +213,7 @@ export class Doppelganger extends Role implements RoleInterface {
 
             console.log(`${this.name} endTurn:choice_Shuffle ${this.choice}`);
             rtnMsg = this.swapPlayers(this.choice, players);
+            actionEvt = this.actionLog("endTurn", host, this.choice, "donzed, God swapped card " + rtnMsg);
           }
           else {
             const key = _.map(players, (player: Player) => player.id + "");
@@ -214,6 +223,7 @@ export class Doppelganger extends Role implements RoleInterface {
 
             console.log(`${this.name} endTurn:choice_Shuffle ${this.choice}`);
             rtnMsg = this.swapPlayers(this.choice, players);
+            actionEvt = this.actionLog("endTurn", host, this.choice, "donzed, God swapped card " + rtnMsg);
           }
           break;
         case Role.DRUNK:
@@ -221,6 +231,7 @@ export class Doppelganger extends Role implements RoleInterface {
             this.choice = _.shuffle(["CARD_A", "CARD_B", "CARD_C"])[0];
             console.log(`${this.name} endTurn:choice_Shuffle ${this.choice}`);
             rtnMsg = this.swapTable(this.choice, host, table);
+            actionEvt = this.actionLog("endTurn", host, this.choice, "donzed, God swapped card " + rtnMsg);
           }
           break;
         case Role.INSOMNIAC:
@@ -234,6 +245,7 @@ export class Doppelganger extends Role implements RoleInterface {
       }
 
       bot.answerCallbackQuery(msg.id, rtnMsg);
+      return (actionEvt || this.actionLog("endTurn", host, this.choice, ""));
     }
   }
 
@@ -329,9 +341,6 @@ export class Doppelganger extends Role implements RoleInterface {
     let tableRole: Role;
     let rtnMsg = "";
 
-    rtnMsg = "You have swapped with ";
-    let targetRole: Role;
-
     switch (picked) {
       case "CARD_A":
         tableRole = table.getLeft();
@@ -360,5 +369,9 @@ export class Doppelganger extends Role implements RoleInterface {
     }
 
     return rtnMsg;
+  }
+
+  actionLog(phase, host, choice, msg) {
+    return super.footprint(host, choice, msg)
   }
 }

@@ -63,6 +63,7 @@ export class Troublemaker extends Role implements RoleInterface {
   useAbility(bot, msg, players, table, host) {
     console.log(`${this.name} useAbility.msg.data: ${msg.data}`);
     let rtnMsg = '';
+    let actionEvt: any;
 
     const regex = new RegExp(/^\d+_\d+/);
 
@@ -86,6 +87,7 @@ export class Troublemaker extends Role implements RoleInterface {
         else {
           this.choice += "_" + msg.data;
           rtnMsg = this.swapPlayers(this.choice, players);
+          actionEvt = this.actionLog("useAbility", host, this.choice, rtnMsg);
         }
       }
     }
@@ -105,11 +107,13 @@ export class Troublemaker extends Role implements RoleInterface {
       }
     }
     bot.answerCallbackQuery(msg.id, rtnMsg);
+    return (actionEvt || this.actionLog("useAbility", host, this.choice, ""));
   }
 
   endTurn(bot, msg, players: Player[], table, host: Player) {
     console.log(`${this.name} endTurn`);
     let rtnMsg = '';
+    let actionEvt: any;
 
     const regex = new RegExp(/^\d_\d/);
 
@@ -126,6 +130,7 @@ export class Troublemaker extends Role implements RoleInterface {
 
       console.log(`${this.name} endTurn:choice_Shuffle ${this.choice}`);
       rtnMsg = this.swapPlayers(this.choice, players);
+      actionEvt = this.actionLog("endTurn", host, this.choice, rtnMsg);
     }
     else {
       //Random first player
@@ -140,8 +145,10 @@ export class Troublemaker extends Role implements RoleInterface {
 
       console.log(`${this.name} endTurn:choice_Shuffle ${this.choice}`);
       rtnMsg = this.swapPlayers(this.choice, players);
+      actionEvt = this.actionLog("endTurn", host, this.choice, rtnMsg);
     }
     bot.answerCallbackQuery(msg.id, rtnMsg);
+    return (actionEvt || this.actionLog("endTurn", host, this.choice, ""));
     /*let rtnMsg = "";
 
     console.log(`${this.name} endTurn:choice ${this.choice}`);
@@ -180,5 +187,11 @@ export class Troublemaker extends Role implements RoleInterface {
       host.swapRole(target);
     }
     return rtnMsg;
+  }
+
+  actionLog(phase, host, choice, msg) {
+    let actionMsg = "";
+    actionMsg = (phase == "useAbility" ? "swapped card " : "donzed, God swapped card ") + msg;
+    return super.footprint(host, choice, actionMsg)
   }
 }

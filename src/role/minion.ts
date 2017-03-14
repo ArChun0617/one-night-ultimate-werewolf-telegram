@@ -38,6 +38,7 @@ export class Minion extends Role implements RoleInterface {
     this.choice = rtnMsg;
     if (rtnMsg.length > 0) rtnMsg = `${Role.WEREWOLF + Role.WEREWOLF_EMOJI} is: ` + rtnMsg;
     bot.answerCallbackQuery(msg.id, rtnMsg);
+    return this.actionLog("useAbility", host, this.choice);
   }
 
   endTurn(bot, msg, players, table, host) {
@@ -46,6 +47,7 @@ export class Minion extends Role implements RoleInterface {
     this.choice = rtnMsg;
     if (rtnMsg.length > 0) rtnMsg = `${Role.WEREWOLF + Role.WEREWOLF_EMOJI} is: ` + rtnMsg;
     bot.answerCallbackQuery(msg.id, rtnMsg);
+    return this.actionLog("endTurn", host, this.choice);
   }
 
   private getRolePlayers(role: string, players) {
@@ -55,5 +57,9 @@ export class Minion extends Role implements RoleInterface {
     rtnMsg = _.map(target, (player: Player) => player.name).join();
 
     return rtnMsg;
+  }
+
+  actionLog(phase, host, choice) {
+    return super.footprint(host, choice, "");
   }
 }

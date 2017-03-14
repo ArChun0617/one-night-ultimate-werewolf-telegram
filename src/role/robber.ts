@@ -54,6 +54,7 @@ export class Robber extends Role implements RoleInterface {
     }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
+    return this.actionLog("useAbility", host, this.choice, players);
   }
 
   endTurn(bot, msg, players, table, host) {
@@ -68,6 +69,7 @@ export class Robber extends Role implements RoleInterface {
       rtnMsg = this.swapPlayer(this.choice, host, players);
 
       bot.answerCallbackQuery(msg.id, rtnMsg);
+      return this.actionLog("endTurn", host, this.choice, players);
     }
   }
 
@@ -82,5 +84,14 @@ export class Robber extends Role implements RoleInterface {
       if (host.id != target.id) host.swapRole(target);
     }
     return rtnMsg;
+  }
+
+  actionLog(phase, host, choice, players) {
+    let actionMsg = "";
+    const target: Player = _.find(players, (player: Player) => player.id == parseInt(this.choice));
+
+    actionMsg = (phase == "useAbility" ? "swapped card " : "donzed, God swapped card ") + `${target.name}${host.getRole().fullName}`;
+
+    return super.footprint(host, choice, actionMsg)
   }
 }

@@ -53,6 +53,7 @@ export class Drunk extends Role implements RoleInterface {
     }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
+    return this.actionLog("useAbility", host, this.choice);
   }
 
   endTurn(bot, msg, players, table, host) {
@@ -66,6 +67,7 @@ export class Drunk extends Role implements RoleInterface {
       rtnMsg = this.swapTable(this.choice, host, table);
 
       bot.answerCallbackQuery(msg.id, rtnMsg);
+      return this.actionLog("endTurn", host, this.choice);
     }
   }
 
@@ -101,5 +103,20 @@ export class Drunk extends Role implements RoleInterface {
     }
 
     return rtnMsg;
+  }
+
+  actionLog(phase, host, choice) {
+    let actionMsg = "";
+
+    actionMsg = (phase == "useAbility" ? "swapped table card " : "donzed, God swapped table card ");
+
+    if (this.choice == "CARD_A")
+      actionMsg += `${host.getRole().emoji}${Emoji.get('question')}${Emoji.get('question')}`;
+    else if (this.choice == "CARD_B")
+      actionMsg += `${Emoji.get('question')}${host.getRole().emoji}${Emoji.get('question')}`;
+    else if (this.choice == "CARD_C")
+      actionMsg += `${Emoji.get('question')}${Emoji.get('question')}${host.getRole().emoji}`;
+
+    return super.footprint(host, choice, actionMsg)
   }
 }

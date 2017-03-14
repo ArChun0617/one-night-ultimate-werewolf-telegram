@@ -38,7 +38,7 @@ export class Werewolf extends Role implements RoleInterface {
       });
   }
 
-  useAbility(bot, msg, players, table) {
+  useAbility(bot, msg, players, table, host) {
     // TODO: avoid syntax error for testing first
     console.log(`${this.name} useAbility.msg.data: ${msg.data}`);
 
@@ -64,6 +64,7 @@ export class Werewolf extends Role implements RoleInterface {
     }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
+    return this.actionLog("endTurn", host, this.choice, table);
   }
 
   endTurn(bot, msg, players, table, host) {
@@ -89,6 +90,7 @@ export class Werewolf extends Role implements RoleInterface {
       }
 
       bot.answerCallbackQuery(msg.id, rtnMsg);
+      return this.actionLog("endTurn", host, this.choice, table);
     }
   }
 
@@ -104,17 +106,44 @@ export class Werewolf extends Role implements RoleInterface {
   private watchTable(picked: string, table) {
     let rtnMsg: string = "";
 
-    rtnMsg = "Centre Card is :\n";
-
-    if (picked == "CARD_A")
-      rtnMsg += "[" + table.getLeft().fullName + "] [" + `${Emoji.get('question')}` + "] [" + `${Emoji.get('question')}` + "]";
-    else if (picked == "CARD_B")
-      rtnMsg += "[" + `${Emoji.get('question')}` + "] [" + table.getCenter().fullName + "] [?]";
-    else if (picked == "CARD_C")
-      rtnMsg += "[" + `${Emoji.get('question')}` + "] [" + `${Emoji.get('question')}` + "] [" + table.getRight().fullName + "]";
-    else
-      rtnMsg = "You cannot view the card in centre.";
+    switch (picked) {
+      case "CARD_A":
+        rtnMsg += `${table.getLeft().fullName}${Emoji.get('question')}${Emoji.get('question')}`;
+        break;
+      case "CARD_B":
+        rtnMsg += `${Emoji.get('question')}${table.getCenter().fullName}${Emoji.get('question')}`;
+        break;
+      case "CARD_C":
+        rtnMsg += `${Emoji.get('question')}${Emoji.get('question')}${table.getRight().fullName}`;
+        break;
+      default:
+        rtnMsg += "You cannot view the card in centre."
+        break;
+    }
 
     return rtnMsg;
+  }
+
+  actionLog(phase, host, choice, table) {
+    let actionMsg = "";
+
+    actionMsg = (phase == "useAbility" ? "watched table card " : "donzed, God watched table card ");
+
+    switch (choice) {
+      case "CARD_A":
+        actionMsg += `[${table.getLeft().fullName}${Emoji.get('question')}${Emoji.get('question')}`;
+        break;
+      case "CARD_B":
+        actionMsg += `[${Emoji.get('question')}${table.getCenter().fullName}${Emoji.get('question')}`;
+        break;
+      case "CARD_C":
+        actionMsg += `[${Emoji.get('question')}${Emoji.get('question')}${table.getRight().fullName}`;
+        break;
+      default:
+        actionMsg = "";
+        break;
+    }
+        
+    return super.footprint(host, choice, actionMsg);
   }
 }

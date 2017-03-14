@@ -7,6 +7,7 @@ import { Role } from "./role/role";
 import { Deck } from "./deck/deck";
 import { Player } from "./player/player";
 import { Table } from "./npc/table";
+import { ActionFootprint } from "./util/ActionFootprint";
 
 interface Result {
   target: Player;
@@ -47,6 +48,7 @@ export class Game {
   deathPlayers: any[] = [];
   winners: Player[] = [];
   losers: Player[] = [];
+  actionStack: ActionFootprint[] = [];
 
   constructor(id: number, bot: any, players: Player[], roles: string[]) {
     this.id = id;
@@ -88,6 +90,7 @@ export class Game {
         console.log('[Deck]', this.deck);
         console.log('[Table]', this.table);
         console.log('[Players]', this.players);
+        console.log('[ActionStack]', this.actionStack);
       })
       .then(() => console.log(`Start conversation`))
       .then(() => this.startConversation(msg))
@@ -281,8 +284,12 @@ export class Game {
       }
 
       setTimeout(() => {
-        if (player)
-          player.getOriginalRole().endTurn(this.bot, msg, this.players, this.table, player);
+        if (player) {
+          let footprint: ActionFootprint;
+          footprint = player.getOriginalRole().endTurn(this.bot, msg, this.players, this.table, player);
+          if (footprint && footprint.action)
+            this.actionStack.push(footprint);
+        }
 
         resolve();
       }, this.actionTime * (role == Role.DOPPELGANGER ? 2 : 1));  // 2x action time for DoppelGanger
@@ -373,6 +380,10 @@ export class Game {
       _.map(this.losers, (loser: Player) => {
         result += `${loser.name} ${loser.getOriginalRole().emoji} ${Emoji.get('arrow_right')} ${loser.getRole().emoji}  ${Emoji.get('point_right')} ${loser.getKillTarget().name} \n`;
       });
+
+      result += `\nAction Stack \n`;
+      result += _.map(this.actionStack, (step: ActionFootprint) => `${step.player.getOriginalRole().emoji}${step.player.name} : ${step.action}`).join("\n");
+
       this.bot.sendMessage(msg.chat.id, result);
       console.log('Result', result);
       resolve();
@@ -421,17 +432,21 @@ export class Game {
   }
 
   private handleWakeUpEvent(event: string, msg: any, player: Player) {
+    let footprint: ActionFootprint;
     if (player.getOriginalRole().checkRole(Role.DOPPELGANGER)) { // The player is Doppleganger
       if (player.getOriginalRole().checkRole([Role.WEREWOLF, Role.MINION, Role.MASON, Role.INSOMNIAC]) || this.getPhase() == 'wakeup_' + Role.DOPPELGANGER.toLowerCase()) // Hard-coded to allow (Werewolf, Minion, Mason, Insomniac) since others should act in DoopleGanger phase
         if (player.getOriginalRole().checkRole(this.getPhase().substring("wakeup_".length)))  // The phase is action for the role
-          return player.getOriginalRole().useAbility(this.bot, msg, this.players, this.table, player);
+          footprint = player.getOriginalRole().useAbility(this.bot, msg, this.players, this.table, player);
         else
-          return this.sendInvalidActionMessage(msg.id);
+          this.sendInvalidActionMessage(msg.id);
     }
     else if (this.getPhase() !== 'wakeup_' + player.getOriginalRole().name.toLowerCase())
-      return this.sendInvalidActionMessage(msg.id);
+      this.sendInvalidActionMessage(msg.id);
     else
-      return player.getOriginalRole().useAbility(this.bot, msg, this.players, this.table, player);
+      footprint = player.getOriginalRole().useAbility(this.bot, msg, this.players, this.table, player);
+
+    if (footprint && footprint.action)
+      this.actionStack.push(footprint);
   }
 
   private handleConversationEvent(event: string, msg: any, player: Player) {

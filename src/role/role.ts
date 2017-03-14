@@ -2,6 +2,7 @@ import * as Emoji from 'node-emoji';
 import * as _ from 'lodash';
 import { Player } from "../player/player";
 import { Table } from "../npc/table";
+import { ActionFootprint } from "../util/ActionFootprint";
 
 export interface RoleInterface {
   emoji: string;
@@ -42,7 +43,7 @@ export class Role implements RoleInterface {
   
   public static DOPPELGANGER_EMOJI:string = `${Emoji.get('ghost')}`;
   public static WEREWOLF_EMOJI:string = `${Emoji.get('smirk_cat')}`;
-  public static MINION_EMOJI:string = `${Emoji.get('footprints')}`;
+  public static MINION_EMOJI:string = `${Emoji.get('dog')}`;
   public static MASON_EMOJI:string = `${Emoji.get('two_men_holding_hands')}`;
   public static SEER_EMOJI:string = `${Emoji.get('crystal_ball')}`;
   public static ROBBER_EMOJI:string = `${Emoji.get('knife')}`;
@@ -63,11 +64,11 @@ export class Role implements RoleInterface {
     throw new Error('WakeUp function does not implemented');
   }
 
-  useAbility(bot, msg, players, table, host) {
+  useAbility(bot, msg, players, table, host): ActionFootprint {
     throw new Error('UseAbility function does not implemented');
   }
 
-  endTurn(bot, msg, players, table, host) {
+  endTurn(bot, msg, players, table, host): ActionFootprint {
     throw new Error('UseAbility function does not implemented');
   }
 
@@ -80,5 +81,9 @@ export class Role implements RoleInterface {
       return _.includes(_.map(roleName, (r: string) => r.toUpperCase()), this.name.toUpperCase());
     else
       return this.name.toUpperCase() == roleName.toUpperCase();
+  }
+
+  footprint(host: Player, choice: string, action: string) {
+    return new ActionFootprint(host, choice, action);
   }
 }

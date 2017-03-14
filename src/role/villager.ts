@@ -16,11 +16,11 @@ export class Villager extends Role implements RoleInterface {
 
   useAbility(bot, msg, players, table, host) {
     console.log(`${this.name} useAbility.msg.data: ${msg.data}`);
-    
+    return super.footprint(host, "", "");
   }
 
   endTurn(bot, msg, players, table, host) {
     console.log(`${this.name} endTurn`);
-
+    return super.footprint(host, "", "");
   }
 }

@@ -63,6 +63,7 @@ export class Seer extends Role implements RoleInterface {
     }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
+    return this.actionLog("useAbility", host, this.choice, rtnMsg);
   }
 
   endTurn(bot, msg, players, table, host) {
@@ -83,6 +84,7 @@ export class Seer extends Role implements RoleInterface {
       rtnMsg = this.watchRole(this.choice, players, table);
 
       bot.answerCallbackQuery(msg.id, rtnMsg);
+      return this.actionLog("endTurn", host, this.choice, rtnMsg);
     }
   }
 
@@ -112,5 +114,11 @@ export class Seer extends Role implements RoleInterface {
     }
 
     return rtnMsg;
+  }
+
+  actionLog(phase, host, choice, msg) {
+    let actionMsg = "";
+    actionMsg = (phase == "useAbility" ? "watched card " : "donzed, God watched card ") + msg;
+    return super.footprint(host, choice, actionMsg)
   }
 }

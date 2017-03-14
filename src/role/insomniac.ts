@@ -42,6 +42,7 @@ export class Insomniac extends Role implements RoleInterface {
     }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
+    return super.footprint(host, "", "");
   }
 
   endTurn(bot, msg, players, table, host) {
@@ -50,5 +51,6 @@ export class Insomniac extends Role implements RoleInterface {
     rtnMsg = host.name + " is: " + host.getRole().fullName;
     this.choice = host.getRole().name;
     bot.answerCallbackQuery(msg.id, rtnMsg);
+    return super.footprint(host, "", "");
   }
 }

@@ -41,6 +41,7 @@ export class Mason extends Role implements RoleInterface {
     }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
+    return this.actionLog("useAbility", host, this.choice);
   }
 
   endTurn(bot, msg, players, table, host) {
@@ -52,6 +53,7 @@ export class Mason extends Role implements RoleInterface {
     if (rtnMsg.length > 0) rtnMsg = `${this.fullName} is: ` + rtnMsg;
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
+    return this.actionLog("endTurn", host, this.choice);
   }
 
   private getRolePlayers(role: string, players) {
@@ -61,5 +63,9 @@ export class Mason extends Role implements RoleInterface {
     rtnMsg = _.map(target, (player: Player) => player.name).join();
 
     return rtnMsg;
+  }
+
+  actionLog(phase, host, choice) {
+    return super.footprint(host, choice, "");
   }
 }
