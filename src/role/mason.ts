@@ -32,19 +32,12 @@ export class Mason extends Role implements RoleInterface {
 
   useAbility(bot, msg, players, table, host) {
     console.log(`${this.name} useAbility.msg.data: ${msg.data}`);
-
-    const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(Role.MASON));
     let rtnMsg: string = "";
 
     if (msg.data == "WAKE_UP") {
-      _.map(target, (player: Player) => {
-        rtnMsg += player.name + ", ";
-      });
-
-      if (rtnMsg.length > 0) {
-        this.choice = rtnMsg.substr(0, rtnMsg.length - 2);
-        rtnMsg = `${this.fullName} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
-      }
+      rtnMsg = this.getRolePlayers(this.name, players);
+      this.choice = rtnMsg;
+      if (rtnMsg.length > 0) rtnMsg = `${this.fullName} is: ` + rtnMsg;
     }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
@@ -54,16 +47,19 @@ export class Mason extends Role implements RoleInterface {
     console.log(`${this.name} endTurn`);
     let rtnMsg: string = "";
 
-    const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(Role.MASON));
-    _.map(target, (player: Player) => {
-      rtnMsg += player.name + ", ";
-    });
-
-    if (rtnMsg.length > 0) {
-      this.choice = rtnMsg.substr(0, rtnMsg.length - 2);
-      rtnMsg = `${this.fullName} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
-    }
+    rtnMsg = this.getRolePlayers(this.name, players);
+    this.choice = rtnMsg;
+    if (rtnMsg.length > 0) rtnMsg = `${this.fullName} is: ` + rtnMsg;
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
+  }
+
+  private getRolePlayers(role: string, players) {
+    let target: Player[];
+    let rtnMsg: string;
+    target = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(role));
+    rtnMsg = _.map(target, (player: Player) => player.name).join();
+
+    return rtnMsg;
   }
 }

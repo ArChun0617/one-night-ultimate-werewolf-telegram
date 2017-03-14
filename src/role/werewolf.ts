@@ -44,15 +44,11 @@ export class Werewolf extends Role implements RoleInterface {
 
     console.log(`${this.name} useAbility:choice ${this.choice}`);
     let rtnMsg: string = "";
-    const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(Role.WEREWOLF));
+    const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(this.name));
 
     if (msg.data == "WAKE_UP") {
-      _.map(target, (player: Player) => {
-        rtnMsg += player.name + ", ";
-      });
-
-      if (rtnMsg.length > 0)
-        rtnMsg = `${this.fullName} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
+      rtnMsg = this.getRolePlayers(this.name, players);
+      if (rtnMsg.length > 0) rtnMsg = `${this.emoji} is: ` + rtnMsg;
     }
     else if ((msg.data == "CARD_A" || msg.data == "CARD_B" || msg.data == "CARD_C") && target.length == 1) {
       if (this.choice) {
@@ -77,15 +73,11 @@ export class Werewolf extends Role implements RoleInterface {
 
     console.log(`${this.name} endTurn:choice ${this.choice}`);
     if (!this.choice) {
-      const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(Role.WEREWOLF));
+      const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(this.name));
 
       if (target.length > 1) {
-        _.map(target, (player: Player) => {
-          rtnMsg += player.name + ", ";
-        });
-
-        if (rtnMsg.length > 0)
-          rtnMsg = `${this.fullName} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
+        rtnMsg = _.map(target, (player: Player) => player.name).join();
+        if (rtnMsg.length > 0) rtnMsg = `${this.fullName} is: ` + rtnMsg;
       }
       else if (target.length == 1) {
         this.choice = _.shuffle(["CARD_A", "CARD_B", "CARD_C"])[0];
@@ -98,6 +90,15 @@ export class Werewolf extends Role implements RoleInterface {
 
       bot.answerCallbackQuery(msg.id, rtnMsg);
     }
+  }
+
+  private getRolePlayers(role: string, players) {
+    let target: Player[];
+    let rtnMsg: string;
+    target = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(role));
+    rtnMsg = _.map(target, (player: Player) => player.name).join();
+
+    return rtnMsg;
   }
 
   private watchTable(picked: string, table) {

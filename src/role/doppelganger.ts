@@ -55,119 +55,108 @@ export class Doppelganger extends Role implements RoleInterface {
   useAbility(bot, msg, players, table, host) {
     let rtnMsg = '';
     let target:any;
-    console.log(`${this.name} useAbility.msg.data: ${msg.data}`);
-    console.log(`${this.name} useAbility.shadowChoice: ${this.shadowChoice}`);
+    console.log(`${this.name} useAbility.${(this.shadowChoice ? this.shadowChoice.name : this.name)}: ${msg.data}`);
     console.log(`${this.name} useAbility.choice: ${this.choice}`);
 
-    if (this.choice) {
-      rtnMsg = "You already make your choice.";
-    }
-    else {
-      console.log(`${this.name} useAbility.${this.shadowChoice}: ${msg.data}`);
-
-      switch (this.shadowChoice ? this.shadowChoice.name : "") {
-        case Role.WEREWOLF:
-          target = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(Role.WEREWOLF));
-          if (msg.data == "WAKE_UP") {
-            _.map(target, (player: Player) => {
-              rtnMsg += player.name + ", ";
-            });
-
-            if (rtnMsg.length > 0)
-              rtnMsg = `${Role.WEREWOLF_EMOJI} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
-          }
-          break;
-        case Role.MINION:
-          target = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(Role.WEREWOLF));
-          if (msg.data == "WAKE_UP") {
-            _.map(target, (player: Player) => {
-              rtnMsg += player.name + ", ";
-            });
-
-            if (rtnMsg.length > 0)
-              rtnMsg = `${Role.WEREWOLF_EMOJI} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
-          }
-          break;
-        case Role.MASON:
-          target = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(Role.MASON));
-          if (msg.data == "WAKE_UP") {
-            _.map(target, (player: Player) => {
-              rtnMsg += player.name + ", ";
-            });
-
-            if (rtnMsg.length > 0)
-              rtnMsg = `${Role.MASON_EMOJI} is: ` + rtnMsg.substr(0, rtnMsg.length - 2);
-          }
-          break;
-        case Role.SEER:
+    switch (this.shadowChoice ? this.shadowChoice.name : "") {
+      case Role.WEREWOLF:
+        if (msg.data == "WAKE_UP") {
+          rtnMsg = this.getRolePlayers(Role.WEREWOLF, players);
+          if (rtnMsg.length > 0) rtnMsg = `${Role.WEREWOLF_EMOJI} is: ` + rtnMsg;
+        }
+        break;
+      case Role.MINION:
+        if (msg.data == "WAKE_UP") {
+          rtnMsg = this.getRolePlayers(Role.WEREWOLF, players);
+          if (rtnMsg.length > 0) rtnMsg = `${Role.WEREWOLF_EMOJI} is: ` + rtnMsg;
+        }
+        break;
+      case Role.MASON:
+        if (msg.data == "WAKE_UP") {
+          rtnMsg = this.getRolePlayers(Role.MASON, players);
+          if (rtnMsg.length > 0) rtnMsg = `${Role.MASON_EMOJI} is: ` + rtnMsg;
+        }
+        break;
+      case Role.SEER:
+        if (!this.choice) {
           if (/^\d+$/.test(msg.data) || _.includes(["CARD_AB", "CARD_AC", "CARD_BC"], msg.data)) {
             this.choice = msg.data;
             rtnMsg = this.watchRole(this.choice, host, table);
           }
-          break;
-        case Role.ROBBER:
+        }
+        else
+          rtnMsg = "You already make your choice.";
+        break;
+      case Role.ROBBER:
+        if (!this.choice) {
           this.choice = msg.data;
           rtnMsg = this.swapPlayer(this.choice, host, players);
-          break;
-        case Role.TROUBLEMAKER:
-          const regex = new RegExp(/^\d+_\d+/);
-          if (regex.test(this.choice)) {
-            //Already chose both player
-            rtnMsg = "You already make your choice.";
+        }
+        else
+          rtnMsg = "You already make your choice.";
+        break;
+      case Role.TROUBLEMAKER:
+        const regex = new RegExp(/^\d+_\d+/);
+        if (regex.test(this.choice)) {
+          //Already chose both player
+          rtnMsg = "You already make your choice.";
+        }
+        else if (this.choice) {
+          //Chose only 1 player
+          if (host.id == parseInt(msg.data)) {
+            rtnMsg = "Buddy, You cannot choose yourself.";
           }
-          else if (this.choice) {
-            //Chose only 1 player
-            if (host.id == parseInt(msg.data)) {
-              rtnMsg = "Buddy, You cannot choose yourself.";
-            }
-            else if (this.choice == msg.data) {
-              this.choice = "";
-              rtnMsg = "You have cancelled, choose 2 players to swap.";
-            }
-            else {
-              this.choice += "_" + msg.data;
-              rtnMsg = this.swapPlayers(this.choice, players);
-            }
+          else if (this.choice == msg.data) {
+            this.choice = "";
+            rtnMsg = "You have cancelled, choose 2 players to swap.";
           }
           else {
-            //Both not yet chose, now set the first player.
-            if (host.id == parseInt(msg.data)) {
-              rtnMsg = "Buddy, You cannot choose yourself.";
-            }
-            else {
-              this.choice = msg.data;
-              const target: Player = _.find(players, (player: Player) => player.id == parseInt(this.choice));
-              rtnMsg = `You have choose ${target.name}, choose 1 more player to swap.`;
-            }
+            this.choice += "_" + msg.data;
+            rtnMsg = this.swapPlayers(this.choice, players);
           }
-          break;
-        case Role.DRUNK:
+        }
+        else {
+          //Both not yet chose, now set the first player.
+          if (host.id == parseInt(msg.data)) {
+            rtnMsg = "Buddy, You cannot choose yourself.";
+          }
+          else {
+            this.choice = msg.data;
+            const target: Player = _.find(players, (player: Player) => player.id == parseInt(this.choice));
+            rtnMsg = `You have choose ${target.name}, choose 1 more player to swap.`;
+          }
+        }
+        break;
+      case Role.DRUNK:
+        if (!this.choice) {
           if (_.includes(["CARD_A", "CARD_B", "CARD_C"], msg.data)) {
             this.choice = msg.data;
             rtnMsg = this.swapTable(this.choice, host, table);
           }
-          break;
-        case Role.INSOMNIAC:
-          if (msg.data == "WAKE_UP") {
-            this.choice = host.getRole().name;
-            rtnMsg = host.name + " is: " + host.getRole().fullName;
-          }
-          break;
-        case "":
-          target = _.find(players, (player: Player) => player.id == parseInt(msg.data));
-          //console.log(`${this.name} useAbility.target:`, target);
-          if (target) {
-            this.shadowChoice = _.clone(target.getRole());
-            //console.log(`${this.name} useAbility.target.getRole():`, target.getRole());
-            //console.log(`${this.name} useAbility.shadowChoice:`, this.shadowChoice);
-            console.log(`${this.name} useAbility.Assign: ${this.shadowChoice.name}`);
-            this.emoji += this.shadowChoice.emoji;
-            rtnMsg = target.name + " : " + target.getRole().fullName;
-          }
-          break;
-        default:
-          break;
-      }
+        }
+        else
+          rtnMsg = "You already make your choice.";
+        break;
+      case Role.INSOMNIAC:
+        if (msg.data == "WAKE_UP") {
+          this.choice = host.getRole().name;
+          rtnMsg = host.name + " is: " + host.getRole().fullName;
+        }
+        break;
+      case "":
+        target = _.find(players, (player: Player) => player.id == parseInt(msg.data));
+        //console.log(`${this.name} useAbility.target:`, target);
+        if (target) {
+          this.shadowChoice = _.clone(target.getRole());
+          //console.log(`${this.name} useAbility.target.getRole():`, target.getRole());
+          //console.log(`${this.name} useAbility.shadowChoice:`, this.shadowChoice);
+          console.log(`${this.name} useAbility.Assign: ${this.shadowChoice.name}`);
+          this.emoji += this.shadowChoice.emoji;
+          rtnMsg = target.name + " : " + target.getRole().fullName;
+        }
+        break;
+      default:
+        break;
     }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
@@ -177,7 +166,7 @@ export class Doppelganger extends Role implements RoleInterface {
     console.log(`${this.name} endTurn`);
     let rtnMsg = "";
 
-    console.log(`${this.shadowChoice} endTurn:shadowChoice ${(this.shadowChoice ? this.shadowChoice.name : "undefined")}`);
+    console.log(`${this.name} endTurn:shadowChoice ${(this.shadowChoice ? this.shadowChoice.name : "undefined")}`);
     console.log(`${this.name} endTurn:choice ${this.choice}`);
     if (this.shadowChoice) {
       switch (this.shadowChoice ? this.shadowChoice.name : "") {
@@ -257,6 +246,16 @@ export class Doppelganger extends Role implements RoleInterface {
       return _.includes(_.map(roleName, (r) => r.toUpperCase()), (chkDoppleGanger ? (this.shadowChoice ? this.shadowChoice.name : this.name) : this.name).toUpperCase());
     else
       return (chkDoppleGanger ? (this.shadowChoice ? this.shadowChoice.name : this.name) : this.name).toUpperCase() == roleName.toUpperCase();
+  }
+
+  // Werewolf, Minion, Mason Handler
+  private getRolePlayers(role: string, players) {
+    let target: Player[];
+    let rtnMsg: string;
+    target = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(role));
+    rtnMsg = _.map(target, (player: Player) => player.name).join();
+
+    return rtnMsg;
   }
 
   // Seer Handler

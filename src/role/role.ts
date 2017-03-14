@@ -42,7 +42,7 @@ export class Role implements RoleInterface {
   
   public static DOPPELGANGER_EMOJI:string = `${Emoji.get('ghost')}`;
   public static WEREWOLF_EMOJI:string = `${Emoji.get('smirk_cat')}`;
-  public static MINION_EMOJI:string = `${Emoji.get('dog')}`;
+  public static MINION_EMOJI:string = `${Emoji.get('footprints')}`;
   public static MASON_EMOJI:string = `${Emoji.get('two_men_holding_hands')}`;
   public static SEER_EMOJI:string = `${Emoji.get('crystal_ball')}`;
   public static ROBBER_EMOJI:string = `${Emoji.get('knife')}`;
