@@ -1,3 +1,4 @@
+import * as Emoji from 'node-emoji';
 import * as _ from 'lodash';
 import { Role, RoleInterface } from "./role";
 import { Player } from "../player/player";
@@ -90,7 +91,7 @@ export class Robber extends Role implements RoleInterface {
     let actionMsg = "";
     const target: Player = _.find(players, (player: Player) => player.id == parseInt(this.choice));
 
-    actionMsg = (phase == "useAbility" ? "swapped card " : "donzed, God swapped card ") + `${target.name}${host.getRole().fullName}`;
+    actionMsg = (phase == "useAbility" ? "" : `${Emoji.get('zzz')}  `) + `${target.name}${host.getRole().fullName}`;
 
     return super.footprint(host, choice, actionMsg)
   }

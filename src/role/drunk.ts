@@ -108,7 +108,7 @@ export class Drunk extends Role implements RoleInterface {
   actionLog(phase, host, choice) {
     let actionMsg = "";
 
-    actionMsg = (phase == "useAbility" ? "swapped table card " : "donzed, God swapped table card ");
+    actionMsg = (phase == "useAbility" ? "" : `${Emoji.get('zzz')}  `);
 
     if (this.choice == "CARD_A")
       actionMsg += `${host.getRole().emoji}${Emoji.get('question')}${Emoji.get('question')}`;

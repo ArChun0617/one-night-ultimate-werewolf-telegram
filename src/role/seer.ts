@@ -100,13 +100,13 @@ export class Seer extends Role implements RoleInterface {
     else {
       switch (picked) {
         case 'CARD_AB':
-          rtnMsg = `[${table.getLeft().fullName}] [${table.getCenter().fullName}] [${Emoji.get('question')}]`;
+          rtnMsg = `${table.getLeft().fullName}${table.getCenter().fullName}${Emoji.get('question')}`;
           break;
         case 'CARD_AC':
-          rtnMsg = `[${table.getLeft().fullName}] [${Emoji.get('question')}] [${table.getRight().fullName}]`;
+          rtnMsg = `${table.getLeft().fullName}${Emoji.get('question')}${table.getRight().fullName}`;
           break;
         case 'CARD_BC':
-          rtnMsg = `[${Emoji.get('question')}] [${table.getCenter().fullName}] [${table.getRight().fullName}]`;
+          rtnMsg = `${Emoji.get('question')}${table.getCenter().fullName}${table.getRight().fullName}`;
           break;
         default:
           break;
@@ -118,7 +118,7 @@ export class Seer extends Role implements RoleInterface {
 
   actionLog(phase, host, choice, msg) {
     let actionMsg = "";
-    actionMsg = (phase == "useAbility" ? "watched card " : "donzed, God watched card ") + msg;
+    actionMsg = (phase == "useAbility" ? "" : `${Emoji.get('zzz')}  `) + msg;
     return super.footprint(host, choice, actionMsg)
   }
 }

@@ -64,7 +64,7 @@ export class Werewolf extends Role implements RoleInterface {
     }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
-    return this.actionLog("endTurn", host, this.choice, table);
+    return this.actionLog("useAbility", host, this.choice, table);
   }
 
   endTurn(bot, msg, players, table, host) {
@@ -126,24 +126,7 @@ export class Werewolf extends Role implements RoleInterface {
 
   actionLog(phase, host, choice, table) {
     let actionMsg = "";
-
-    actionMsg = (phase == "useAbility" ? "watched table card " : "donzed, God watched table card ");
-
-    switch (choice) {
-      case "CARD_A":
-        actionMsg += `[${table.getLeft().fullName}${Emoji.get('question')}${Emoji.get('question')}`;
-        break;
-      case "CARD_B":
-        actionMsg += `[${Emoji.get('question')}${table.getCenter().fullName}${Emoji.get('question')}`;
-        break;
-      case "CARD_C":
-        actionMsg += `[${Emoji.get('question')}${Emoji.get('question')}${table.getRight().fullName}`;
-        break;
-      default:
-        actionMsg = "";
-        break;
-    }
-        
+    actionMsg = (phase == "useAbility" ? "" : `${Emoji.get('zzz')}  `) + this.watchTable(choice,table);        
     return super.footprint(host, choice, actionMsg);
   }
 }
