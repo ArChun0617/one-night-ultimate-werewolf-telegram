@@ -95,7 +95,7 @@ export class Seer extends Role implements RoleInterface {
 
     if (target) {
       // if target to a specific guy
-      rtnMsg = target.name + " : " + target.getRole().fullName;
+      rtnMsg = `${target.getRole().emoji}${target.name}`;
     }
     else {
       switch (picked) {

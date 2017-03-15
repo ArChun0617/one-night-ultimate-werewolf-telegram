@@ -81,7 +81,7 @@ export class Robber extends Role implements RoleInterface {
 
     if (host && target) {
       // swap the role
-      rtnMsg = target.name + " : " + target.getRole().fullName;
+      rtnMsg = `${target.getRole().emoji}${target.name}`;
       if (host.id != target.id) host.swapRole(target);
     }
     return rtnMsg;
@@ -91,7 +91,7 @@ export class Robber extends Role implements RoleInterface {
     let actionMsg = "";
     const target: Player = _.find(players, (player: Player) => player.id == parseInt(this.choice));
 
-    actionMsg = (phase == "useAbility" ? "" : `${Emoji.get('zzz')}  `) + `${target.name}${host.getRole().fullName}`;
+    actionMsg = (phase == "useAbility" ? "" : `${Emoji.get('zzz')}  `) + `${host.getRole().emoji}${target.name}`;
 
     return super.footprint(host, choice, actionMsg)
   }
