@@ -71,6 +71,7 @@ export class Werewolf extends Role implements RoleInterface {
     // TODO: avoid syntax error for testing first
     console.log(`${this.name} endTurn`);
     let rtnMsg = "";
+    let actionEvt: any;
 
     console.log(`${this.name} endTurn:choice ${this.choice}`);
     if (!this.choice) {
@@ -83,6 +84,7 @@ export class Werewolf extends Role implements RoleInterface {
       else if (target.length == 1) {
         this.choice = _.shuffle(["CARD_A", "CARD_B", "CARD_C"])[0];
         console.log(`${this.name} endTurn:choice_Shuffle ${this.choice}`);
+        actionEvt = this.actionLog("endTurn", host, this.choice, table);
         rtnMsg = this.watchTable(this.choice, table);
       }
       else {
@@ -90,7 +92,7 @@ export class Werewolf extends Role implements RoleInterface {
       }
 
       bot.answerCallbackQuery(msg.id, rtnMsg);
-      return this.actionLog("endTurn", host, this.choice, table);
+      return (actionEvt || this.actionLog("endTurn", host, "", table));
     }
   }
 
@@ -126,7 +128,7 @@ export class Werewolf extends Role implements RoleInterface {
 
   actionLog(phase, host, choice, table) {
     let actionMsg = "";
-    actionMsg = (phase == "useAbility" ? "" : `${Emoji.get('zzz')}  `) + this.watchTable(choice,table);        
+    if (choice) actionMsg = (phase == "useAbility" ? "" : `${Emoji.get('zzz')}  `) + this.watchTable(choice,table);        
     return super.footprint(host, choice, actionMsg);
   }
 }
