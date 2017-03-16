@@ -115,7 +115,7 @@ export class Troublemaker extends Role implements RoleInterface {
     let rtnMsg = '';
     let actionEvt: any;
 
-    const regex = new RegExp(/^\d_\d/);
+    const regex = new RegExp(/^\d+_\d+/);
 
     console.log(`${this.name} endTurn:choice ${this.choice}`);
     if (regex.test(this.choice)) {
