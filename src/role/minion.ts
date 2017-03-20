@@ -36,7 +36,7 @@ export class Minion extends Role implements RoleInterface {
     let rtnMsg: string = "";
     rtnMsg = this.getRolePlayers(Role.WEREWOLF, players);
     this.choice = rtnMsg;
-    if (rtnMsg.length > 0) rtnMsg = `${Role.WEREWOLF + Role.WEREWOLF_EMOJI} is: ` + rtnMsg;
+    rtnMsg = `${Role.WEREWOLF + Role.WEREWOLF_EMOJI} is: ` + (rtnMsg || "[not exists]");
     bot.answerCallbackQuery(msg.id, rtnMsg);
     return this.actionLog("useAbility", host, this.choice);
   }
@@ -45,7 +45,7 @@ export class Minion extends Role implements RoleInterface {
     console.log(`${this.name} endTurn`);
     let rtnMsg: string = "";
     this.choice = rtnMsg;
-    if (rtnMsg.length > 0) rtnMsg = `${Role.WEREWOLF + Role.WEREWOLF_EMOJI} is: ` + rtnMsg;
+    rtnMsg = `${Role.WEREWOLF + Role.WEREWOLF_EMOJI} is: ` + (rtnMsg || "[not exists]");
     bot.answerCallbackQuery(msg.id, rtnMsg);
     return this.actionLog("endTurn", host, this.choice);
   }

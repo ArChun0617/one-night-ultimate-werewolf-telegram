@@ -191,7 +191,7 @@ export class Troublemaker extends Role implements RoleInterface {
 
   actionLog(phase, host, choice, msg) {
     let actionMsg = "";
-    actionMsg = (phase == "useAbility" ? "" : `${Emoji.get('zzz')}  `) + msg;
+    if (msg) actionMsg = (phase == "useAbility" ? "" : `${Emoji.get('zzz')}  `) + msg;
     return super.footprint(host, choice, actionMsg)
   }
 }

@@ -37,7 +37,7 @@ export class Mason extends Role implements RoleInterface {
     if (msg.data == "WAKE_UP") {
       rtnMsg = this.getRolePlayers(this.name, players);
       this.choice = rtnMsg;
-      if (rtnMsg.length > 0) rtnMsg = `${this.fullName} is: ` + rtnMsg;
+      rtnMsg = `${this.fullName} is: ` + (rtnMsg || "[not exists]");
     }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
@@ -50,7 +50,7 @@ export class Mason extends Role implements RoleInterface {
 
     rtnMsg = this.getRolePlayers(this.name, players);
     this.choice = rtnMsg;
-    if (rtnMsg.length > 0) rtnMsg = `${this.fullName} is: ` + rtnMsg;
+    rtnMsg = `${this.fullName} is: ` + (rtnMsg || "[not exists]");
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
     return this.actionLog("endTurn", host, this.choice);

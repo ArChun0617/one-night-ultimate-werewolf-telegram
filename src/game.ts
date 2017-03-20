@@ -74,7 +74,7 @@ export class Game {
 
     return this.prepareDeck()
       .then(() => console.log(`Announce player role`))
-      .then(() => this.announcePlayerRole(msg))
+      .then(() => this.announcePlayerRole(msg, this.actionTime * 2))
       .then(() => {
         // debug
         console.log('[announcePlayerRole]');
@@ -83,7 +83,7 @@ export class Game {
         console.log('[Players]', this.players);
       })
       .then(() => console.log(`Start night`))
-      .then(() => this.startNight(msg))
+      .then(() => this.startNight(msg, this.actionTime))
       .then(() => {
         // debug
         console.log('[startDay]');
@@ -93,9 +93,9 @@ export class Game {
         console.log('[ActionStack]', this.actionStack);
       })
       .then(() => console.log(`Start conversation`))
-      .then(() => this.startConversation(msg))
+      .then(() => this.startConversation(msg, this.gameTime))
       .then(() => console.log(`Begin voting`))
-      .then(() => this.beginVoting(msg))
+      .then(() => this.beginVoting(msg, this.actionTime))
       .then(() => console.log(`Kill player`))
       .then(() => this.killPlayer())
       .then(() => console.log(`Show result`))
@@ -212,7 +212,7 @@ export class Game {
     });
   }
 
-  private announcePlayerRole(msg) {
+  private announcePlayerRole(msg, timeDuration: number) {
     this.setPhase(Game.PHASE_ANNOUNCE_PLAYER_ROLE);
 
     return new Promise((resolve, reject) => {
@@ -241,26 +241,27 @@ export class Game {
         }
       );
 
-      setTimeout(() => resolve(), this.actionTime);
+      this.setCountDown(msg, timeDuration, [10000, 5000], "sec");
+      setTimeout(() => resolve(), timeDuration); // Check role for double time
     });
   }
 
-  private startNight(msg) {
+  private startNight(msg, timeDuration: number) {
     this.setPhase(Game.PHASE_START_NIGHT);
 
     return this.bot.sendMessage(msg.chat.id, `${Emoji.get('crescent_moon')}  Night start, Everyone close your eye.`)
-      .then(() => this.wakeUp(Role.DOPPELGANGER, msg))
-      .then(() => this.wakeUp(Role.WEREWOLF, msg))
-      .then(() => this.wakeUp(Role.MINION, msg))
-      .then(() => this.wakeUp(Role.MASON, msg))
-      .then(() => this.wakeUp(Role.SEER, msg))
-      .then(() => this.wakeUp(Role.ROBBER, msg))
-      .then(() => this.wakeUp(Role.TROUBLEMAKER, msg))
-      .then(() => this.wakeUp(Role.DRUNK, msg))
-      .then(() => this.wakeUp(Role.INSOMNIAC, msg));
+      .then(() => this.wakeUp(msg, Role.DOPPELGANGER, timeDuration * 2))  // 2x action time for DoppelGanger
+      .then(() => this.wakeUp(msg, Role.WEREWOLF, timeDuration))
+      .then(() => this.wakeUp(msg, Role.MINION, timeDuration))
+      .then(() => this.wakeUp(msg, Role.MASON, timeDuration))
+      .then(() => this.wakeUp(msg, Role.SEER, timeDuration))
+      .then(() => this.wakeUp(msg, Role.ROBBER, timeDuration))
+      .then(() => this.wakeUp(msg, Role.TROUBLEMAKER, timeDuration))
+      .then(() => this.wakeUp(msg, Role.DRUNK, timeDuration))
+      .then(() => this.wakeUp(msg, Role.INSOMNIAC, timeDuration));
   }
 
-  private wakeUp(role, msg): Promise<any> {
+  private wakeUp(msg, role, timeDuration: number): Promise<any> {
     if (!this.isExistInCurrentGame(role)) return Promise.resolve();
 
     this.setWakeUpPhase(role);
@@ -292,28 +293,30 @@ export class Game {
         }
 
         resolve();
-      }, this.actionTime * (role == Role.DOPPELGANGER ? 2 : 1));  // 2x action time for DoppelGanger
+      }, timeDuration);
     });
   }
 
-  private startConversation(msg) {
+  private startConversation(msg, gameDuration: number) {
+    let now: Date = new Date(new Date().getTime() + gameDuration);
     this.setPhase(Game.PHASE_CONVERSATION);
 
     this.bot.sendMessage(
       msg.chat.id,
-      `${Emoji.get('hourglass_flowing_sand')}  Everyone wake up, you have ${this.gameTime / 60 / 1000}mins to discuss ...`
+      `${Emoji.get('hourglass_flowing_sand')}  Everyone wake up, you have ${gameDuration / 60 / 1000} mins to discuss ... Vote at ${now.getHours() + ":" + ("0" + now.getMinutes()).slice(-2) + ":" + now.getSeconds()}`
     );
 
+    this.setCountDown(msg, gameDuration, [300000, 180000, 60000, 30000], "mins");
+
     return new Promise((resolve, reject) => {
-      setTimeout(() => resolve(), this.gameTime);
+      setTimeout(() => resolve(), gameDuration);
     });
   }
 
-  private beginVoting(msg: any) {
+  private beginVoting(msg: any, timeDuration: number) {
     this.setPhase(Game.PHASE_VOTING);
 
     return new Promise((resolve, reject) => {
-
       this.bot.sendMessage(msg.chat.id, `${Emoji.get('alarm_clock')}  Time\'s up. Everyone please vote.`)
         .then(this.sendVotingList(msg.chat.id))
         .then(setTimeout(() => {
@@ -322,7 +325,7 @@ export class Game {
             if (!player.getKillTarget()) this.randomVote(player);
           });
           resolve();
-        }, this.actionTime));
+        }, this.actionTime * 2));
     });
   }
 
@@ -550,5 +553,45 @@ export class Game {
     }
 
     this.bot.answerCallbackQuery(msg.id, rtnMsg);
+  }
+
+  private setCountDown(msg, totalTime, intervalArray, unit: string) {
+    let timerArray: any[] = [];
+    let ratio: number, startTime: number;
+    switch (unit) {
+      case "mins":
+        ratio = 60 * 1000;
+        break;
+      case "sec":
+        ratio = 1000;
+        break;
+      default:
+        ratio = 1;
+        break;
+    }
+
+    //console.log(`intervalArray: `, intervalArray);
+    startTime = totalTime;
+    while (intervalArray.length > 0) {
+      let interval = intervalArray.shift();
+
+      if (totalTime > interval) {
+        timerArray.push({ time: startTime - interval, count: interval / ratio });
+        startTime = interval;
+      }
+    }
+    //console.log(`timerArray: `, timerArray);
+    //return timerArray;
+    this.countDown(msg, timerArray, unit);
+  }
+
+  private countDown(msg, timerArray: any[], unit: string)
+  {
+    if (!timerArray) return;
+    let interval = timerArray.shift();
+    setTimeout(() => {
+      this.bot.sendMessage(msg.chat.id, `${Emoji.get('microphone')} You have ${interval.count} ${unit} left...`);
+      if (timerArray.length > 0) this.countDown(msg, timerArray, unit);
+    }, interval.time);
   }
 }
