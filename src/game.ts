@@ -50,6 +50,9 @@ export class Game {
   losers: Player[] = [];
   actionStack: ActionFootprint[] = [];
 
+  votingTimer: any;
+  votingResolve: any;
+
   constructor(id: number, bot: any, players: Player[], roles: string[]) {
     this.id = id;
     this.bot = bot;
@@ -309,6 +312,7 @@ export class Game {
     this.setCountDown(msg, gameDuration, [300000, 180000, 60000, 30000], "mins");
 
     return new Promise((resolve, reject) => {
+      this.votingResolve = resolve;
       setTimeout(() => resolve(), gameDuration);
     });
   }
@@ -460,6 +464,10 @@ export class Game {
     }
 
     this.votePlayer(id, msg, player);
+    if (_.filter(this.players, (player) => !(player.getKillTarget())).length == 0 && this.votingResolve) {
+      clearTimeout(this.votingTimer);
+      this.votingResolve();
+    }
   }
 
   private handleVotingEvent(event: string, msg: any, player: Player) {
@@ -470,6 +478,10 @@ export class Game {
     }
 
     this.votePlayer(id, msg, player);
+    if (_.filter(this.players, (player) => !(player.getKillTarget())).length == 0 && this.votingResolve) {
+      clearTimeout(this.votingTimer);
+      this.votingResolve();
+    }
   }
 
   private randomVote(host: Player) {
@@ -570,6 +582,7 @@ export class Game {
         break;
     }
 
+    //console.log(`totalTime: `, totalTime);
     //console.log(`intervalArray: `, intervalArray);
     startTime = totalTime;
     while (intervalArray.length > 0) {
@@ -582,14 +595,14 @@ export class Game {
     }
     //console.log(`timerArray: `, timerArray);
     //return timerArray;
-    this.countDown(msg, timerArray, unit);
+    if (timerArray.length > 0) this.countDown(msg, timerArray, unit);
   }
 
   private countDown(msg, timerArray: any[], unit: string)
   {
     if (!timerArray) return;
     let interval = timerArray.shift();
-    setTimeout(() => {
+    this.votingTimer = setTimeout(() => {
       this.bot.sendMessage(msg.chat.id, `${Emoji.get('microphone')} You have ${interval.count} ${unit} left...`);
       if (timerArray.length > 0) this.countDown(msg, timerArray, unit);
     }, interval.time);
