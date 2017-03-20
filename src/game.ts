@@ -321,15 +321,21 @@ export class Game {
     this.setPhase(Game.PHASE_VOTING);
 
     return new Promise((resolve, reject) => {
-      this.bot.sendMessage(msg.chat.id, `${Emoji.get('alarm_clock')}  Time\'s up. Everyone please vote.`)
-        .then(this.sendVotingList(msg.chat.id))
-        .then(setTimeout(() => {
-          // make sure every vote a player, random vote if needed
-          _.map(this.players, (player) => {
-            if (!player.getKillTarget()) this.randomVote(player);
-          });
-          resolve();
-        }, this.actionTime * 2));
+      if (_.filter(this.players, (player) => !(player.getKillTarget())).length == 0) {
+        clearTimeout(this.votingTimer);
+        resolve();
+      }
+      else {
+        this.bot.sendMessage(msg.chat.id, `${Emoji.get('alarm_clock')}  Time\'s up. Everyone please vote.`)
+          .then(this.sendVotingList(msg.chat.id))
+          .then(setTimeout(() => {
+            // make sure every vote a player, random vote if needed
+            _.map(this.players, (player) => {
+              if (!player.getKillTarget()) this.randomVote(player);
+            });
+            resolve();
+          }, this.actionTime * 2));
+      }
     });
   }
 
@@ -464,10 +470,8 @@ export class Game {
     }
 
     this.votePlayer(id, msg, player);
-    if (_.filter(this.players, (player) => !(player.getKillTarget())).length == 0 && this.votingResolve) {
-      clearTimeout(this.votingTimer);
+    if (_.filter(this.players, (player) => !(player.getKillTarget())).length == 0 && this.votingResolve)
       this.votingResolve();
-    }
   }
 
   private handleVotingEvent(event: string, msg: any, player: Player) {
@@ -478,10 +482,8 @@ export class Game {
     }
 
     this.votePlayer(id, msg, player);
-    if (_.filter(this.players, (player) => !(player.getKillTarget())).length == 0 && this.votingResolve) {
-      clearTimeout(this.votingTimer);
+    if (_.filter(this.players, (player) => !(player.getKillTarget())).length == 0 && this.votingResolve)
       this.votingResolve();
-    }
   }
 
   private randomVote(host: Player) {
