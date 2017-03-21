@@ -58,8 +58,6 @@ export class Game {
     this.bot = bot;
     this.gameRoles = roles;
     this.players = players;
-
-    this.setPhase(Game.PHASE_NEW_GAME);
   }
 
   show() {
@@ -68,7 +66,7 @@ export class Game {
   }
 
   start(msg) {
-    if (this.getPhase() != Game.PHASE_NEW_GAME) return; //Prevent double start game
+    if (this.getPhase() != Game.PHASE_WAITING_PLAYER) return; //Prevent double start game
 
     console.log(`Game started: ${this.id}`);
 
