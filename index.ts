@@ -13,7 +13,7 @@ interface GameSetting {
 
 const gameSettings: GameSetting[] = [];
 const games = [];
-const token = process.env.BOT_TOKEN || '312958690:AAHFt5195080aCBqF3P4Hi89ShnfKe862JI';
+const token = '331592410:AAHy9uA7PLWBHmIcNcyNt78hT6XLarrOjHM';
 const bot = new TelegramBot(token, { polling: true });
 const roles = [
   { name: Role.DOPPELGANGER, max: 1 },

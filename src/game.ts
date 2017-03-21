@@ -1,5 +1,4 @@
 import { GameEndError } from "./error/gameend";
-const util = require('util');
 import * as Emoji from 'node-emoji';
 import * as _ from 'lodash';
 import { DeckFactory } from "./deck/deckFactory";
@@ -40,9 +39,9 @@ export class Game {
   bot: any;
   deck: Deck;
   gameRoles: string[];
-  gameTime: number = process.env.GAME_TIME || 5 * 60 * 1000;
-  actionTime: number = process.env.ACTION_TIME || 10 * 1000;
-  btnPerLine: number = process.env.BTN_PER_LINE || 3;
+  gameTime: number = 5 * 60 * 1000;
+  actionTime: number = 10 * 1000;
+  btnPerLine: number = 3;
   phase: string = Game.PHASE_WAITING_PLAYER;
   result: Result[] = [];
   deathPlayers: any[] = [];
