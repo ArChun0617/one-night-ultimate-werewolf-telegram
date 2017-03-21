@@ -40,7 +40,7 @@ export class Game {
   bot: any;
   deck: Deck;
   gameRoles: string[];
-  gameTime: number = process.env.GAME_TIME || 10 * 60 * 1000;
+  gameTime: number = process.env.GAME_TIME || 5 * 60 * 1000;
   actionTime: number = process.env.ACTION_TIME || 10 * 1000;
   btnPerLine: number = process.env.BTN_PER_LINE || 3;
   phase: string = Game.PHASE_WAITING_PLAYER;
@@ -70,6 +70,30 @@ export class Game {
     console.log(`Game started: ${this.id}`);
 
     this.bot.sendMessage(msg.chat.id, `${Emoji.get('game_die')}  Game start`);
+
+    if (this.players.length >= 3) {
+      this.gameRoles = this.gameRoles.slice(0, this.players.length + 3);  // Auto apply role by number of user, *unless* user below 3, then debug mode.
+    }
+    else {
+      const playerTemp = [
+        "Thomas",
+        "Kenny",
+        "Gary",
+        "Rico",
+        "Paul",
+        "Luis",
+        "Wilson",
+        "Serina",
+        "Tab"
+      ];
+
+      // TODO: hardcode to add dummy players
+      if (this.players.length < this.gameRoles.length - 3)
+        for (let i = this.players.length; i < this.gameRoles.length - 3; i++) {
+          //game.players.push(new Player({ id: i, name: 'Player'+i }));
+          this.players.push(new Player({ id: i, name: "AI_" + playerTemp.shift() }));
+        }
+    }
 
     if (this.players.length + 3 !== this.gameRoles.length) {
       return Promise.reject('Number of players and roles doesn\'t match');
