@@ -16,7 +16,7 @@ const games = [];
 const token = process.env.BOT_TOKEN || '312958690:AAHFt5195080aCBqF3P4Hi89ShnfKe862JI';
 const bot = new TelegramBot(token, { polling: true });
 const roles = [
-  // { name: Role.DOPPELGANGER, max: 1 },
+  { name: Role.DOPPELGANGER, max: 1 },
   { name: Role.WEREWOLF, max: 2 },
   { name: Role.MINION, max: 1 },
   { name: Role.MASON, max: 2 },
@@ -68,6 +68,7 @@ bot.onText(/\/setting/, (msg) => {
 
 bot.onText(/\/newgame/, (msg) => {
   const id = msg.chat.id;
+  console.log(`newgame: chat.id: `, id);
   // validation and make sure one channel only have one game
   if (_.find(games, (g) => g.id === id)) {
     bot.sendMessage(
@@ -77,11 +78,27 @@ bot.onText(/\/newgame/, (msg) => {
     return;
   }
 
-  const gameSetting = _.find(gameSettings, setting => setting.id === msg.chat.id);
+  let gameSetting = _.find(gameSettings, setting => setting.id === msg.chat.id);
   
   if (!gameSetting) {
-    sendAskForSettingMessage(msg.chat.id);
-    return;
+    /*sendAskForSettingMessage(msg.chat.id);
+    return;*/
+    gameSetting = { id: msg.chat.id, roles: [] };
+    gameSettings.push(gameSetting);
+
+    addGameSettingRole(msg.id, gameSetting, Role.WEREWOLF);         // 1 - 0
+    addGameSettingRole(msg.id, gameSetting, Role.WEREWOLF);         // 2 - 0
+    addGameSettingRole(msg.id, gameSetting, Role.SEER);             // 3 - 0
+    addGameSettingRole(msg.id, gameSetting, Role.ROBBER);           // 4 - 0
+    addGameSettingRole(msg.id, gameSetting, Role.INSOMNIAC);        // 5 - 0
+    addGameSettingRole(msg.id, gameSetting, Role.TROUBLEMAKER);     // 6 - 3p
+    addGameSettingRole(msg.id, gameSetting, Role.MINION);           // 7 - 4p
+    addGameSettingRole(msg.id, gameSetting, Role.DOPPELGANGER);     // 8 - 5p
+    addGameSettingRole(msg.id, gameSetting, Role.TANNER);           // 9 - 6p
+    addGameSettingRole(msg.id, gameSetting, Role.MASON);            // 10- 7p
+    addGameSettingRole(msg.id, gameSetting, Role.MASON);            // 11- 8p
+    addGameSettingRole(msg.id, gameSetting, Role.DRUNK);            // 12- 9p
+    addGameSettingRole(msg.id, gameSetting, Role.VILLAGER);         // 13- 10p
   }
 
   const players: Player[] = [
@@ -117,17 +134,11 @@ bot.onText(/\/start/, (msg) => {
   const game = getGame(msg.chat.id);
 
   if (!gameSetting) {
-    sendAskForSettingMessage(msg.chat.id);
-    return;
+    /*sendAskForSettingMessage(msg.chat.id);
+    return;*/
   }
 
   if (!game) return askForCreateNewGame(msg.chat.id);
-
-  // TODO: hardcode to add dummy players
-  if (game.players.length < gameSetting.roles.length - 3)
-    for(let i = game.players.length; i < gameSetting.roles.length - 3; i++)
-      game.players.push(new Player({ id: i, name: 'Player'+i }));
-
   console.log('gameSetting.roles', gameSetting.roles);
 
   game.start(msg)
@@ -164,8 +175,8 @@ bot.on('callback_query', (msg) => {
   const gameSetting = _.find(gameSettings, setting => setting.id === msg.message.chat.id);
   
   if (!gameSetting) {
-    sendAskForSettingMessage(msg.message.chat.id);
-    return;
+    /*sendAskForSettingMessage(msg.message.chat.id);
+    return;*/
   }
 
   const regex = new RegExp(/^SET_ROLE_(.+?)/);
