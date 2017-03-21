@@ -15,6 +15,7 @@ interface Result {
 
 export class Game {
   public static PHASE_WAITING_PLAYER: string = 'waiting';
+  public static PHASE_NEW_GAME: string = 'newgame';
   public static PHASE_START_GAME: string = 'startgame';
   public static PHASE_PREPARE_DECK: string = 'prepare_deck';
   public static PHASE_ANNOUNCE_PLAYER_ROLE: string = 'announce_player_role';
@@ -57,6 +58,8 @@ export class Game {
     this.bot = bot;
     this.gameRoles = roles;
     this.players = players;
+
+    this.setPhase(Game.PHASE_NEW_GAME);
   }
 
   show() {
@@ -65,7 +68,8 @@ export class Game {
   }
 
   start(msg) {
-    this.setPhase(Game.PHASE_START_GAME);
+    if (this.getPhase() != Game.PHASE_NEW_GAME) return; //Prevent double start game
+
     console.log(`Game started: ${this.id}`);
 
     this.bot.sendMessage(msg.chat.id, `${Emoji.get('game_die')}  Game start`);
@@ -119,7 +123,7 @@ export class Game {
         console.log('[ActionStack]', this.actionStack);
       })
       .then(() => console.log(`Start conversation`))
-      .then(() => this.startConversation(msg, this.gameTime))
+      .then(() => this.startConversation(msg, this.gameTime * (this.players.length > 6 ? 2 : 1)))  // If more than 6 player, then game time *2
       .then(() => console.log(`Begin voting`))
       .then(() => this.beginVoting(msg, this.actionTime))
       .then(() => console.log(`Kill player`))

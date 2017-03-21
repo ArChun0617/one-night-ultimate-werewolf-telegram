@@ -11,8 +11,11 @@
     "skipLibCheck": true,
     "noEmitHelpers": false,
     "target": "es5",
+    "types": [
+        "node", "lodash"
+     ],
     "typeRoots": [
-      "node_modules/@types"
+      "./node_modules/@types"
     ],
     "lib": ["es6", "dom"]
   },

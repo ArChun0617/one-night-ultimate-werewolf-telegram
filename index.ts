@@ -11,6 +11,11 @@ interface GameSetting {
   roles: string[];
 }
 
+let port = process.env.PORT || 8443;
+let host = process.env.HOST;
+
+console.log(`port: ${port}`);
+
 const gameSettings: GameSetting[] = [];
 const games = [];
 const token = '331592410:AAHy9uA7PLWBHmIcNcyNt78hT6XLarrOjHM';
