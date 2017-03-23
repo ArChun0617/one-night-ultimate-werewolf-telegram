@@ -78,7 +78,7 @@ bot.onText(/\/newgame/, (msg) => {
   if (_.find(games, (g) => g.id === id)) {
     bot.sendMessage(
       msg.chat.id,
-      `${Emoji.get('no_entry_sign')}  Sorry. There is a game start in this channel, please move there and try \/join to join game`
+      `${Emoji.get('no_entry_sign')}  Sorry. There is a game start in this channel, please \/join the game`
     );
     return;
   }
@@ -111,7 +111,7 @@ bot.onText(/\/newgame/, (msg) => {
   ];
 
   games.push(new Game(id, bot, players, gameSetting.roles));
-  bot.sendMessage(msg.chat.id, `${Emoji.get('star')}  Created a new game, please enter \/join to join this game`);
+  bot.sendMessage(msg.chat.id, `${Emoji.get('star')}  Created a new game, please \/join the game or \/start the game.`);
   console.log(`GAME ${id} has been created`);
 });
 
@@ -151,21 +151,27 @@ bot.onText(/\/start/, (msg) => {
       killGame(msg.chat.id);
     })
     .catch((error) => {
-      console.log(`Error ${error}`);
-      // crazy I don't know why it is not instanceof GameEndError
-      console.log('error instanceof GameEndError', error instanceof GameEndError);
-      // shit way to catch the error
-      if (error.message === 'This game is end') {
-        console.log('Catch game is ended');
-        return;
-      }
+      console.log(`Catch error`, error);
+      console.log(`Catch error.message`, error.message);
+      console.log(`Catch error.name`, error.name);
+      if (error) {
+        console.log(`Error`, error);
+        // crazy I don't know why it is not instanceof GameEndError
+        console.log('error instanceof GameEndError', error instanceof GameEndError);
+        // shit way to catch the error
+        if (error.message === 'This game is end') {
+          console.log('Catch game is ended');
+          return;
+        }
 
-      bot.sendMessage(msg.chat.id, `${Emoji.get('bomb')}  Error: ${error}.`);
+        bot.sendMessage(msg.chat.id, `${Emoji.get('bomb')}  Error: ${error}.`);
+      }
     });
 });
 
 bot.onText(/\/delgame/, (msg) => {
   killGame(msg.chat.id);
+  bot.sendMessage(msg.chat.id, `${Emoji.get('bomb')}  Game terminated.`);
 });
 
 bot.onText(/\/vote/, (msg) => {

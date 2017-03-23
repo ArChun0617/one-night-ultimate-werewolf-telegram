@@ -40,7 +40,7 @@ export class Game {
   bot: any;
   deck: Deck;
   gameRoles: string[];
-  gameTime: number = 5 * 60 * 1000;
+  gameTime: number = 10 * 60 * 1000;
   actionTime: number = 10 * 1000;
   btnPerLine: number = 3;
   phase: string = Game.PHASE_WAITING_PLAYER;
@@ -85,7 +85,8 @@ export class Game {
         "Luis",
         "Wilson",
         "Serina",
-        "Tab"
+        "Tab",
+        "Raphael"
       ];
 
       // TODO: hardcode to add dummy players
@@ -94,6 +95,8 @@ export class Game {
           //game.players.push(new Player({ id: i, name: 'Player'+i }));
           this.players.push(new Player({ id: i, name: "AI_" + playerTemp.shift() }));
         }
+
+      this.actionTime = 3 * 1000;
     }
 
     if (this.players.length + 3 !== this.gameRoles.length) {
@@ -132,6 +135,7 @@ export class Game {
 
   end() {
     this.setPhase(Game.PHASE_END_GAME);
+    if (this.votingTimer) clearTimeout(this.votingTimer);
   }
 
   isStarted() {
@@ -291,6 +295,7 @@ export class Game {
 
   private wakeUp(msg, role, timeDuration: number): Promise<any> {
     if (!this.isExistInCurrentGame(role)) return Promise.resolve();
+    if (this.isEnded()) return Promise.reject("");
 
     this.setWakeUpPhase(role);
 
@@ -331,10 +336,13 @@ export class Game {
 
     this.bot.sendMessage(
       msg.chat.id,
-      `${Emoji.get('hourglass_flowing_sand')}  Everyone wake up, you have ${gameDuration / 60 / 1000} mins to discuss ... Vote at ${now.getHours() + ":" + ("0" + now.getMinutes()).slice(-2) + ":" + now.getSeconds()}`
+      `${Emoji.get('hourglass_flowing_sand')}  Everyone wake up, you have ${gameDuration / 60 / 1000} mins to discuss ... \/vote at ${now.getHours() + ":" + ("0" + now.getMinutes()).slice(-2) + ":" + now.getSeconds()}`
     );
 
     this.setCountDown(msg, gameDuration, [300000, 180000, 60000, 30000], "mins");
+
+    const AIPlayers = _.filter(this.players, (player) => player.id <= 20);
+    _.map(AIPlayers, (ai) => this.randomVote(ai));  //Random vote for AI immediately
 
     return new Promise((resolve, reject) => {
       this.votingResolve = resolve;
