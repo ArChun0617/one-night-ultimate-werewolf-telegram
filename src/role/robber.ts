@@ -2,6 +2,7 @@ import * as Emoji from 'node-emoji';
 import * as _ from 'lodash';
 import { Role, RoleInterface } from "./role";
 import { Player } from "../player/player";
+import { ActionFootprint } from "../util/ActionFootprint";
 
 export class Robber extends Role implements RoleInterface {
   choice: string;
@@ -40,6 +41,7 @@ export class Robber extends Role implements RoleInterface {
 
   useAbility(bot, msg, players, table, host) {
     console.log(`${this.name} useAbility.msg.data: ${msg.data}`);
+    let rtnActionEvt: ActionFootprint;
     let rtnMsg = '';
 
     if (this.choice) {
@@ -51,11 +53,12 @@ export class Robber extends Role implements RoleInterface {
       else {
         this.choice = msg.data;
         rtnMsg = this.swapPlayer(this.choice, host, players);
+        rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
       }
     }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
-    return this.actionLog("useAbility", host, this.choice, players);
+    return rtnActionEvt;
   }
 
   endTurn(bot, msg, players, table, host) {
@@ -70,7 +73,8 @@ export class Robber extends Role implements RoleInterface {
       rtnMsg = this.swapPlayer(this.choice, host, players);
 
       bot.answerCallbackQuery(msg.id, rtnMsg);
-      return this.actionLog("endTurn", host, this.choice, players);
+      this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
+      return this.actionEvt;
     }
   }
 
@@ -85,14 +89,5 @@ export class Robber extends Role implements RoleInterface {
       if (host.id != target.id) host.swapRole(target);
     }
     return rtnMsg;
-  }
-
-  actionLog(phase, host, choice, players) {
-    let actionMsg = "";
-    const target: Player = _.find(players, (player: Player) => player.id == parseInt(this.choice));
-
-    actionMsg = (phase == "useAbility" ? "" : `${Emoji.get('zzz')}  `) + `${host.getRole().emoji}${target.name}`;
-
-    return super.footprint(host, choice, actionMsg)
   }
 }

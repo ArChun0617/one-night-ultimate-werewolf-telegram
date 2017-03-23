@@ -2,6 +2,7 @@ import * as Emoji from 'node-emoji';
 import * as _ from 'lodash';
 import { Role, RoleInterface } from "./role";
 import { Player } from "../player/player";
+import { ActionFootprint } from "../util/ActionFootprint";
 
 export class Doppelganger extends Role implements RoleInterface {
   shadowChoice: Role;
@@ -20,7 +21,7 @@ export class Doppelganger extends Role implements RoleInterface {
     // clone a user
     // apply that role ability
 
-    const key = [];
+    /*const key = [];
     let pos = 0;
     let btnPerLine = 3;
 
@@ -49,10 +50,10 @@ export class Doppelganger extends Role implements RoleInterface {
       .then((sended) => {
         // `sended` is the sent message.
         //console.log(`${this.name} sended >> MessageID:${sended.message_id} Text:${sended.text}`);
-      });
+      });*/
   }
 
-  useAbility(bot, msg, players, table, host) {
+  /*useAbility(bot, msg, players, table, host) {
     let rtnMsg = '';
     let target: any;
     let actionEvt: any;
@@ -62,19 +63,19 @@ export class Doppelganger extends Role implements RoleInterface {
     switch (this.shadowChoice ? this.shadowChoice.name : "") {
       case Role.WEREWOLF:
         if (msg.data == "WAKE_UP") {
-          rtnMsg = this.getRolePlayers(Role.WEREWOLF, players);
+          this.choice = rtnMsg = this.getRolePlayers(Role.WEREWOLF, players);
           if (rtnMsg.length > 0) rtnMsg = `${Role.WEREWOLF_EMOJI} is: ` + rtnMsg;
         }
         break;
       case Role.MINION:
         if (msg.data == "WAKE_UP") {
-          rtnMsg = this.getRolePlayers(Role.WEREWOLF, players);
+          this.choice = rtnMsg = this.getRolePlayers(Role.WEREWOLF, players);
           if (rtnMsg.length > 0) rtnMsg = `${Role.WEREWOLF_EMOJI} is: ` + rtnMsg;
         }
         break;
       case Role.MASON:
         if (msg.data == "WAKE_UP") {
-          rtnMsg = this.getRolePlayers(Role.MASON, players);
+          this.choice = rtnMsg = this.getRolePlayers(Role.MASON, players);
           if (rtnMsg.length > 0) rtnMsg = `${Role.MASON_EMOJI} is: ` + rtnMsg;
         }
         break;
@@ -166,9 +167,9 @@ export class Doppelganger extends Role implements RoleInterface {
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
     return (actionEvt || this.actionLog("useAbility", host, this.choice, ""));
-  }
+  }*/
 
-  endTurn(bot, msg, players, table, host) {
+  /*endTurn(bot, msg, players, table, host) {
     console.log(`${this.name} endTurn`);
     let rtnMsg = "";
     let actionEvt: any;
@@ -247,7 +248,7 @@ export class Doppelganger extends Role implements RoleInterface {
       bot.answerCallbackQuery(msg.id, rtnMsg);
       return (actionEvt || this.actionLog("endTurn", host, this.choice, ""));
     }
-  }
+  }*/
 
   checkRole(roleName, chkDoppleGanger: boolean = true) {
      //chkShadow is deduce use shadowChoice or real role(DoppleGanger)
@@ -265,7 +266,7 @@ export class Doppelganger extends Role implements RoleInterface {
     let target: Player[];
     let rtnMsg: string;
     target = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(role));
-    rtnMsg = _.map(target, (player: Player) => player.name).join();
+    rtnMsg = _.map(target, (player: Player) => this.emoji + player.name).join(" ");
 
     return rtnMsg;
   }
@@ -369,9 +370,5 @@ export class Doppelganger extends Role implements RoleInterface {
     }
 
     return rtnMsg;
-  }
-
-  actionLog(phase, host, choice, msg) {
-    return super.footprint(host, choice, msg)
   }
 }

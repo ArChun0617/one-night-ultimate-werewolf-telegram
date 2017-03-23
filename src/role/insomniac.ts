@@ -2,6 +2,7 @@ import * as Emoji from 'node-emoji';
 import * as _ from 'lodash';
 import { Role, RoleInterface } from "./role";
 import { Player } from "../player/player";
+import { ActionFootprint } from "../util/ActionFootprint";
 
 export class Insomniac extends Role implements RoleInterface {
   choice: string;
@@ -31,26 +32,30 @@ export class Insomniac extends Role implements RoleInterface {
   }
 
   useAbility(bot, msg, players, table, host) {
-    // TODO: avoid syntax error for testing first
     console.log(`${this.name} useAbility.msg.data: ${msg.data}`);
-
+    let rtnActionEvt: ActionFootprint;
     let rtnMsg: string = "";
 
     if (msg.data == "WAKE_UP") {
-      rtnMsg = host.name + " is: " + host.getRole().fullName;
       this.choice = host.getRole().name;
+      rtnMsg = host.getRole().fullName;
+      rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
     }
-
     bot.answerCallbackQuery(msg.id, rtnMsg);
-    return super.footprint(host, "", "");
+    return rtnActionEvt;
   }
 
   endTurn(bot, msg, players, table, host) {
     console.log(`${this.name} endTurn`);
     let rtnMsg: string = "";
-    rtnMsg = host.name + " is: " + host.getRole().fullName;
-    this.choice = host.getRole().name;
-    bot.answerCallbackQuery(msg.id, rtnMsg);
-    return super.footprint(host, "", "");
+
+    if (!this.choice) {
+      this.choice = host.getRole().name;
+      rtnMsg = host.getRole().fullName;
+
+      bot.answerCallbackQuery(msg.id, rtnMsg);
+      this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
+      return this.actionEvt;
+    }
   }
 }

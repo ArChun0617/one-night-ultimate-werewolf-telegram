@@ -7,6 +7,8 @@ import { ActionFootprint } from "../util/ActionFootprint";
 export interface RoleInterface {
   emoji: string;
   name: string;
+  choice: string;
+  actionEvt: ActionFootprint;
   wakeUp(bot, msg, players: Player[], table: Table, host: Player);
   useAbility(bot, msg, players: Player[], table: Table, host: Player);
   endTurn(bot, msg, players: Player[], table, host: Player);
@@ -23,6 +25,8 @@ export interface RoleOptions {
 export class Role implements RoleInterface {
   emoji: string;
   name: string;
+  choice: string;
+  actionEvt: ActionFootprint;
   ordering: number;
   get fullName(): string {
     return this.emoji + this.name;
@@ -81,9 +85,5 @@ export class Role implements RoleInterface {
       return _.includes(_.map(roleName, (r: string) => r.toUpperCase()), this.name.toUpperCase());
     else
       return this.name.toUpperCase() == roleName.toUpperCase();
-  }
-
-  footprint(host: Player, choice: string, action: string) {
-    return new ActionFootprint(host, choice, action);
   }
 }

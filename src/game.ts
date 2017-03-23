@@ -428,7 +428,7 @@ export class Game {
       });
 
       result += `\nAction Stack \n`;
-      result += _.map(this.actionStack, (step: ActionFootprint) => `${step.player.getOriginalRole().emoji}${step.player.name} : ${step.action}`).join("\n");
+      result += _.map(this.actionStack, (step: ActionFootprint) => `${step.player.getOriginalRole().emoji}${step.player.name} : ${step.toString()}`).join("\n");
 
       this.bot.sendMessage(msg.chat.id, result);
       console.log('Result', result);
@@ -492,7 +492,8 @@ export class Game {
       footprint = player.getOriginalRole().useAbility(this.bot, msg, this.players, this.table, player);
 
     if (footprint && footprint.action)
-      this.actionStack.push(footprint);
+      if (_.filter(this.actionStack, (action: ActionFootprint) => (action.player.id === footprint.player.id && action.choice === footprint.choice)).length == 0)
+        this.actionStack.push(footprint);
   }
 
   private handleConversationEvent(event: string, msg: any, player: Player) {

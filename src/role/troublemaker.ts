@@ -2,6 +2,7 @@ import * as Emoji from 'node-emoji';
 import * as _ from 'lodash';
 import { Role, RoleInterface } from "./role";
 import { Player } from "../player/player";
+import { ActionFootprint } from "../util/ActionFootprint";
 
 export class Troublemaker extends Role implements RoleInterface {
   choice: string;
@@ -62,8 +63,8 @@ export class Troublemaker extends Role implements RoleInterface {
 
   useAbility(bot, msg, players, table, host) {
     console.log(`${this.name} useAbility.msg.data: ${msg.data}`);
+    let rtnActionEvt: ActionFootprint;
     let rtnMsg = '';
-    let actionEvt: any;
 
     const regex = new RegExp(/^\d+_\d+/);
 
@@ -87,7 +88,7 @@ export class Troublemaker extends Role implements RoleInterface {
         else {
           this.choice += "_" + msg.data;
           rtnMsg = this.swapPlayers(this.choice, players);
-          actionEvt = this.actionLog("useAbility", host, this.choice, rtnMsg);
+          rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
         }
       }
     }
@@ -107,7 +108,7 @@ export class Troublemaker extends Role implements RoleInterface {
       }
     }
     bot.answerCallbackQuery(msg.id, rtnMsg);
-    return (actionEvt || this.actionLog("useAbility", host, this.choice, ""));
+    return rtnActionEvt;
   }
 
   endTurn(bot, msg, players: Player[], table, host: Player) {
@@ -130,7 +131,7 @@ export class Troublemaker extends Role implements RoleInterface {
 
       console.log(`${this.name} endTurn:choice_Shuffle ${this.choice}`);
       rtnMsg = this.swapPlayers(this.choice, players);
-      actionEvt = this.actionLog("endTurn", host, this.choice, rtnMsg);
+      this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
     }
     else {
       //Random first player
@@ -145,31 +146,10 @@ export class Troublemaker extends Role implements RoleInterface {
 
       console.log(`${this.name} endTurn:choice_Shuffle ${this.choice}`);
       rtnMsg = this.swapPlayers(this.choice, players);
-      actionEvt = this.actionLog("endTurn", host, this.choice, rtnMsg);
+      this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
     }
     bot.answerCallbackQuery(msg.id, rtnMsg);
-    return (actionEvt || this.actionLog("endTurn", host, this.choice, ""));
-    /*let rtnMsg = "";
-
-    console.log(`${this.name} endTurn:choice ${this.choice}`);
-    if (!this.choice) {
-      const key = [];
-      _.map(players, (playerFrom: Player) => {
-        if (playerFrom.id == parseInt(host.id)) return true;
-        _.map(players, (playerTo: Player) => {
-          if (playerTo.id == parseInt(host.id)) return true;
-          if (playerFrom.id == playerTo.id) return true;
-          key.push(playerFrom.id + "_" + playerTo.id);
-        });
-      });
-
-      console.log(`${this.name} key:`, key);
-      this.choice = _.shuffle(key)[0];
-      console.log(`${this.name} endTurn:choice_Shuffle ${this.choice}`);
-      rtnMsg = this.swapPlayers(this.choice, players);
-
-      bot.answerCallbackQuery(msg.id, rtnMsg);
-    }*/
+    return (rtnMsg ? this.actionEvt : null);
   }
 
   private swapPlayers(picked: string, players) {
@@ -187,11 +167,5 @@ export class Troublemaker extends Role implements RoleInterface {
       host.swapRole(target);
     }
     return rtnMsg;
-  }
-
-  actionLog(phase, host, choice, msg) {
-    let actionMsg = "";
-    if (msg) actionMsg = (phase == "useAbility" ? "" : `${Emoji.get('zzz')}  `) + msg;
-    return super.footprint(host, choice, actionMsg)
   }
 }

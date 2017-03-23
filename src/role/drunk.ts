@@ -2,6 +2,7 @@ import * as Emoji from 'node-emoji';
 import * as _ from 'lodash';
 import { Role, RoleInterface } from "./role";
 import { Player } from "../player/player";
+import { ActionFootprint } from "../util/ActionFootprint";
 
 export class Drunk extends Role implements RoleInterface {
   choice: string;
@@ -38,6 +39,7 @@ export class Drunk extends Role implements RoleInterface {
   useAbility(bot, msg, players, table, host) {
     // TODO: avoid syntax error for testing first
     console.log(`${this.name} useAbility.msg.data: ${msg.data}`);
+    let rtnActionEvt: ActionFootprint;
     let rtnMsg = '';
 
     if (this.choice) {
@@ -49,11 +51,12 @@ export class Drunk extends Role implements RoleInterface {
       else {
         this.choice = msg.data;
         rtnMsg = this.swapTable(this.choice, host, table);
+        rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, this.actionLog(this.choice));
       }
     }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
-    return this.actionLog("useAbility", host, this.choice);
+    return rtnActionEvt;
   }
 
   endTurn(bot, msg, players, table, host) {
@@ -67,7 +70,8 @@ export class Drunk extends Role implements RoleInterface {
       rtnMsg = this.swapTable(this.choice, host, table);
 
       bot.answerCallbackQuery(msg.id, rtnMsg);
-      return this.actionLog("endTurn", host, this.choice);
+      this.actionEvt = new ActionFootprint(host, this.choice, this.actionLog(this.choice), true);
+      return this.actionEvt;
     }
   }
 
@@ -105,18 +109,16 @@ export class Drunk extends Role implements RoleInterface {
     return rtnMsg;
   }
 
-  actionLog(phase, host, choice) {
+  actionLog(choice) {
     let actionMsg = "";
 
-    actionMsg = (phase == "useAbility" ? "" : `${Emoji.get('zzz')}  `);
-
     if (this.choice == "CARD_A")
-      actionMsg += `${host.getRole().emoji}${Emoji.get('question')}${Emoji.get('question')}`;
+      actionMsg += `${this.emoji}${Emoji.get('question')}${Emoji.get('question')}`;
     else if (this.choice == "CARD_B")
-      actionMsg += `${Emoji.get('question')}${host.getRole().emoji}${Emoji.get('question')}`;
+      actionMsg += `${Emoji.get('question')}${this.emoji}${Emoji.get('question')}`;
     else if (this.choice == "CARD_C")
-      actionMsg += `${Emoji.get('question')}${Emoji.get('question')}${host.getRole().emoji}`;
+      actionMsg += `${Emoji.get('question')}${Emoji.get('question')}${this.emoji}`;
 
-    return super.footprint(host, choice, actionMsg)
+    return actionMsg;
   }
 }

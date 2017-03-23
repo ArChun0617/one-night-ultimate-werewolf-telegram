@@ -98,7 +98,7 @@ bot.onText(/\/newgame/, (msg) => {
     addGameSettingRole(msg.id, gameSetting, Role.INSOMNIAC);        // 5 - 0
     addGameSettingRole(msg.id, gameSetting, Role.TROUBLEMAKER);     // 6 - 3p
     addGameSettingRole(msg.id, gameSetting, Role.MINION);           // 7 - 4p
-    addGameSettingRole(msg.id, gameSetting, Role.DOPPELGANGER);     // 8 - 5p
+    //addGameSettingRole(msg.id, gameSetting, Role.DOPPELGANGER);     // 8 - 5p
     addGameSettingRole(msg.id, gameSetting, Role.TANNER);           // 9 - 6p
     addGameSettingRole(msg.id, gameSetting, Role.MASON);            // 10- 7p
     addGameSettingRole(msg.id, gameSetting, Role.MASON);            // 11- 8p

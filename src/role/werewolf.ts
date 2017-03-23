@@ -2,6 +2,7 @@ import * as Emoji from 'node-emoji';
 import * as _ from 'lodash';
 import { Role, RoleInterface } from './role';
 import { Player } from "../player/player";
+import { ActionFootprint } from "../util/ActionFootprint";
 
 export class Werewolf extends Role implements RoleInterface {
   choice: string;
@@ -39,6 +40,8 @@ export class Werewolf extends Role implements RoleInterface {
   }
 
   useAbility(bot, msg, players, table, host) {
+    let rtnActionEvt: ActionFootprint;
+
     // TODO: avoid syntax error for testing first
     console.log(`${this.name} useAbility.msg.data: ${msg.data}`);
 
@@ -48,7 +51,8 @@ export class Werewolf extends Role implements RoleInterface {
 
     if (msg.data == "WAKE_UP") {
       rtnMsg = this.getRolePlayers(this.name, players);
-      if (rtnMsg.length > 0) rtnMsg = `${this.emoji} is: ` + rtnMsg;
+      if (target.length >= 2) this.choice = rtnMsg;
+      rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
     }
     else if ((msg.data == "CARD_A" || msg.data == "CARD_B" || msg.data == "CARD_C") && target.length == 1) {
       if (this.choice) {
@@ -57,6 +61,7 @@ export class Werewolf extends Role implements RoleInterface {
       else {
         this.choice = msg.data;
         rtnMsg = this.watchTable(this.choice, table);
+        rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
       }
     }
     else {
@@ -64,27 +69,25 @@ export class Werewolf extends Role implements RoleInterface {
     }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
-    return this.actionLog("useAbility", host, this.choice, table);
+    return rtnActionEvt;
   }
 
   endTurn(bot, msg, players, table, host) {
     // TODO: avoid syntax error for testing first
     console.log(`${this.name} endTurn`);
     let rtnMsg = "";
-    let actionEvt: any;
 
     console.log(`${this.name} endTurn:choice ${this.choice}`);
     if (!this.choice) {
       const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(this.name));
 
-      if (target.length > 1) {
-        rtnMsg = _.map(target, (player: Player) => player.name).join();
-        if (rtnMsg.length > 0) rtnMsg = `${this.fullName} is: ` + rtnMsg;
+      if (target.length >= 2) {
+        rtnMsg = this.getRolePlayers(this.name, players);
+        this.choice = rtnMsg;
       }
       else if (target.length == 1) {
         this.choice = _.shuffle(["CARD_A", "CARD_B", "CARD_C"])[0];
         console.log(`${this.name} endTurn:choice_Shuffle ${this.choice}`);
-        actionEvt = this.actionLog("endTurn", host, this.choice, table);
         rtnMsg = this.watchTable(this.choice, table);
       }
       else {
@@ -92,7 +95,8 @@ export class Werewolf extends Role implements RoleInterface {
       }
 
       bot.answerCallbackQuery(msg.id, rtnMsg);
-      return (actionEvt || this.actionLog("endTurn", host, "", table));
+      this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
+      return this.actionEvt;
     }
   }
 
@@ -100,7 +104,7 @@ export class Werewolf extends Role implements RoleInterface {
     let target: Player[];
     let rtnMsg: string;
     target = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(role));
-    rtnMsg = _.map(target, (player: Player) => player.name).join();
+    rtnMsg = _.map(target, (player: Player) => this.emoji + player.name).join(" ");
 
     return rtnMsg;
   }
@@ -124,11 +128,5 @@ export class Werewolf extends Role implements RoleInterface {
     }
 
     return rtnMsg;
-  }
-
-  actionLog(phase, host, choice, table) {
-    let actionMsg = "";
-    if (choice) actionMsg = (phase == "useAbility" ? "" : `${Emoji.get('zzz')}  `) + this.watchTable(choice,table);        
-    return super.footprint(host, choice, actionMsg);
   }
 }

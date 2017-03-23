@@ -2,6 +2,7 @@ import * as Emoji from 'node-emoji';
 import * as _ from 'lodash';
 import { Role, RoleInterface } from "./role";
 import { Player } from "../player/player";
+import { ActionFootprint } from "../util/ActionFootprint";
 
 export class Seer extends Role implements RoleInterface {
   choice: string;
@@ -47,6 +48,7 @@ export class Seer extends Role implements RoleInterface {
 
   useAbility(bot, msg, players, table, host) {
     console.log(`${this.name} useAbility.msg.data: ${msg.data}`);
+    let rtnActionEvt: ActionFootprint;
     let rtnMsg = '';
 
     if (this.choice) {
@@ -59,11 +61,12 @@ export class Seer extends Role implements RoleInterface {
         // TODO: avoid syntax error for testing first
         this.choice = msg.data;
         rtnMsg = this.watchRole(this.choice, players, table);
+        rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
       }
     }
 
     bot.answerCallbackQuery(msg.id, rtnMsg);
-    return this.actionLog("useAbility", host, this.choice, rtnMsg);
+    return rtnActionEvt;
   }
 
   endTurn(bot, msg, players, table, host) {
@@ -84,7 +87,8 @@ export class Seer extends Role implements RoleInterface {
       rtnMsg = this.watchRole(this.choice, players, table);
 
       bot.answerCallbackQuery(msg.id, rtnMsg);
-      return this.actionLog("endTurn", host, this.choice, rtnMsg);
+      this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
+      return this.actionEvt;
     }
   }
 
@@ -114,11 +118,5 @@ export class Seer extends Role implements RoleInterface {
     }
 
     return rtnMsg;
-  }
-
-  actionLog(phase, host, choice, msg) {
-    let actionMsg = "";
-    actionMsg = (phase == "useAbility" ? "" : `${Emoji.get('zzz')}  `) + msg;
-    return super.footprint(host, choice, actionMsg)
   }
 }

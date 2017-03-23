@@ -2,6 +2,7 @@ import * as Emoji from 'node-emoji';
 import * as _ from 'lodash';
 import { Role, RoleInterface } from "./role";
 import { Player } from "../player/player";
+import { ActionFootprint } from "../util/ActionFootprint";
 
 export class Minion extends Role implements RoleInterface {
   choice: string;
@@ -21,7 +22,6 @@ export class Minion extends Role implements RoleInterface {
       [{ text: `Wake Up${Emoji.get('eyes')}`, callback_data: "WAKE_UP" }]
     ];
 
-    //bot.sendMessage(msg.chat.id, `${this.emoji}  ${this.name}, wake up. '${wolf.emoji}${wolf.name}', stick out your thumb so the Minion can see who you are.`, {
     bot.sendMessage(msg.chat.id, `${this.fullName}, wake up.`, {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
@@ -33,33 +33,38 @@ export class Minion extends Role implements RoleInterface {
 
   useAbility(bot, msg, players, table, host) {
     console.log(`${this.name} useAbility.msg.data: ${msg.data}`);
+    let rtnActionEvt: ActionFootprint;
     let rtnMsg: string = "";
-    rtnMsg = this.getRolePlayers(Role.WEREWOLF, players);
-    this.choice = rtnMsg;
-    rtnMsg = `${Role.WEREWOLF + Role.WEREWOLF_EMOJI} is: ` + (rtnMsg || "[not exists]");
+
+    if (msg.data == "WAKE_UP") {
+      this.choice = rtnMsg = this.getRolePlayers(Role.WEREWOLF, players);
+      rtnMsg = (rtnMsg || `[${Role.WEREWOLF + Role.WEREWOLF_EMOJI} not exists]`);
+      rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
+    }
     bot.answerCallbackQuery(msg.id, rtnMsg);
-    return this.actionLog("useAbility", host, this.choice);
+    return rtnActionEvt;
   }
 
   endTurn(bot, msg, players, table, host) {
     console.log(`${this.name} endTurn`);
     let rtnMsg: string = "";
-    this.choice = rtnMsg;
-    rtnMsg = `${Role.WEREWOLF + Role.WEREWOLF_EMOJI} is: ` + (rtnMsg || "[not exists]");
-    bot.answerCallbackQuery(msg.id, rtnMsg);
-    return this.actionLog("endTurn", host, this.choice);
+
+    if (!this.choice) {
+      this.choice = rtnMsg = this.getRolePlayers(Role.WEREWOLF, players);
+      rtnMsg = (rtnMsg || `[${Role.WEREWOLF + Role.WEREWOLF_EMOJI} not exists]`);
+
+      bot.answerCallbackQuery(msg.id, rtnMsg);
+      this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
+      return this.actionEvt;
+    }
   }
 
   private getRolePlayers(role: string, players) {
     let target: Player[];
     let rtnMsg: string;
     target = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(role));
-    rtnMsg = _.map(target, (player: Player) => player.name).join();
+    rtnMsg = _.map(target, (player: Player) => Role.WEREWOLF_EMOJI + player.name).join(" ");
 
     return rtnMsg;
-  }
-
-  actionLog(phase, host, choice) {
-    return super.footprint(host, choice, "");
   }
 }

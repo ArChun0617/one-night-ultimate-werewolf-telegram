@@ -2,6 +2,7 @@ import * as Emoji from 'node-emoji';
 import * as _ from 'lodash';
 import { Role, RoleInterface } from "./role";
 import { Player } from "../player/player";
+import { ActionFootprint } from "../util/ActionFootprint";
 
 export class Mason extends Role implements RoleInterface {
   choice: string;
@@ -32,40 +33,38 @@ export class Mason extends Role implements RoleInterface {
 
   useAbility(bot, msg, players, table, host) {
     console.log(`${this.name} useAbility.msg.data: ${msg.data}`);
+    let rtnActionEvt: ActionFootprint;
     let rtnMsg: string = "";
 
     if (msg.data == "WAKE_UP") {
-      rtnMsg = this.getRolePlayers(this.name, players);
-      this.choice = rtnMsg;
-      rtnMsg = `${this.fullName} is: ` + (rtnMsg || "[not exists]");
+      this.choice = rtnMsg = this.getRolePlayers(this.name, players);
+      rtnMsg = (rtnMsg || `[${this.fullName} not exists]`);
+      rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
     }
-
     bot.answerCallbackQuery(msg.id, rtnMsg);
-    return this.actionLog("useAbility", host, this.choice);
+    return rtnActionEvt;
   }
 
   endTurn(bot, msg, players, table, host) {
     console.log(`${this.name} endTurn`);
     let rtnMsg: string = "";
 
-    rtnMsg = this.getRolePlayers(this.name, players);
-    this.choice = rtnMsg;
-    rtnMsg = `${this.fullName} is: ` + (rtnMsg || "[not exists]");
+    if (!this.choice) {
+      this.choice = rtnMsg = this.getRolePlayers(this.name, players);
+      rtnMsg = (rtnMsg || `[${this.fullName} not exists]`);
 
-    bot.answerCallbackQuery(msg.id, rtnMsg);
-    return this.actionLog("endTurn", host, this.choice);
+      bot.answerCallbackQuery(msg.id, rtnMsg);
+      this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
+      return this.actionEvt;
+    }
   }
 
   private getRolePlayers(role: string, players) {
     let target: Player[];
     let rtnMsg: string;
     target = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(role));
-    rtnMsg = _.map(target, (player: Player) => player.name).join();
+    rtnMsg = _.map(target, (player: Player) => this.emoji + player.name).join(" ");
 
     return rtnMsg;
-  }
-
-  actionLog(phase, host, choice) {
-    return super.footprint(host, choice, "");
   }
 }
