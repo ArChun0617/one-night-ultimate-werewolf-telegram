@@ -336,7 +336,9 @@ export class Game {
 
     this.bot.sendMessage(
       msg.chat.id,
-      `${Emoji.get('hourglass_flowing_sand')}  Everyone wake up, you have ${gameDuration / 60 / 1000} mins to discuss ... \/vote at ${now.getHours() + ":" + ("0" + now.getMinutes()).slice(-2) + ":" + now.getSeconds()}`
+      `${Emoji.get('hourglass_flowing_sand')}  Everyone wake up, you have ${gameDuration / 60 / 1000} mins to discuss ... \/vote at ${now.getHours() + ":" + ("0" + now.getMinutes()).slice(-2) + ":" + now.getSeconds()}\n If you dozed, try the button, It'll help.`, {
+        reply_markup: JSON.stringify({ inline_keyboard: [[{ text: `Oops... I dozed ${Emoji.get('zzz')}`, callback_data: "DOZED_WAKE_UP" }]] })
+      }
     );
 
     this.setCountDown(msg, gameDuration, [300000, 180000, 60000, 30000], "mins");
@@ -497,15 +499,25 @@ export class Game {
   }
 
   private handleConversationEvent(event: string, msg: any, player: Player) {
-    const id = parseInt(event);
+    if (event == "DOZED_WAKE_UP") {
+      let action: ActionFootprint = player.getOriginalRole().actionEvt;
 
-    if (player.id === id) {
-      return this.sendInvalidActionMessage(msg.id);
+      if (action.dozed)
+        this.bot.answerCallbackQuery(msg.id, action.toString());
+      else
+        this.bot.answerCallbackQuery(msg.id, `${Emoji.get('middle_finger')}  Hey! Stop doing that!`);
     }
+    else {
+      const id = parseInt(event);
 
-    this.votePlayer(id, msg, player);
-    if (_.filter(this.players, (player) => !(player.getKillTarget())).length == 0 && this.votingResolve)
-      this.votingResolve();
+      if (player.id === id) {
+        return this.sendInvalidActionMessage(msg.id);
+      }
+
+      this.votePlayer(id, msg, player);
+      if (_.filter(this.players, (player) => !(player.getKillTarget())).length == 0 && this.votingResolve)
+        this.votingResolve();
+    }
   }
 
   private handleVotingEvent(event: string, msg: any, player: Player) {
