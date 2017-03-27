@@ -1,6 +1,6 @@
 import * as Emoji from 'node-emoji';
 import * as _ from 'lodash';
-import { Role, RoleInterface } from "./role";
+import { Role, RoleInterface, RoleClass } from "./role";
 import { Player } from "../player/player";
 import { ActionFootprint } from "../util/ActionFootprint";
 
@@ -8,11 +8,7 @@ export class Insomniac extends Role implements RoleInterface {
   choice: string;
 
   constructor() {
-    super({
-      emoji: Role.INSOMNIAC_EMOJI,
-      name: Role.INSOMNIAC,
-      ordering: 90
-    });
+    super(RoleClass.INSOMNIAC);
   }
 
   wakeUp(bot, msg, players, table, host) {

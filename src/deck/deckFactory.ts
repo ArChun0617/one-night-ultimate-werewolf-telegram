@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { Role } from '../role/role';
+import { Role, RoleClass, RoleClassInterface } from '../role/role';
 import { Werewolf } from "../role/werewolf";
 import { Doppelganger } from "../role/doppelganger";
 import { Minion } from "../role/minion";
@@ -20,46 +20,46 @@ export const DeckFactory = {
    * @param gameRoles
    * @returns {Deck}
    */
-  generate: (gameRoles: string[]): Deck => {
+  generate: (gameRoles: RoleClassInterface[]): Deck => {
     gameRoles = _.shuffle(gameRoles);
     const roles:Role[] = [];
 
     _.map(gameRoles, (role) => {
       switch (role) {
-        case Role.DOPPELGANGER:
+        case RoleClass.DOPPELGANGER:
           roles.push(new Doppelganger());
           break;
-        case Role.WEREWOLF:
+        case RoleClass.WEREWOLF:
           roles.push(new Werewolf());
           break;
-        case Role.MINION:
+        case RoleClass.MINION:
           roles.push(new Minion());
           break;
-        case Role.MASON:
+        case RoleClass.MASON:
           roles.push(new Mason());
           break;
-        case Role.SEER:
+        case RoleClass.SEER:
           roles.push(new Seer());
           break;
-        case Role.ROBBER:
+        case RoleClass.ROBBER:
           roles.push(new Robber());
           break;
-        case Role.TROUBLEMAKER:
+        case RoleClass.TROUBLEMAKER:
           roles.push(new Troublemaker());
           break;
-        case Role.DRUNK:
+        case RoleClass.DRUNK:
           roles.push(new Drunk());
           break;
-        case Role.INSOMNIAC:
+        case RoleClass.INSOMNIAC:
           roles.push(new Insomniac());
           break;
-        case Role.VILLAGER:
+        case RoleClass.VILLAGER:
           roles.push(new Villager());
           break;
-        case Role.TANNER:
+        case RoleClass.TANNER:
           roles.push(new Tanner());
           break;
-        case Role.HUNTER:
+        case RoleClass.HUNTER:
           roles.push(new Hunter());
           break;
         default:

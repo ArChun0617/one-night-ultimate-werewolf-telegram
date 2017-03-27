@@ -1,6 +1,6 @@
 import * as Emoji from 'node-emoji';
 import * as _ from 'lodash';
-import { Role, RoleInterface } from "./role";
+import { Role, RoleInterface, RoleClass, RoleClassInterface } from "./role";
 import { Player } from "../player/player";
 import { ActionFootprint } from "../util/ActionFootprint";
 
@@ -8,11 +8,7 @@ export class Mason extends Role implements RoleInterface {
   choice: string;
 
   constructor() {
-    super({
-      emoji: Role.MASON_EMOJI,
-      name: Role.MASON,
-      ordering: 40
-    });
+    super(RoleClass.MASON);
   }
 
   wakeUp(bot, msg, players, table, host) {
@@ -37,7 +33,7 @@ export class Mason extends Role implements RoleInterface {
     let rtnMsg: string = "";
 
     if (msg.data == "WAKE_UP") {
-      this.choice = rtnMsg = this.getRolePlayers(this.name, players);
+      this.choice = rtnMsg = this.getRolePlayers(RoleClass.MASON, players);
       rtnMsg = (rtnMsg || `[${this.fullName} not exists]`);
       rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
     }
@@ -50,7 +46,7 @@ export class Mason extends Role implements RoleInterface {
     let rtnMsg: string = "";
 
     if (!this.choice) {
-      this.choice = rtnMsg = this.getRolePlayers(this.name, players);
+      this.choice = rtnMsg = this.getRolePlayers(RoleClass.MASON, players);
       rtnMsg = (rtnMsg || `[${this.fullName} not exists]`);
 
       bot.answerCallbackQuery(msg.id, rtnMsg);
@@ -59,11 +55,11 @@ export class Mason extends Role implements RoleInterface {
     }
   }
 
-  private getRolePlayers(role: string, players) {
+  private getRolePlayers(role: RoleClassInterface, players) {
     let target: Player[];
     let rtnMsg: string;
     target = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(role));
-    rtnMsg = _.map(target, (player: Player) => this.emoji + player.name).join(" ");
+    rtnMsg = _.map(target, (player: Player) => role.emoji + player.name).join(" ");
 
     return rtnMsg;
   }

@@ -1,6 +1,6 @@
 import * as Emoji from 'node-emoji';
 import * as _ from 'lodash';
-import { Role, RoleInterface } from './role';
+import { Role, RoleInterface, RoleClass, RoleClassInterface } from './role';
 import { Player } from "../player/player";
 import { ActionFootprint } from "../util/ActionFootprint";
 
@@ -8,11 +8,7 @@ export class Werewolf extends Role implements RoleInterface {
   choice: string;
 
   constructor() {
-    super({
-      emoji: Role.WEREWOLF_EMOJI,
-      name: Role.WEREWOLF,
-      ordering: 20
-    });
+    super(RoleClass.WEREWOLF);
   }
 
   wakeUp(bot, msg) {
@@ -47,10 +43,10 @@ export class Werewolf extends Role implements RoleInterface {
 
     console.log(`${this.name} useAbility:choice ${this.choice}`);
     let rtnMsg: string = "";
-    const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(this.name));
+    const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(RoleClass.WEREWOLF));
 
     if (msg.data == "WAKE_UP") {
-      rtnMsg = this.getRolePlayers(this.name, players);
+      rtnMsg = this.getRolePlayers(RoleClass.WEREWOLF, players);
       if (target.length >= 2) this.choice = rtnMsg;
       rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
     }
@@ -79,10 +75,10 @@ export class Werewolf extends Role implements RoleInterface {
 
     console.log(`${this.name} endTurn:choice ${this.choice}`);
     if (!this.choice) {
-      const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(this.name));
+      const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(RoleClass.WEREWOLF));
 
       if (target.length >= 2) {
-        rtnMsg = this.getRolePlayers(this.name, players);
+        rtnMsg = this.getRolePlayers(RoleClass.WEREWOLF, players);
         this.choice = rtnMsg;
       }
       else if (target.length == 1) {
@@ -100,11 +96,11 @@ export class Werewolf extends Role implements RoleInterface {
     }
   }
 
-  private getRolePlayers(role: string, players) {
+  private getRolePlayers(role: RoleClassInterface, players) {
     let target: Player[];
     let rtnMsg: string;
     target = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(role));
-    rtnMsg = _.map(target, (player: Player) => this.emoji + player.name).join(" ");
+    rtnMsg = _.map(target, (player: Player) => role.emoji + player.name).join(" ");
 
     return rtnMsg;
   }

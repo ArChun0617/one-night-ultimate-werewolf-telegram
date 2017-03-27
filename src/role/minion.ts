@@ -1,6 +1,6 @@
 import * as Emoji from 'node-emoji';
 import * as _ from 'lodash';
-import { Role, RoleInterface } from "./role";
+import { Role, RoleInterface, RoleClass, RoleClassInterface } from "./role";
 import { Player } from "../player/player";
 import { ActionFootprint } from "../util/ActionFootprint";
 
@@ -8,11 +8,7 @@ export class Minion extends Role implements RoleInterface {
   choice: string;
 
   constructor() {
-    super({
-      emoji: Role.MINION_EMOJI,
-      name: Role.MINION,
-      ordering: 30
-    });
+    super(RoleClass.MINION);
   }
 
   wakeUp(bot, msg, players, table, host) {
@@ -37,8 +33,8 @@ export class Minion extends Role implements RoleInterface {
     let rtnMsg: string = "";
 
     if (msg.data == "WAKE_UP") {
-      this.choice = rtnMsg = this.getRolePlayers(Role.WEREWOLF, players);
-      rtnMsg = (rtnMsg || `[${Role.WEREWOLF + Role.WEREWOLF_EMOJI} not exists]`);
+      this.choice = rtnMsg = this.getRolePlayers(RoleClass.WEREWOLF, players);
+      rtnMsg = (rtnMsg || `[${RoleClass.WEREWOLF.name + RoleClass.WEREWOLF.emoji} not exists]`);
       rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
     }
     bot.answerCallbackQuery(msg.id, rtnMsg);
@@ -50,8 +46,8 @@ export class Minion extends Role implements RoleInterface {
     let rtnMsg: string = "";
 
     if (!this.choice) {
-      this.choice = rtnMsg = this.getRolePlayers(Role.WEREWOLF, players);
-      rtnMsg = (rtnMsg || `[${Role.WEREWOLF + Role.WEREWOLF_EMOJI} not exists]`);
+      this.choice = rtnMsg = this.getRolePlayers(RoleClass.WEREWOLF, players);
+      rtnMsg = (rtnMsg || `[${RoleClass.WEREWOLF.name + RoleClass.WEREWOLF.emoji} not exists]`);
 
       bot.answerCallbackQuery(msg.id, rtnMsg);
       this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
@@ -59,11 +55,11 @@ export class Minion extends Role implements RoleInterface {
     }
   }
 
-  private getRolePlayers(role: string, players) {
+  private getRolePlayers(role: RoleClassInterface, players) {
     let target: Player[];
     let rtnMsg: string;
     target = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(role));
-    rtnMsg = _.map(target, (player: Player) => Role.WEREWOLF_EMOJI + player.name).join(" ");
+    rtnMsg = _.map(target, (player: Player) => role.emoji + player.name).join(" ");
 
     return rtnMsg;
   }

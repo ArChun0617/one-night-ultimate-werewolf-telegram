@@ -1,12 +1,8 @@
-import { Role, RoleInterface } from "./role";
+import { Role, RoleInterface, RoleClass } from "./role";
 
 export class Tanner extends Role implements RoleInterface {
   constructor() {
-    super({
-      emoji: Role.TANNER_EMOJI,
-      name: Role.TANNER,
-      ordering: 997
-    });
+    super(RoleClass.TANNER);
   }
 
   wakeUp(bot, msg, players, table, host) {

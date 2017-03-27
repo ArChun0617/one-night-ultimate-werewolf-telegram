@@ -1,12 +1,8 @@
-import { Role, RoleInterface } from "./role";
+import { Role, RoleInterface, RoleClass } from "./role";
 
 export class Hunter extends Role implements RoleInterface {
   constructor() {
-    super({
-      emoji: Role.HUNTER_EMOJI,
-      name: Role.HUNTER,
-      ordering: 998
-    });
+    super(RoleClass.HUNTER);
   }
 
   wakeUp(bot, msg, players, table, host) {

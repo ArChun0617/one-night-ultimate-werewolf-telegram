@@ -2,13 +2,13 @@ import * as _ from 'lodash';
 import * as TelegramBot from 'node-telegram-bot-api';
 import * as Emoji from 'node-emoji';
 import { Game } from './src/game';
-import { Role } from "./src/role/role";
+import { Role, RoleClass, RoleClassInterface } from "./src/role/role";
 import { Player } from "./src/player/player";
 import { GameEndError } from "./src/error/gameend";
 
 interface GameSetting {
   id: string;
-  roles: string[];
+  roles: RoleClassInterface[];
 }
 
 let port = process.env.PORT || 8443;
@@ -21,18 +21,18 @@ const games = [];
 const token = '331592410:AAHy9uA7PLWBHmIcNcyNt78hT6XLarrOjHM';
 const bot = new TelegramBot(token, { polling: true });
 const roles = [
-  { name: Role.DOPPELGANGER, max: 1 },
-  { name: Role.WEREWOLF, max: 2 },
-  { name: Role.MINION, max: 1 },
-  { name: Role.MASON, max: 2 },
-  { name: Role.SEER, max: 1 },
-  { name: Role.ROBBER, max: 1 },
-  { name: Role.TROUBLEMAKER, max: 1 },
-  { name: Role.DRUNK, max: 1 },
-  { name: Role.INSOMNIAC, max: 1 },
-  { name: Role.VILLAGER, max: 3 },
-  { name: Role.HUNTER, max: 1 },
-  { name: Role.TANNER, max: 1 }
+  { name: RoleClass.DOPPELGANGER.name, max: 1 },
+  { name: RoleClass.WEREWOLF.name, max: 2 },
+  { name: RoleClass.MINION.name, max: 1 },
+  { name: RoleClass.MASON.name, max: 2 },
+  { name: RoleClass.SEER.name, max: 1 },
+  { name: RoleClass.ROBBER.name, max: 1 },
+  { name: RoleClass.TROUBLEMAKER.name, max: 1 },
+  { name: RoleClass.DRUNK.name, max: 1 },
+  { name: RoleClass.INSOMNIAC.name, max: 1 },
+  { name: RoleClass.VILLAGER.name, max: 3 },
+  { name: RoleClass.HUNTER.name, max: 1 },
+  { name: RoleClass.TANNER.name, max: 1 }
 ];
 
 bot.onText(/\/setting/, (msg) => {
@@ -91,19 +91,19 @@ bot.onText(/\/newgame/, (msg) => {
     gameSetting = { id: msg.chat.id, roles: [] };
     gameSettings.push(gameSetting);
 
-    addGameSettingRole(msg.id, gameSetting, Role.WEREWOLF);         // 1 - 0
-    addGameSettingRole(msg.id, gameSetting, Role.WEREWOLF);         // 2 - 0
-    addGameSettingRole(msg.id, gameSetting, Role.SEER);             // 3 - 0
-    addGameSettingRole(msg.id, gameSetting, Role.ROBBER);           // 4 - 0
-    addGameSettingRole(msg.id, gameSetting, Role.INSOMNIAC);        // 5 - 0
-    addGameSettingRole(msg.id, gameSetting, Role.TROUBLEMAKER);     // 6 - 3p
-    addGameSettingRole(msg.id, gameSetting, Role.MINION);           // 7 - 4p
-    //addGameSettingRole(msg.id, gameSetting, Role.DOPPELGANGER);     // 8 - 5p
-    addGameSettingRole(msg.id, gameSetting, Role.TANNER);           // 9 - 6p
-    addGameSettingRole(msg.id, gameSetting, Role.MASON);            // 10- 7p
-    addGameSettingRole(msg.id, gameSetting, Role.MASON);            // 11- 8p
-    addGameSettingRole(msg.id, gameSetting, Role.DRUNK);            // 12- 9p
-    addGameSettingRole(msg.id, gameSetting, Role.VILLAGER);         // 13- 10p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.DOPPELGANGER);     // 8 - 5p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 1 - 0
+    addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 2 - 0
+    addGameSettingRole(msg.id, gameSetting, RoleClass.SEER);             // 3 - 0
+    addGameSettingRole(msg.id, gameSetting, RoleClass.ROBBER);           // 4 - 0
+    addGameSettingRole(msg.id, gameSetting, RoleClass.INSOMNIAC);        // 5 - 0
+    addGameSettingRole(msg.id, gameSetting, RoleClass.TROUBLEMAKER);     // 6 - 3p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.MINION);           // 7 - 4p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.TANNER);           // 9 - 6p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 10- 7p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 11- 8p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.DRUNK);            // 12- 9p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
   }
 
   const players: Player[] = [
@@ -195,17 +195,17 @@ bot.on('callback_query', (msg) => {
   if (regex.test(msg.data)) {
     // game setting - set role
     switch (msg.data) {
-      case `SET_ROLE_${Role.WEREWOLF}`: addGameSettingRole(msg.id, gameSetting, Role.WEREWOLF); break;
-      case `SET_ROLE_${Role.MINION}`: addGameSettingRole(msg.id, gameSetting, Role.MINION); break;
-      case `SET_ROLE_${Role.MASON}`: addGameSettingRole(msg.id, gameSetting, Role.MASON); break;
-      case `SET_ROLE_${Role.SEER}`: addGameSettingRole(msg.id, gameSetting, Role.SEER); break;
-      case `SET_ROLE_${Role.ROBBER}`: addGameSettingRole(msg.id, gameSetting, Role.ROBBER); break;
-      case `SET_ROLE_${Role.TROUBLEMAKER}`: addGameSettingRole(msg.id, gameSetting, Role.TROUBLEMAKER); break;
-      case `SET_ROLE_${Role.DRUNK}`: addGameSettingRole(msg.id, gameSetting, Role.DRUNK); break;
-      case `SET_ROLE_${Role.INSOMNIAC}`: addGameSettingRole(msg.id, gameSetting, Role.INSOMNIAC); break;
-      case `SET_ROLE_${Role.VILLAGER}`: addGameSettingRole(msg.id, gameSetting, Role.VILLAGER); break;
-      case `SET_ROLE_${Role.HUNTER}`: addGameSettingRole(msg.id, gameSetting, Role.HUNTER); break;
-      case `SET_ROLE_${Role.TANNER}`: addGameSettingRole(msg.id, gameSetting, Role.TANNER); break;
+      case `SET_ROLE_${RoleClass.WEREWOLF.name}`: addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF); break;
+      case `SET_ROLE_${RoleClass.MINION.name}`: addGameSettingRole(msg.id, gameSetting, RoleClass.MINION); break;
+      case `SET_ROLE_${RoleClass.MASON.name}`: addGameSettingRole(msg.id, gameSetting, RoleClass.MASON); break;
+      case `SET_ROLE_${RoleClass.SEER.name}`: addGameSettingRole(msg.id, gameSetting, RoleClass.SEER); break;
+      case `SET_ROLE_${RoleClass.ROBBER.name}`: addGameSettingRole(msg.id, gameSetting, RoleClass.ROBBER); break;
+      case `SET_ROLE_${RoleClass.TROUBLEMAKER.name}`: addGameSettingRole(msg.id, gameSetting, RoleClass.TROUBLEMAKER); break;
+      case `SET_ROLE_${RoleClass.DRUNK.name}`: addGameSettingRole(msg.id, gameSetting, RoleClass.DRUNK); break;
+      case `SET_ROLE_${RoleClass.INSOMNIAC.name}`: addGameSettingRole(msg.id, gameSetting, RoleClass.INSOMNIAC); break;
+      case `SET_ROLE_${RoleClass.VILLAGER.name}`: addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER); break;
+      case `SET_ROLE_${RoleClass.HUNTER.name}`: addGameSettingRole(msg.id, gameSetting, RoleClass.HUNTER); break;
+      case `SET_ROLE_${RoleClass.TANNER.name}`: addGameSettingRole(msg.id, gameSetting, RoleClass.TANNER); break;
     }
 
     return;
@@ -213,14 +213,13 @@ bot.on('callback_query', (msg) => {
 
   // find the user and callback the Game on handler
   const game = getGame(msg.message.chat.id);
-  if (!game) return askForCreateNewGame(msg.message.chat.id);
-
-  // Game event
-  game.on(msg.data, msg);
+  if (game) game.on(msg.data, msg); // Game event
+  // return askForCreateNewGame(msg.message.chat.id);
 });
 
-function addGameSettingRole(msgId: number, gameSetting: any, role: string) {
-  const roleSetting = _.find(roles, r => r.name === role);
+function addGameSettingRole(msgId: number, gameSetting: any, role: RoleClassInterface) {
+  const roleSetting = _.find(roles, r => r.name === role.name);
+
   if (_.filter(gameSetting.roles, (r) => r === role).length < roleSetting.max) {
     gameSetting.roles.push(role);
     bot.answerCallbackQuery(msgId, `${Emoji.get('white_check_mark')}  Added ${role}`);

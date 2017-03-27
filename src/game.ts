@@ -2,7 +2,7 @@ import { GameEndError } from "./error/gameend";
 import * as Emoji from 'node-emoji';
 import * as _ from 'lodash';
 import { DeckFactory } from "./deck/deckFactory";
-import { Role } from "./role/role";
+import { Role, RoleClass, RoleClassInterface } from "./role/role";
 import { Deck } from "./deck/deck";
 import { Player } from "./player/player";
 import { Table } from "./npc/table";
@@ -39,7 +39,7 @@ export class Game {
   table: Table = new Table();
   bot: any;
   deck: Deck;
-  gameRoles: string[];
+  gameRoles: RoleClassInterface[];
   gameTime: number = 10 * 60 * 1000;
   actionTime: number = 10 * 1000;
   btnPerLine: number = 3;
@@ -53,7 +53,7 @@ export class Game {
   votingTimer: any;
   votingResolve: any;
 
-  constructor(id: number, bot: any, players: Player[], roles: string[]) {
+  constructor(id: number, bot: any, players: Player[], roles: RoleClassInterface[]) {
     this.id = id;
     this.bot = bot;
     this.gameRoles = roles;
@@ -282,15 +282,15 @@ export class Game {
     this.setPhase(Game.PHASE_START_NIGHT);
 
     return this.bot.sendMessage(msg.chat.id, `${Emoji.get('crescent_moon')}  Night start, Everyone close your eye.`)
-      .then(() => this.wakeUp(msg, Role.DOPPELGANGER, timeDuration * 2))  // 2x action time for DoppelGanger
-      .then(() => this.wakeUp(msg, Role.WEREWOLF, timeDuration))
-      .then(() => this.wakeUp(msg, Role.MINION, timeDuration))
-      .then(() => this.wakeUp(msg, Role.MASON, timeDuration))
-      .then(() => this.wakeUp(msg, Role.SEER, timeDuration))
-      .then(() => this.wakeUp(msg, Role.ROBBER, timeDuration))
-      .then(() => this.wakeUp(msg, Role.TROUBLEMAKER, timeDuration))
-      .then(() => this.wakeUp(msg, Role.DRUNK, timeDuration))
-      .then(() => this.wakeUp(msg, Role.INSOMNIAC, timeDuration));
+      .then(() => this.wakeUp(msg, RoleClass.DOPPELGANGER, timeDuration * 2))  // 2x action time for DoppelGanger
+      .then(() => this.wakeUp(msg, RoleClass.WEREWOLF, timeDuration))
+      .then(() => this.wakeUp(msg, RoleClass.MINION, timeDuration))
+      .then(() => this.wakeUp(msg, RoleClass.MASON, timeDuration))
+      .then(() => this.wakeUp(msg, RoleClass.SEER, timeDuration))
+      .then(() => this.wakeUp(msg, RoleClass.ROBBER, timeDuration))
+      .then(() => this.wakeUp(msg, RoleClass.TROUBLEMAKER, timeDuration))
+      .then(() => this.wakeUp(msg, RoleClass.DRUNK, timeDuration))
+      .then(() => this.wakeUp(msg, RoleClass.INSOMNIAC, timeDuration));
   }
 
   private wakeUp(msg, role, timeDuration: number): Promise<any> {
@@ -395,7 +395,7 @@ export class Game {
       
       //console.log('this.result', util.inspect(this.result, false, 3));
       _.map(deaths, (death: Result) => {
-        if (death.target.getOriginalRole().checkRole(Role.HUNTER)) {
+        if (death.target.getOriginalRole().checkRole(RoleClass.HUNTER)) {
           this.deathPlayers.push(_.assignIn(death.target.getKillTarget(), {"count": "HUNTER"}));
         }
         this.deathPlayers.push(_.assignIn(death.target, { "count": death.count }));
@@ -416,21 +416,32 @@ export class Game {
 
       result += `${Emoji.get('skull')}\n`;
       _.map(this.deathPlayers, (death) => {
+        console.log(`showResult.death: ${death.name}`);
         result += `${death.name} ${death.getOriginalRole().emoji} ${Emoji.get('arrow_right')} ${death.getRole().emoji}  ${Emoji.get('point_left')} ${death.count} \n`;
       });
 
       result += `\n${Emoji.get('trophy')}${Emoji.get('full_moon_with_face')}\n`;
       _.map(this.winners, (winner: Player) => {
+        console.log(`showResult.winner: ${winner.name}`);
         result += `${winner.name} ${winner.getOriginalRole().emoji} ${Emoji.get('arrow_right')} ${winner.getRole().emoji}  ${Emoji.get('point_right')} ${winner.getKillTarget().name} \n`;
       });
 
       result += `\n${Emoji.get('new_moon_with_face')}\n`;
       _.map(this.losers, (loser: Player) => {
+        console.log(`showResult.loser: ${loser.name}`);
         result += `${loser.name} ${loser.getOriginalRole().emoji} ${Emoji.get('arrow_right')} ${loser.getRole().emoji}  ${Emoji.get('point_right')} ${loser.getKillTarget().name} \n`;
       });
 
       result += `\nAction Stack \n`;
-      result += _.map(this.actionStack, (step: ActionFootprint) => `${step.player.getOriginalRole().emoji}${step.player.name} : ${step.toString()}`).join("\n");
+      result += _.map(this.actionStack, (step: ActionFootprint) => {
+        let rolePrefix = "";
+        let role: any;
+        if (step.player.getOriginalRole().name == RoleClass.DOPPELGANGER.name) {
+          role = step.player.getOriginalRole();
+          rolePrefix = (role.shadowChoice ? role.shadowChoice.emoji : "");
+        }
+        return `${step.player.getOriginalRole().emoji}${rolePrefix}${step.player.name} : ${step.toString()}`
+      }).join("\n");
 
       this.bot.sendMessage(msg.chat.id, result);
       console.log('Result', result);
@@ -452,15 +463,15 @@ export class Game {
 
   private setWakeUpPhase(role) {
     switch (role) {
-      case Role.DOPPELGANGER: this.setPhase(Game.PHASE_WAKEUP_DOPPELGANGER); break;
-      case Role.WEREWOLF: this.setPhase(Game.PHASE_WAKEUP_WEREWOLF); break;
-      case Role.MINION: this.setPhase(Game.PHASE_WAKEUP_MINION); break;
-      case Role.MASON: this.setPhase(Game.PHASE_WAKEUP_MASON); break;
-      case Role.SEER: this.setPhase(Game.PHASE_WAKEUP_SEER); break;
-      case Role.ROBBER: this.setPhase(Game.PHASE_WAKEUP_ROBBER); break;
-      case Role.TROUBLEMAKER: this.setPhase(Game.PHASE_WAKEUP_TROUBLEMAKER); break;
-      case Role.DRUNK: this.setPhase(Game.PHASE_WAKEUP_DRUNK); break;
-      case Role.INSOMNIAC: this.setPhase(Game.PHASE_WAKEUP_INSOMNIAC); break;
+      case RoleClass.DOPPELGANGER: this.setPhase(Game.PHASE_WAKEUP_DOPPELGANGER); break;
+      case RoleClass.WEREWOLF: this.setPhase(Game.PHASE_WAKEUP_WEREWOLF); break;
+      case RoleClass.MINION: this.setPhase(Game.PHASE_WAKEUP_MINION); break;
+      case RoleClass.MASON: this.setPhase(Game.PHASE_WAKEUP_MASON); break;
+      case RoleClass.SEER: this.setPhase(Game.PHASE_WAKEUP_SEER); break;
+      case RoleClass.ROBBER: this.setPhase(Game.PHASE_WAKEUP_ROBBER); break;
+      case RoleClass.TROUBLEMAKER: this.setPhase(Game.PHASE_WAKEUP_TROUBLEMAKER); break;
+      case RoleClass.DRUNK: this.setPhase(Game.PHASE_WAKEUP_DRUNK); break;
+      case RoleClass.INSOMNIAC: this.setPhase(Game.PHASE_WAKEUP_INSOMNIAC); break;
     }
   }
 
@@ -481,8 +492,8 @@ export class Game {
 
   private handleWakeUpEvent(event: string, msg: any, player: Player) {
     let footprint: ActionFootprint;
-    if (player.getOriginalRole().checkRole(Role.DOPPELGANGER)) { // The player is Doppleganger
-      if (player.getOriginalRole().checkRole([Role.WEREWOLF, Role.MINION, Role.MASON, Role.INSOMNIAC]) || this.getPhase() == 'wakeup_' + Role.DOPPELGANGER.toLowerCase()) // Hard-coded to allow (Werewolf, Minion, Mason, Insomniac) since others should act in DoopleGanger phase
+    if (player.getOriginalRole().checkRole(RoleClass.DOPPELGANGER)) { // The player is Doppleganger
+      if (player.getOriginalRole().checkRole([RoleClass.WEREWOLF, RoleClass.MINION, RoleClass.MASON, RoleClass.INSOMNIAC]) || this.getPhase() == 'wakeup_' + RoleClass.DOPPELGANGER.name.toLowerCase()) // Hard-coded to allow (Werewolf, Minion, Mason, Insomniac) since others should act in DoopleGanger phase
         if (player.getOriginalRole().checkRole(this.getPhase().substring("wakeup_".length)))  // The phase is action for the role
           footprint = player.getOriginalRole().useAbility(this.bot, msg, this.players, this.table, player);
         else
@@ -503,7 +514,22 @@ export class Game {
       let action: ActionFootprint = player.getOriginalRole().actionEvt;
 
       if (action.dozed)
-        this.bot.answerCallbackQuery(msg.id, action.toString());
+      {
+        let rolePrefix = "";
+        let role: any;
+
+        if (action.player.getOriginalRole().name == RoleClass.DOPPELGANGER.name) {
+          role = action.player.getOriginalRole();
+          rolePrefix = role.emoji + role.shadowChoice.emoji + role.shadowChoice.name;
+        }
+        else
+        {
+          rolePrefix = action.player.getOriginalRole().fullName;
+        }
+
+        this.bot.answerCallbackQuery(msg.id, `${rolePrefix} ${Emoji.get('arrow_right')} ${action.toString()}`);
+
+      }
       else
         this.bot.answerCallbackQuery(msg.id, `${Emoji.get('middle_finger')}  Hey! Stop doing that!`);
     }
@@ -553,10 +579,10 @@ export class Game {
   private determineWinners(deathPlayers: Player[]) {
     let winners: Player[] = [];
 
-    const deathTanners = _.filter(deathPlayers, player => player.getRole().checkRole(Role.TANNER));
-    const deathWerewolfs = _.filter(deathPlayers, player => player.getRole().checkRole(Role.WEREWOLF));
+    const deathTanners = _.filter(deathPlayers, player => player.getRole().checkRole(RoleClass.TANNER));
+    const deathWerewolfs = _.filter(deathPlayers, player => player.getRole().checkRole(RoleClass.WEREWOLF));
     const deathVillages = _.filter(deathPlayers, player => _.indexOf([
-      Role.WEREWOLF, Role.MINION, Role.TANNER
+      RoleClass.WEREWOLF.name, RoleClass.MINION.name, RoleClass.TANNER.name
     ], player.getRole().name) < 0);
 
     console.log('this.deathPlayers', deathPlayers);
@@ -588,15 +614,15 @@ export class Game {
   }
 
   private getNonTannerVillagesTeam() {
-    return _.filter(this.players, player => !(player.getRole().checkRole([Role.WEREWOLF, Role.MINION, Role.TANNER])));
+    return _.filter(this.players, player => !(player.getRole().checkRole([RoleClass.WEREWOLF, RoleClass.MINION, RoleClass.TANNER])));
   }
 
   private getWerewolfTeam() {
-    return _.filter(this.players, player => player.getRole().checkRole([Role.WEREWOLF, Role.MINION]));
+    return _.filter(this.players, player => player.getRole().checkRole([RoleClass.WEREWOLF, RoleClass.MINION]));
   }
 
   private hasWerewolfOnTable() {
-    const werewolfs = _.filter(this.players, player => player.getRole().checkRole(Role.WEREWOLF));
+    const werewolfs = _.filter(this.players, player => player.getRole().checkRole(RoleClass.WEREWOLF));
     return werewolfs.length > 0;
   }
 

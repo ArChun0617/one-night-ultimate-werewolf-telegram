@@ -1,6 +1,6 @@
 import * as Emoji from 'node-emoji';
 import * as _ from 'lodash';
-import { Role, RoleInterface } from "./role";
+import { Role, RoleInterface, RoleClass } from "./role";
 import { Player } from "../player/player";
 import { ActionFootprint } from "../util/ActionFootprint";
 
@@ -8,11 +8,7 @@ export class Drunk extends Role implements RoleInterface {
   choice: string;
 
   constructor() {
-    super({
-      emoji: Role.DRUNK_EMOJI,
-      name: Role.DRUNK,
-      ordering: 80
-    });
+    super(RoleClass.DRUNK);
   }
 
   wakeUp(bot, msg, players, table, host) {
@@ -51,7 +47,7 @@ export class Drunk extends Role implements RoleInterface {
       else {
         this.choice = msg.data;
         rtnMsg = this.swapTable(this.choice, host, table);
-        rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, this.actionLog(this.choice));
+        rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
       }
     }
 
@@ -70,7 +66,7 @@ export class Drunk extends Role implements RoleInterface {
       rtnMsg = this.swapTable(this.choice, host, table);
 
       bot.answerCallbackQuery(msg.id, rtnMsg);
-      this.actionEvt = new ActionFootprint(host, this.choice, this.actionLog(this.choice), true);
+      this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
       return this.actionEvt;
     }
   }
@@ -85,21 +81,21 @@ export class Drunk extends Role implements RoleInterface {
         table.setLeft(host.getRole());
         host.setRole(tableRole);
 
-        rtnMsg += "left";
+        rtnMsg += `${this.emoji}${Emoji.get('question')}${Emoji.get('question')}`;
         break;
       case "CARD_B":
         tableRole = table.getCenter();
         table.setCenter(host.getRole());
         host.setRole(tableRole);
 
-        rtnMsg += "centre";
+        rtnMsg += `${Emoji.get('question')}${this.emoji}${Emoji.get('question')}`;
         break;
       case "CARD_C":
         tableRole = table.getRight();
         table.setRight(host.getRole());
         host.setRole(tableRole);
 
-        rtnMsg += "right";
+        rtnMsg += `${Emoji.get('question')}${Emoji.get('question')}${this.emoji}`;
         break;
       default:
         rtnMsg = "Invalid action";
@@ -109,7 +105,7 @@ export class Drunk extends Role implements RoleInterface {
     return rtnMsg;
   }
 
-  actionLog(choice) {
+  /*actionLog(choice) {
     let actionMsg = "";
 
     if (this.choice == "CARD_A")
@@ -120,5 +116,5 @@ export class Drunk extends Role implements RoleInterface {
       actionMsg += `${Emoji.get('question')}${Emoji.get('question')}${this.emoji}`;
 
     return actionMsg;
-  }
+  }*/
 }

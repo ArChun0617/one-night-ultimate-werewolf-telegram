@@ -1,12 +1,8 @@
-import { Role, RoleInterface } from "./role";
+import { Role, RoleInterface, RoleClass } from "./role";
 
 export class Villager extends Role implements RoleInterface {
   constructor() {
-    super({
-      emoji: Role.VILLAGER_EMOJI,
-      name: Role.VILLAGER,
-      ordering: 999
-    });
+    super(RoleClass.VILLAGER);
   }
 
   wakeUp(bot, msg, players, table, host) {

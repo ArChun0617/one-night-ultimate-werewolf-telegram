@@ -4,9 +4,19 @@ import { Player } from "../player/player";
 import { Table } from "../npc/table";
 import { ActionFootprint } from "../util/ActionFootprint";
 
-export interface RoleInterface {
+export class RoleClassInterface {
   emoji: string;
   name: string;
+  ordering: number
+
+  constructor(_emoji: string, _name: string, _ordering) {
+    this.emoji = _emoji;
+    this.name = _name;
+    this.ordering = _ordering;
+  }
+}
+
+export interface RoleInterface {
   choice: string;
   actionEvt: ActionFootprint;
   wakeUp(bot, msg, players: Player[], table: Table, host: Player);
@@ -16,10 +26,19 @@ export interface RoleInterface {
   checkRole(roleName);
 }
 
-export interface RoleOptions {
-  emoji: string;
-  name: string;
-  ordering: number;
+export class RoleClass {
+  public static DOPPELGANGER: RoleClassInterface = new RoleClassInterface(`${Emoji.get('ghost')}`, 'Doppelganger', 10);
+  public static WEREWOLF: RoleClassInterface = new RoleClassInterface(`${Emoji.get('smirk_cat')}`, 'Werewolf', 20);
+  public static MINION: RoleClassInterface = new RoleClassInterface(`${Emoji.get('dog')}`, 'Minion', 30);
+  public static MASON: RoleClassInterface = new RoleClassInterface(`${Emoji.get('two_men_holding_hands')}`, 'Mason', 40);
+  public static SEER: RoleClassInterface = new RoleClassInterface(`${Emoji.get('crystal_ball')}`, 'Seer', 50);
+  public static ROBBER: RoleClassInterface = new RoleClassInterface(`${Emoji.get('knife')}`, 'Robber', 60);
+  public static TROUBLEMAKER: RoleClassInterface = new RoleClassInterface(`${Emoji.get('smiling_imp')}`, 'Troublemaker', 70);
+  public static DRUNK: RoleClassInterface = new RoleClassInterface(`${Emoji.get('beer')}`, 'Drunk', 80);
+  public static INSOMNIAC: RoleClassInterface = new RoleClassInterface(`${Emoji.get('alarm_clock')}`, 'Insomniac', 90);
+  public static VILLAGER: RoleClassInterface = new RoleClassInterface(`${Emoji.get('boy')}`, 'Villager', 999);
+  public static TANNER: RoleClassInterface = new RoleClassInterface(`${Emoji.get('hammer')}`, 'Tanner', 997);
+  public static HUNTER: RoleClassInterface = new RoleClassInterface(`${Emoji.get('gun')}`, 'Hunter', 998);
 }
 
 export class Role implements RoleInterface {
@@ -31,37 +50,11 @@ export class Role implements RoleInterface {
   get fullName(): string {
     return this.emoji + this.name;
   }
-
-  public static DOPPELGANGER:string = 'Doppelganger';
-  public static WEREWOLF:string = 'Werewolf';
-  public static MINION:string = 'Minion';
-  public static MASON:string = 'Mason';
-  public static SEER:string = 'Seer';
-  public static ROBBER:string = 'Robber';
-  public static TROUBLEMAKER:string = 'Troublemaker';
-  public static DRUNK:string = 'Drunk';
-  public static INSOMNIAC:string = 'Insomniac';
-  public static VILLAGER:string = 'Villager';
-  public static TANNER:string = 'Tanner';
-  public static HUNTER:string = 'Hunter';
-  
-  public static DOPPELGANGER_EMOJI:string = `${Emoji.get('ghost')}`;
-  public static WEREWOLF_EMOJI:string = `${Emoji.get('smirk_cat')}`;
-  public static MINION_EMOJI:string = `${Emoji.get('dog')}`;
-  public static MASON_EMOJI:string = `${Emoji.get('two_men_holding_hands')}`;
-  public static SEER_EMOJI:string = `${Emoji.get('crystal_ball')}`;
-  public static ROBBER_EMOJI:string = `${Emoji.get('knife')}`;
-  public static TROUBLEMAKER_EMOJI:string = `${Emoji.get('smiling_imp')}`;
-  public static DRUNK_EMOJI:string = `${Emoji.get('beer')}`;
-  public static INSOMNIAC_EMOJI:string = `${Emoji.get('alarm_clock')}`;
-  public static VILLAGER_EMOJI:string = `${Emoji.get('boy')}`;
-  public static TANNER_EMOJI:string = `${Emoji.get('hammer')}`;
-  public static HUNTER_EMOJI:string = `${Emoji.get('gun')}`;
-  
-  constructor(options: RoleOptions) {
-    this.emoji = options.emoji;
-    this.name = options.name;
-    this.ordering = options.ordering;
+    
+  constructor(roleClass: RoleClassInterface) {
+    this.emoji = roleClass.emoji;
+    this.name = roleClass.name;
+    this.ordering = roleClass.ordering;
   }
 
   wakeUp(bot, msg, players, table, host) {
@@ -82,8 +75,8 @@ export class Role implements RoleInterface {
 
   checkRole(roleName, chkShadow: boolean = true) {  //chkShadow is used for doppleganger, for other role no difference
     if (roleName instanceof Array)
-      return _.includes(_.map(roleName, (r: string) => r.toUpperCase()), this.name.toUpperCase());
+      return _.includes(_.map(roleName, (r: RoleClassInterface) => r.name.toUpperCase()), this.name.toUpperCase());
     else
-      return this.name.toUpperCase() == roleName.toUpperCase();
+      return this.name.toUpperCase() == roleName.name.toUpperCase();
   }
 }
