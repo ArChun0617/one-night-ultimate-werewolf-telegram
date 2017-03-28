@@ -91,7 +91,6 @@ bot.onText(/\/newgame/, (msg) => {
     gameSetting = { id: msg.chat.id, roles: [] };
     gameSettings.push(gameSetting);
 
-    addGameSettingRole(msg.id, gameSetting, RoleClass.DOPPELGANGER);     // 8 - 5p
     addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 1 - 0
     addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 2 - 0
     addGameSettingRole(msg.id, gameSetting, RoleClass.SEER);             // 3 - 0
@@ -99,6 +98,7 @@ bot.onText(/\/newgame/, (msg) => {
     addGameSettingRole(msg.id, gameSetting, RoleClass.INSOMNIAC);        // 5 - 0
     addGameSettingRole(msg.id, gameSetting, RoleClass.TROUBLEMAKER);     // 6 - 3p
     addGameSettingRole(msg.id, gameSetting, RoleClass.MINION);           // 7 - 4p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.DOPPELGANGER);     // 8 - 5p
     addGameSettingRole(msg.id, gameSetting, RoleClass.TANNER);           // 9 - 6p
     addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 10- 7p
     addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 11- 8p
