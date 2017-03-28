@@ -6,6 +6,7 @@ export class Player {
   originalRole: Role = null;
   role: Role;
   killTarget: Player;
+  readyStart: boolean;
 
   constructor(options) {
     this.id = options.id;

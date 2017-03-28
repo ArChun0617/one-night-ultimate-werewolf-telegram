@@ -96,6 +96,7 @@ export class Game {
           this.players.push(new Player({ id: i, name: "AI_" + playerTemp.shift() }));
         }
 
+      //Debug mode = 3sec action
       this.actionTime = 3 * 1000;
     }
 
@@ -166,6 +167,12 @@ export class Game {
 
   getPlayer(id: number) {
     return _.find(this.players, player => player.id === id);
+  }
+
+  setPlayerReady(_id: number) {
+    _.map(_.filter(this.players, (player: Player) => player.id == _id), (player: Player) => player.readyStart = true);
+
+    return _.filter(this.players, (player: Player) => player.readyStart).length;
   }
 
   sendVotingList(msgId: number) {

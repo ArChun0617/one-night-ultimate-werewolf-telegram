@@ -146,27 +146,35 @@ bot.onText(/\/start/, (msg) => {
   if (!game) return askForCreateNewGame(msg.chat.id);
   console.log('gameSetting.roles', gameSetting.roles);
 
-  game.start(msg)
-    .then(() => {
-      killGame(msg.chat.id);
-    })
-    .catch((error) => {
-      console.log(`Catch error`, error);
-      console.log(`Catch error.message`, error.message);
-      console.log(`Catch error.name`, error.name);
-      if (error) {
-        console.log(`Error`, error);
-        // crazy I don't know why it is not instanceof GameEndError
-        console.log('error instanceof GameEndError', error instanceof GameEndError);
-        // shit way to catch the error
-        if (error.message === 'This game is end') {
-          console.log('Catch game is ended');
-          return;
-        }
+  let readyPlayers: number = game.setPlayerReady(msg.from.id);
+  let totalPlayers: number = game.players.length;
 
-        bot.sendMessage(msg.chat.id, `${Emoji.get('bomb')}  Error: ${error}.`);
-      }
-    });
+  if (readyPlayers == totalPlayers) {
+    game.start(msg)
+      .then(() => {
+        killGame(msg.chat.id);
+      })
+      .catch((error) => {
+        console.log(`Catch error`, error);
+        console.log(`Catch error.message`, error.message);
+        console.log(`Catch error.name`, error.name);
+        if (error) {
+          console.log(`Error`, error);
+          // crazy I don't know why it is not instanceof GameEndError
+          console.log('error instanceof GameEndError', error instanceof GameEndError);
+          // shit way to catch the error
+          if (error.message === 'This game is end') {
+            console.log('Catch game is ended');
+            return;
+          }
+
+          bot.sendMessage(msg.chat.id, `${Emoji.get('bomb')}  Error: ${error}.`);
+        }
+      });
+  }
+  else {
+    bot.sendMessage(msg.chat.id, `${Emoji.get('microphone')} Wait for player to \/start... ${readyPlayers}/${totalPlayers}`);
+  }
 });
 
 bot.onText(/\/delgame/, (msg) => {
