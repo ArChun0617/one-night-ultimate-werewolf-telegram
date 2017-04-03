@@ -255,8 +255,18 @@ function killGame(id: number) {
     game.end();
   }
   
-  console.log('games', games);
+  console.log('games', _.map(games, (game: Game) => game.id));
 }
+
+bot.onText(/\/iisreset/, (msg) => {
+  console.log("IISReset");
+  bot.sendMessage(msg.chat.id, `${Emoji.get('bomb')}  Game Server Reset.`);
+  if (games.length > 0)
+  {
+    games.length = 0;
+    process.exit(0);
+  }
+});
 
 function getGame(id: number) {
   return _.find(games, (game) => game.id === id);

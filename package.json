@@ -6,7 +6,7 @@
   "scripts": {
     "watch": "./node_modules/webpack/bin/webpack.js --watch",
     "watch:dev": "npm run server & npm run watch",
-    "server": "nodemon dist/index.js",
+    "server": "forever dist/index.js",
     "start": "npm run build && npm run server",
     "build": "node ./node_modules/webpack/bin/webpack.js",
     "app": "nodemon ./src/app.js",
@@ -26,7 +26,8 @@
     "nodemon": "^1.11.0",
     "awesome-typescript-loader": "^3.0.4",
     "typescript": "^2.1.6",
-    "webpack": "^2.2.1"
+    "webpack": "^2.2.1",
+    "forever": "^0.15.1"
   },
   "engines": {
     "node": ">=6.0"
@@ -37,6 +38,7 @@
     "@types/node": "^7.0.5",
     "awesome-typescript-loader": "^3.0.4",
     "typescript": "^2.1.6",
-    "webpack": "^2.2.1"
+    "webpack": "^2.2.1",
+    "forever": "^0.15.1"
   }
 }
