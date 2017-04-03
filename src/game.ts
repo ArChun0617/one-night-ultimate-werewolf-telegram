@@ -193,7 +193,7 @@ export class Game {
     key.push([{ text: "Blank vote", callback_data: `-1` }]);
 
     this.bot.sendMessage(msgId,
-      `${Emoji.get('point_up_2')}  Voting list`,
+      `${Emoji.get('arrow_right')}  Voting list ${Emoji.get('arrow_left')}`,
       {
         reply_markup: JSON.stringify({ inline_keyboard: key })
       });
@@ -639,7 +639,7 @@ export class Game {
     let rtnMsg = "";
     if (target) {
       player.setKillTarget(target);
-      rtnMsg = `${Emoji.get('point_up_2')}  You have vote ${target.name}`;
+      rtnMsg = `${Emoji.get('arrow_right')} ${target.name}`;
     }
     else {
       rtnMsg = `Invalid player selected !`;
