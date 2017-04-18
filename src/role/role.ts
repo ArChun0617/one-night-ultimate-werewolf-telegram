@@ -27,6 +27,7 @@ export interface RoleInterface {
 }
 
 export class RoleClass {
+  public static COPYCAT: RoleClassInterface = new RoleClassInterface(`${Emoji.get('beer')}`, 'Copycat', 9);
   public static DOPPELGANGER: RoleClassInterface = new RoleClassInterface(`${Emoji.get('ghost')}`, 'Doppelganger', 10);
   public static WEREWOLF: RoleClassInterface = new RoleClassInterface(`${Emoji.get('smirk_cat')}`, 'Werewolf', 20);
   public static MINION: RoleClassInterface = new RoleClassInterface(`${Emoji.get('dog')}`, 'Minion', 30);
@@ -73,7 +74,7 @@ export class Role implements RoleInterface {
     bot.answerCallbackQuery(msg.id, `Your role is ${this.fullName}`);
   }
 
-  checkRole(roleName, chkShadow: boolean = true) {  //chkShadow is used for doppleganger, for other role no difference
+  checkRole(roleName, chkShadow: boolean = true) {  //chkShadow is used for doppelganger, for other role no difference
     if (roleName instanceof Array)
       return _.includes(_.map(roleName, (r: RoleClassInterface) => r.name.toUpperCase()), this.name.toUpperCase());
     else

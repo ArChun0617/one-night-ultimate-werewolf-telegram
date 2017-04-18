@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import { Role, RoleClass, RoleClassInterface } from '../role/role';
 import { Werewolf } from "../role/werewolf";
+import { Copycat } from "../role/copycat";
 import { Doppelganger } from "../role/doppelganger";
 import { Minion } from "../role/minion";
 import { Mason } from "../role/mason";
@@ -26,6 +27,9 @@ export const DeckFactory = {
 
     _.map(gameRoles, (role) => {
       switch (role) {
+        case RoleClass.COPYCAT:
+          roles.push(new Copycat());
+          break;
         case RoleClass.DOPPELGANGER:
           roles.push(new Doppelganger());
           break;

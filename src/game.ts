@@ -20,6 +20,7 @@ export class Game {
   public static PHASE_PREPARE_DECK: string = 'prepare_deck';
   public static PHASE_ANNOUNCE_PLAYER_ROLE: string = 'announce_player_role';
   public static PHASE_START_NIGHT: string = 'start_night';
+  public static PHASE_WAKEUP_COPYCAT: string = 'wakeup_copycat';
   public static PHASE_WAKEUP_DOPPELGANGER: string = 'wakeup_doppelganger';
   public static PHASE_WAKEUP_WEREWOLF: string = 'wakeup_werewolf';
   public static PHASE_WAKEUP_MINION: string = 'wakeup_minion';
@@ -289,6 +290,7 @@ export class Game {
     this.setPhase(Game.PHASE_START_NIGHT);
 
     return this.bot.sendMessage(msg.chat.id, `${Emoji.get('crescent_moon')}  Night start, Everyone close your eye.`)
+      .then(() => this.wakeUp(msg, RoleClass.COPYCAT, timeDuration))
       .then(() => this.wakeUp(msg, RoleClass.DOPPELGANGER, timeDuration * 2))  // 2x action time for DoppelGanger
       .then(() => this.wakeUp(msg, RoleClass.WEREWOLF, timeDuration))
       .then(() => this.wakeUp(msg, RoleClass.MINION, timeDuration))
@@ -327,7 +329,9 @@ export class Game {
       setTimeout(() => {
         if (player) {
           let footprint: ActionFootprint;
-          footprint = player.getOriginalRole().endTurn(this.bot, msg, this.players, this.table, player);
+          if (this.getPhase() !== Game.PHASE_WAKEUP_COPYCAT)
+            footprint = player.getOriginalRole().endTurn(this.bot, msg, this.players, this.table, player);
+
           if (footprint && footprint.action)
             this.actionStack.push(footprint);
         }
@@ -470,6 +474,7 @@ export class Game {
 
   private setWakeUpPhase(role) {
     switch (role) {
+      case RoleClass.COPYCAT: this.setPhase(Game.PHASE_WAKEUP_COPYCAT); break;
       case RoleClass.DOPPELGANGER: this.setPhase(Game.PHASE_WAKEUP_DOPPELGANGER); break;
       case RoleClass.WEREWOLF: this.setPhase(Game.PHASE_WAKEUP_WEREWOLF); break;
       case RoleClass.MINION: this.setPhase(Game.PHASE_WAKEUP_MINION); break;
@@ -499,17 +504,43 @@ export class Game {
 
   private handleWakeUpEvent(event: string, msg: any, player: Player) {
     let footprint: ActionFootprint;
-    if (player.getOriginalRole().checkRole(RoleClass.DOPPELGANGER)) { // The player is Doppleganger
-      if (player.getOriginalRole().checkRole([RoleClass.WEREWOLF, RoleClass.MINION, RoleClass.MASON, RoleClass.INSOMNIAC]) || this.getPhase() == 'wakeup_' + RoleClass.DOPPELGANGER.name.toLowerCase()) // Hard-coded to allow (Werewolf, Minion, Mason, Insomniac) since others should act in DoopleGanger phase
-        if (player.getOriginalRole().checkRole(this.getPhase().substring("wakeup_".length)))  // The phase is action for the role
-          footprint = player.getOriginalRole().useAbility(this.bot, msg, this.players, this.table, player);
-        else
-          this.sendInvalidActionMessage(msg.id);
+    if (player.getOriginalRole().checkRole(RoleClass.DOPPELGANGER)) { // The player is Doppelganger
+      let role: any = player.getOriginalRole();
+      let shadowRoleName: string = (role.shadowChoice ? role.shadowChoice.name.toLowerCase() : "");
+
+      if (this.getPhase() == Game.PHASE_WAKEUP_DOPPELGANGER && !shadowRoleName) {
+        //If (DOPPELGANGER and not picked), Okay
+      }
+      else if (this.getPhase() == 'wakeup_' + shadowRoleName && _.includes([Game.PHASE_WAKEUP_WEREWOLF, Game.PHASE_WAKEUP_MINION, Game.PHASE_WAKEUP_MASON, Game.PHASE_WAKEUP_INSOMNIAC], this.getPhase())) {
+        //If (picked and correct phase) and within [Werewolf, Minion, Mason, Insomniac] phase, Okay
+      }
+      else {
+        this.sendInvalidActionMessage(msg.id);
+        return;
+      }
     }
-    else if (this.getPhase() !== 'wakeup_' + player.getOriginalRole().name.toLowerCase())
+    else if (player.getOriginalRole().checkRole(RoleClass.COPYCAT)) { // The player is Copycat
+      let role: any = player.getOriginalRole();
+      let shadowRoleName: string = (role.shadowChoice ? role.shadowChoice.name.toLowerCase() : "");
+
+      if (this.getPhase() == Game.PHASE_WAKEUP_COPYCAT && !shadowRoleName) {
+        //If (COPYCAT and not picked), Okay
+      }
+      else if (this.getPhase() == 'wakeup_' + shadowRoleName) {
+        //If (picked and correct phase), Okay
+      }
+      else
+      {
+        this.sendInvalidActionMessage(msg.id);
+        return;
+      }
+    }
+    else if (this.getPhase() !== 'wakeup_' + player.getOriginalRole().name.toLowerCase()) {
       this.sendInvalidActionMessage(msg.id);
-    else
-      footprint = player.getOriginalRole().useAbility(this.bot, msg, this.players, this.table, player);
+      return;
+    }
+
+    footprint = player.getOriginalRole().useAbility(this.bot, msg, this.players, this.table, player);
 
     if (footprint && footprint.action)
       if (_.filter(this.actionStack, (action: ActionFootprint) => (action.player.id === footprint.player.id && action.choice === footprint.choice)).length == 0)

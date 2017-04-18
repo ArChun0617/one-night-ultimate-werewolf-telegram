@@ -4,48 +4,31 @@ import { Role, RoleInterface, RoleClass, RoleClassInterface } from "./role";
 import { Player } from "../player/player";
 import { ActionFootprint } from "../util/ActionFootprint";
 
-export class Doppelganger extends Role implements RoleInterface {
+export class Copycat extends Role implements RoleInterface {
   shadowChoice: Role;
   choice: string;
 
   constructor() {
-    super(RoleClass.DOPPELGANGER);
+    super(RoleClass.COPYCAT);
   }
 
   wakeUp(bot, msg, players, table, host) {
     console.log(`${this.name} wake up called`);
-    // clone a user
-    // apply that role ability
 
-    const key = [];
-    let pos = 0;
-    let btnPerLine = 3;
+    const key = [
+      [
+        { text: `${this.emoji}${Emoji.get('question')}${Emoji.get('question')}`, callback_data: "CARD_A" },
+        { text: `${Emoji.get('question')}${this.emoji}${Emoji.get('question')}`, callback_data: "CARD_B" },
+        { text: `${Emoji.get('question')}${Emoji.get('question')}${this.emoji}`, callback_data: "CARD_C" }
+      ]
+    ];
 
-    _.map(players, (player: Player) => {
-      let row = pos / btnPerLine | 0;
-      if (!key[row]) key[row] = [];
-      key[row].push({ text: player.name, callback_data: "" + player.id });
-      pos++;
-    });
-
-    key.push([
-      { text: `${this.emoji}${this.emoji}${Emoji.get('question')}`, callback_data: "CARD_AB" },
-      { text: `${this.emoji}${Emoji.get('question')}${this.emoji}`, callback_data: "CARD_AC" },
-      { text: `${Emoji.get('question')}${this.emoji}${this.emoji}`, callback_data: "CARD_BC" }
-    ]);
-
-    key.push([
-      { text: `${this.emoji}${Emoji.get('question')}${Emoji.get('question')}`, callback_data: "CARD_A" },
-      { text: `${Emoji.get('question')}${this.emoji}${Emoji.get('question')}`, callback_data: "CARD_B" },
-      { text: `${Emoji.get('question')}${Emoji.get('question')}${this.emoji}`, callback_data: "CARD_C" }
-    ]);
-
-    bot.sendMessage(msg.chat.id, `${this.fullName}, wake up. Choose a player to copy his role.\n If you are ${RoleClass.SEER.emoji}${RoleClass.ROBBER.emoji}${RoleClass.TROUBLEMAKER.emoji}${RoleClass.DRUNK.emoji}, do your action now.\nIf you are ${RoleClass.WEREWOLF.emoji}${RoleClass.MINION.emoji}${RoleClass.MASON.emoji}${RoleClass.INSOMNIAC.emoji}, wait until their turn.`, {
+    bot.sendMessage(msg.chat.id, `${this.fullName}, wake up.`, {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {
         // `sended` is the sent message.
-        //console.log(`${this.name} sended >> MessageID:${sended.message_id} Text:${sended.text}`);
+        console.log(`${this.name} sended >> MessageID:${sended.message_id} Text:${sended.text}`);
       });
   }
 
@@ -147,19 +130,24 @@ export class Doppelganger extends Role implements RoleInterface {
         }
         break;
       case "":
-        if (host.id == parseInt(msg.data)) {
-          rtnMsg = "Buddy, You cannot choose yourself.";
-        }
-        else
-        {
-          target = _.find(players, (player: Player) => player.id == parseInt(msg.data));
-          if (target) {
-            this.shadowChoice = _.clone(target.getRole());
-            console.log(`${this.name} useAbility.Assign: ${this.shadowChoice.name}`);
-            //this.emoji += this.shadowChoice.emoji;
-            rtnMsg = `${target.name} : ${target.getRole().fullName}`;
-            rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, `cloned ${target.getRole().emoji}${target.name}`);
+        if (_.includes(["CARD_A", "CARD_B", "CARD_C"], msg.data)) {
+          switch (msg.data) {
+            case "CARD_A":
+              this.shadowChoice = _.clone(table.getLeft());
+              rtnMsg += `${this.shadowChoice.emoji}${Emoji.get('question')}${Emoji.get('question')}`;
+              break;
+            case "CARD_B":
+              this.shadowChoice = _.clone(table.getCenter());
+              rtnMsg += `${Emoji.get('question')}${this.shadowChoice.emoji}${Emoji.get('question')}`;
+              break;
+            case "CARD_C":
+              this.shadowChoice = _.clone(table.getRight());
+              rtnMsg += `${Emoji.get('question')}${Emoji.get('question')}${this.shadowChoice.emoji}`;
+              break;
           }
+
+          console.log(`${this.name} useAbility.Assign: ${this.shadowChoice.name}`);
+          rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, `cloned ${rtnMsg}`);
         }
         break;
       default:
@@ -280,7 +268,7 @@ export class Doppelganger extends Role implements RoleInterface {
 
   checkRole(roleName, chkDoppelGanger: boolean = true) {
     //chkShadow is deduce use shadowChoice or real role(DoppelGanger)
-    if (!(roleName instanceof Array) && roleName.name.toUpperCase() == RoleClass.DOPPELGANGER.name.toUpperCase())// If role checked is DoppelGanger, always true for this
+    if (!(roleName instanceof Array) && roleName.name.toUpperCase() == RoleClass.COPYCAT.name.toUpperCase())// If role checked is Copycat, always true for this
       return true;
     else if (roleName instanceof Array) // Otherwise check depends on chkShadow
       return _.includes(_.map(roleName, (r) => r.name.toUpperCase()), (chkDoppelGanger ? (this.shadowChoice ? this.shadowChoice.name : this.name) : this.name).toUpperCase());
