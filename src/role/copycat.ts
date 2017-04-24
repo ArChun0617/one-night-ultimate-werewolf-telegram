@@ -166,7 +166,7 @@ export class Copycat extends Role implements RoleInterface {
     console.log(`${this.name} endTurn:shadowChoice ${(this.shadowChoice ? this.shadowChoice.name : "undefined")}`);
     console.log(`${this.name} endTurn:choice ${this.choice}`);
     switch (this.shadowChoice ? this.shadowChoice.name : "") {
-      case RoleClass.WEREWOLF.name:
+      /*case RoleClass.WEREWOLF.name:
         if (!this.choice) {
           this.choice = rtnMsg = this.getRolePlayers(RoleClass.WEREWOLF, players);
           rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
@@ -252,13 +252,16 @@ export class Copycat extends Role implements RoleInterface {
           rtnMsg = host.getRole().fullName;
           rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
         }
-        break;
+        break;*/
       case "":
         //do nothing
         console.log(`${this.name} endTurn:choice_Shuffle_empty zzz`);
         rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, `${Emoji.get('zzz')}`, true);
         break;
       default:
+        //do nothing
+        console.log(`${this.name} endTurn:choice_Shuffle_empty zzz`);
+        rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, `${Emoji.get('zzz')}`, true);
         break;
     }
 

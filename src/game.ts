@@ -322,15 +322,14 @@ export class Game {
             throw new TypeError(`${role} is not found in both Table & Player !`);
           else
             roleCard = tempPlayer.getRole();
-        }        
+        }
         roleCard.wakeUp(this.bot, msg, this.players, this.table, player);
       }
 
       setTimeout(() => {
         if (player) {
           let footprint: ActionFootprint;
-          if (this.getPhase() !== Game.PHASE_WAKEUP_COPYCAT)
-            footprint = player.getOriginalRole().endTurn(this.bot, msg, this.players, this.table, player);
+          footprint = player.getOriginalRole().endTurn(this.bot, msg, this.players, this.table, player);
 
           if (footprint && footprint.action)
             this.actionStack.push(footprint);
@@ -551,7 +550,7 @@ export class Game {
     if (event == "DOZED_WAKE_UP") {
       let action: ActionFootprint = player.getOriginalRole().actionEvt;
 
-      if (action.dozed)
+      if (action && action.dozed)
       {
         let rolePrefix = "";
         let role: any;
