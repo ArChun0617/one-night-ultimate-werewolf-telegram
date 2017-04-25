@@ -166,7 +166,7 @@ export class Doppelganger extends Role implements RoleInterface {
         break;
     }
 
-    bot.answerCallbackQuery(msg.id, rtnMsg);
+    bot.showNotification(msg.id, rtnMsg);
     return rtnActionEvt;
   }
 
@@ -209,7 +209,7 @@ export class Doppelganger extends Role implements RoleInterface {
           console.log(`${this.name} endTurn:choice_Shuffle ${this.choice}`);
           rtnMsg = this.watchRole(this.choice, players, table);
 
-          bot.answerCallbackQuery(msg.id, rtnMsg);
+          bot.showNotification(msg.id, rtnMsg);
           rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
         }
         break;
@@ -274,7 +274,7 @@ export class Doppelganger extends Role implements RoleInterface {
         break;
     }
 
-    bot.answerCallbackQuery(msg.id, rtnMsg);
+    //bot.showNotification(msg.id, rtnMsg);
     return rtnActionEvt;
   }
 

@@ -45,4 +45,8 @@ export class MessagerInterface {
         message_id: this.gameActionID
       }));
   }
+
+  showNotification(callbackQueryId, text, showAlert = false, form = {}) {
+    return this.bot.answerCallbackQuery(callbackQueryId, text, showAlert, form);
+  }
 }

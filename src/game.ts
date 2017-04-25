@@ -333,7 +333,7 @@ export class Game {
       setTimeout(() => {
         if (player) {
           let footprint: ActionFootprint;
-          footprint = player.getOriginalRole().endTurn(this.msgInterface.bot, msg, this.players, this.table, player);
+          footprint = player.getOriginalRole().endTurn(this.msgInterface, msg, this.players, this.table, player);
 
           if (footprint && footprint.action)
             this.actionStack.push(footprint);
@@ -490,11 +490,11 @@ export class Game {
   }
 
   private sendInvalidActionMessage(msgId) {
-    return this.msgInterface.bot.answerCallbackQuery(msgId, `${Emoji.get('middle_finger')}  Hey! Stop doing that!`);
+    return this.msgInterface.showNotification(msgId, `${Emoji.get('middle_finger')}  Hey! Stop doing that!`);
   }
 
   private viewPlayerRole(player, msg) {
-    player.getRole().notifyRole(this.msgInterface.bot, msg);
+    player.getRole().notifyRole(this.msgInterface, msg);
   }
 
   private handleAnnouncePlayerEvent(event: string, msg: any, player: Player) {
@@ -542,7 +542,7 @@ export class Game {
       return;
     }
 
-    footprint = player.getOriginalRole().useAbility(this.msgInterface.bot, msg, this.players, this.table, player);
+    footprint = player.getOriginalRole().useAbility(this.msgInterface, msg, this.players, this.table, player);
 
     if (footprint && footprint.action)
       if (_.filter(this.actionStack, (action: ActionFootprint) => (action.player.id === footprint.player.id && action.choice === footprint.choice)).length == 0)
@@ -551,6 +551,7 @@ export class Game {
 
   private handleConversationEvent(event: string, msg: any, player: Player) {
     if (event == "DOZED_WAKE_UP") {
+      // command = "Dozed"
       let action: ActionFootprint = player.getOriginalRole().actionEvt;
 
       if (action && action.dozed)
@@ -567,22 +568,28 @@ export class Game {
           rolePrefix = action.player.getOriginalRole().fullName;
         }
 
-        this.msgInterface.bot.answerCallbackQuery(msg.id, `${rolePrefix} ${Emoji.get('arrow_right')} ${action.toString()}`);
+        this.msgInterface.showNotification(msg.id, `${rolePrefix} ${Emoji.get('arrow_right')} ${action.toString()}`);
 
       }
       else
-        this.msgInterface.bot.answerCallbackQuery(msg.id, `${Emoji.get('middle_finger')}  Hey! Stop doing that!`);
+        this.msgInterface.showNotification(msg.id, `${Emoji.get('middle_finger')}  Hey! Stop doing that!`);
     }
-    else {
+    else if (parseInt(event)) {
+      //if the command = integer, it should be a Vote.
       const id = parseInt(event);
 
-      if (player.id === id) {
-        return this.sendInvalidActionMessage(msg.id);
-      }
+      if (id && _.filter(this.players, player => player.id == id)) {
+        if (player.id === id) {
+          return this.sendInvalidActionMessage(msg.id);
+        }
 
-      this.votePlayer(id, msg, player);
-      if (_.filter(this.players, (player) => !(player.getKillTarget())).length == 0 && this.votingResolve)
-        this.votingResolve();
+        this.votePlayer(id, msg, player);
+        if (_.filter(this.players, (player) => !(player.getKillTarget())).length == 0 && this.votingResolve)
+          this.votingResolve();
+      }
+    }
+    else {
+      // unknown command
     }
   }
 
@@ -678,7 +685,7 @@ export class Game {
       rtnMsg = `Invalid player selected !`;
     }
 
-    this.msgInterface.bot.answerCallbackQuery(msg.id, rtnMsg);
+    this.msgInterface.showNotification(msg.id, rtnMsg);
   }
 
   private setCountDown(msg, totalTime, intervalArray, unit: string) {

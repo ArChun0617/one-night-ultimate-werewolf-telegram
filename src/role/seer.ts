@@ -61,7 +61,7 @@ export class Seer extends Role implements RoleInterface {
       }
     }
 
-    bot.answerCallbackQuery(msg.id, rtnMsg);
+    bot.showNotification(msg.id, rtnMsg);
     return rtnActionEvt;
   }
 
@@ -82,7 +82,7 @@ export class Seer extends Role implements RoleInterface {
       console.log(`${this.name} endTurn:choice_Shuffle ${this.choice}`);
       rtnMsg = this.watchRole(this.choice, players, table);
 
-      bot.answerCallbackQuery(msg.id, rtnMsg);
+      //bot.showNotification(msg.id, rtnMsg);
       this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
       return this.actionEvt;
     }

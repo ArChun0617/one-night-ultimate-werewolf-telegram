@@ -154,7 +154,7 @@ export class Copycat extends Role implements RoleInterface {
         break;
     }
 
-    bot.answerCallbackQuery(msg.id, rtnMsg);
+    bot.showNotification(msg.id, rtnMsg);
     return rtnActionEvt;
   }
 
@@ -265,7 +265,7 @@ export class Copycat extends Role implements RoleInterface {
         break;
     }
 
-    bot.answerCallbackQuery(msg.id, rtnMsg);
+    //bot.showNotification(msg.id, rtnMsg);
     return rtnActionEvt;
   }
 

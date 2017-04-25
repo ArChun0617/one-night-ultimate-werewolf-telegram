@@ -37,7 +37,7 @@ export class Mason extends Role implements RoleInterface {
       rtnMsg = (rtnMsg || `[${this.fullName} not exists]`);
       rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
     }
-    bot.answerCallbackQuery(msg.id, rtnMsg);
+    bot.showNotification(msg.id, rtnMsg);
     return rtnActionEvt;
   }
 
@@ -49,7 +49,7 @@ export class Mason extends Role implements RoleInterface {
       this.choice = rtnMsg = this.getRolePlayers(RoleClass.MASON, players);
       rtnMsg = (rtnMsg || `[${this.fullName} not exists]`);
 
-      bot.answerCallbackQuery(msg.id, rtnMsg);
+      //bot.showNotification(msg.id, rtnMsg);
       this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
       return this.actionEvt;
     }

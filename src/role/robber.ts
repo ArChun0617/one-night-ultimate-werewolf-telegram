@@ -53,7 +53,7 @@ export class Robber extends Role implements RoleInterface {
       }
     }
 
-    bot.answerCallbackQuery(msg.id, rtnMsg);
+    bot.showNotification(msg.id, rtnMsg);
     return rtnActionEvt;
   }
 
@@ -68,7 +68,7 @@ export class Robber extends Role implements RoleInterface {
       console.log(`${this.name} endTurn:choice_Shuffle ${this.choice}`);
       rtnMsg = this.swapPlayer(this.choice, host, players);
 
-      bot.answerCallbackQuery(msg.id, rtnMsg);
+      //bot.showNotification(msg.id, rtnMsg);
       this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
       return this.actionEvt;
     }

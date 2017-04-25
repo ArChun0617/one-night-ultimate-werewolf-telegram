@@ -64,7 +64,7 @@ export class Werewolf extends Role implements RoleInterface {
       rtnMsg = "You cannot view the card.";
     }
 
-    bot.answerCallbackQuery(msg.id, rtnMsg);
+    bot.showNotification(msg.id, rtnMsg);
     return rtnActionEvt;
   }
 
@@ -90,7 +90,7 @@ export class Werewolf extends Role implements RoleInterface {
         // unreachable for no wolf
       }
 
-      bot.answerCallbackQuery(msg.id, rtnMsg);
+      //bot.showNotification(msg.id, rtnMsg);
       this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
       return this.actionEvt;
     }

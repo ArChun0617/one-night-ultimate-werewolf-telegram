@@ -71,7 +71,7 @@ export class Role implements RoleInterface {
   }
 
   notifyRole(bot, msg) {
-    bot.answerCallbackQuery(msg.id, `Your role is ${this.fullName}`);
+    bot.showNotification(msg.id, `Your role is ${this.fullName}`);
   }
 
   checkRole(roleName, chkShadow: boolean = true) {  //chkShadow is used for doppelganger, for other role no difference

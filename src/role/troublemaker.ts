@@ -103,7 +103,7 @@ export class Troublemaker extends Role implements RoleInterface {
         }
       }
     }
-    bot.answerCallbackQuery(msg.id, rtnMsg);
+    bot.showNotification(msg.id, rtnMsg);
     return rtnActionEvt;
   }
 
@@ -144,7 +144,7 @@ export class Troublemaker extends Role implements RoleInterface {
       rtnMsg = this.swapPlayers(this.choice, players);
       this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
     }
-    bot.answerCallbackQuery(msg.id, rtnMsg);
+    //bot.showNotification(msg.id, rtnMsg);
     return (rtnMsg ? this.actionEvt : null);
   }
 
