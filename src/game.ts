@@ -7,6 +7,7 @@ import { Deck } from "./deck/deck";
 import { Player } from "./player/player";
 import { Table } from "./npc/table";
 import { ActionFootprint } from "./util/ActionFootprint";
+import { MessagerInterface } from "./util/MessagerInterface";
 
 interface Result {
   target: Player;
@@ -38,7 +39,7 @@ export class Game {
   id: number;
   players: any[];
   table: Table = new Table();
-  bot: any;
+  msgInterface: MessagerInterface;
   deck: Deck;
   gameRoles: RoleClassInterface[];
   gameTime: number = 10 * 60 * 1000;
@@ -54,9 +55,10 @@ export class Game {
   votingTimer: any;
   votingResolve: any;
 
-  constructor(id: number, bot: any, players: Player[], roles: RoleClassInterface[]) {
-    this.id = id;
-    this.bot = bot;
+  constructor(chatID: number, bot: any, players: Player[], roles: RoleClassInterface[]) {
+    this.id = chatID;
+    this.msgInterface = new MessagerInterface(bot);
+    this.msgInterface.chatID = chatID;
     this.gameRoles = roles;
     this.players = players;
   }
@@ -70,8 +72,7 @@ export class Game {
     if (this.getPhase() != Game.PHASE_WAITING_PLAYER) return; //Prevent double start game
 
     console.log(`Game started: ${this.id}`);
-
-    this.bot.sendMessage(msg.chat.id, `${Emoji.get('game_die')}  Game start`);
+    this.msgInterface.sendMsg(`${Emoji.get('game_die')}  Game start`);
 
     if (this.players.length >= 3) {
       this.gameRoles = this.gameRoles.slice(0, this.players.length + 3);  // Auto apply role by number of user, *unless* user below 3, then debug mode.
@@ -162,7 +163,7 @@ export class Game {
       rtnMsg += `${player.name}\n`;
     });
 
-    this.bot.sendMessage(msg.chat.id, `Player joined:\n${rtnMsg}`);
+    this.msgInterface.sendMsg(`Player joined:\n${rtnMsg}`);
     console.log(this.players);
   }
 
@@ -173,10 +174,13 @@ export class Game {
   setPlayerReady(_id: number) {
     _.map(_.filter(this.players, (player: Player) => player.id == _id), (player: Player) => player.readyStart = true);
 
-    return _.filter(this.players, (player: Player) => player.readyStart).length;
+    let readyPlayers: number = _.filter(this.players, (player: Player) => player.readyStart).length;
+    let totalPlayers: number = this.players.length;
+
+    return (readyPlayers == totalPlayers ? "" : `${Emoji.get('microphone')} Wait for player to \/start... ${readyPlayers}/${totalPlayers}`);
   }
 
-  sendVotingList(msgId: number) {
+  sendVotingList(msgId) {
     if (this.getPhase() !== Game.PHASE_CONVERSATION && this.getPhase() !== Game.PHASE_VOTING) {
       return this.sendInvalidActionMessage(msgId);
     }
@@ -193,8 +197,7 @@ export class Game {
 
     key.push([{ text: "Blank vote", callback_data: `-1` }]);
 
-    this.bot.sendMessage(msgId,
-      `${Emoji.get('arrow_right')}  Voting list ${Emoji.get('arrow_left')}`,
+    this.msgInterface.sendMsg(`${Emoji.get('arrow_right')}  Voting list ${Emoji.get('arrow_left')}`,
       {
         reply_markup: JSON.stringify({ inline_keyboard: key })
       });
@@ -269,8 +272,7 @@ export class Game {
         role.push(r.fullName);
       });
 
-      this.bot.sendMessage(
-        msg.chat.id,
+      this.msgInterface.sendMsg(
         `${Emoji.get('eyeglasses')}  Everyone, please check your role. The game has below role\n  ` + role.join("\n  "),
         {
           reply_markup: JSON.stringify({
@@ -289,7 +291,9 @@ export class Game {
   private startNight(msg, timeDuration: number) {
     this.setPhase(Game.PHASE_START_NIGHT);
 
-    return this.bot.sendMessage(msg.chat.id, `${Emoji.get('crescent_moon')}  Night start, Everyone close your eye.`)
+    return this.msgInterface.sendMsg(`${Emoji.get('crescent_moon')}  Night start, Everyone close your eye.`)
+      .then(() => this.msgInterface.sendMsg(`Game Start`))
+      .then((sended) => this.msgInterface.actionID = sended.message_id)
       .then(() => this.wakeUp(msg, RoleClass.COPYCAT, timeDuration))
       .then(() => this.wakeUp(msg, RoleClass.DOPPELGANGER, timeDuration * 2))  // 2x action time for DoppelGanger
       .then(() => this.wakeUp(msg, RoleClass.WEREWOLF, timeDuration))
@@ -312,7 +316,7 @@ export class Game {
       const player: Player = _.find(this.players, (p) => p.getOriginalRole().checkRole(role, false));
 
       if (player) {
-        player.getOriginalRole().wakeUp(this.bot, msg, this.players, this.table, player);
+        player.getOriginalRole().wakeUp(this.msgInterface, msg, this.players, this.table, player);
       } else {
         let roleCard = _.find(this.table.getRoles(), (r: Role) => r.checkRole(role, false));
 
@@ -323,13 +327,13 @@ export class Game {
           else
             roleCard = tempPlayer.getRole();
         }
-        roleCard.wakeUp(this.bot, msg, this.players, this.table, player);
+        roleCard.wakeUp(this.msgInterface, msg, this.players, this.table, player);
       }
 
       setTimeout(() => {
         if (player) {
           let footprint: ActionFootprint;
-          footprint = player.getOriginalRole().endTurn(this.bot, msg, this.players, this.table, player);
+          footprint = player.getOriginalRole().endTurn(this.msgInterface.bot, msg, this.players, this.table, player);
 
           if (footprint && footprint.action)
             this.actionStack.push(footprint);
@@ -344,8 +348,7 @@ export class Game {
     let now: Date = new Date(new Date().getTime() + gameDuration);
     this.setPhase(Game.PHASE_CONVERSATION);
 
-    this.bot.sendMessage(
-      msg.chat.id,
+    this.msgInterface.editAction(
       `${Emoji.get('hourglass_flowing_sand')}  Everyone wake up, you have ${gameDuration / 60 / 1000} mins to discuss ... \/vote at ${now.getHours() + ":" + ("0" + now.getMinutes()).slice(-2) + ":" + now.getSeconds()}\n If you dozed, try the button, It'll help.`, {
         reply_markup: JSON.stringify({ inline_keyboard: [[{ text: `Oops... I dozed ${Emoji.get('zzz')}`, callback_data: "DOZED_WAKE_UP" }]] })
       }
@@ -371,7 +374,7 @@ export class Game {
         resolve();
       }
       else {
-        this.bot.sendMessage(msg.chat.id, `${Emoji.get('alarm_clock')}  Time\'s up. Everyone please vote.`)
+        this.msgInterface.sendMsg(`${Emoji.get('alarm_clock')}  Time\'s up. Everyone please vote.`)
           .then(this.sendVotingList(msg.chat.id))
           .then(setTimeout(() => {
             // make sure every vote a player, random vote if needed
@@ -453,7 +456,7 @@ export class Game {
         return `${step.player.getOriginalRole().emoji}${rolePrefix}${step.player.name} : ${step.toString()}`
       }).join("\n");
 
-      this.bot.sendMessage(msg.chat.id, result);
+      this.msgInterface.sendMsg(result);
       console.log('Result', result);
       resolve();
     });
@@ -487,11 +490,11 @@ export class Game {
   }
 
   private sendInvalidActionMessage(msgId) {
-    return this.bot.answerCallbackQuery(msgId, `${Emoji.get('middle_finger')}  Hey! Stop doing that!`);
+    return this.msgInterface.bot.answerCallbackQuery(msgId, `${Emoji.get('middle_finger')}  Hey! Stop doing that!`);
   }
 
   private viewPlayerRole(player, msg) {
-    player.getRole().notifyRole(this.bot, msg);
+    player.getRole().notifyRole(this.msgInterface.bot, msg);
   }
 
   private handleAnnouncePlayerEvent(event: string, msg: any, player: Player) {
@@ -539,7 +542,7 @@ export class Game {
       return;
     }
 
-    footprint = player.getOriginalRole().useAbility(this.bot, msg, this.players, this.table, player);
+    footprint = player.getOriginalRole().useAbility(this.msgInterface.bot, msg, this.players, this.table, player);
 
     if (footprint && footprint.action)
       if (_.filter(this.actionStack, (action: ActionFootprint) => (action.player.id === footprint.player.id && action.choice === footprint.choice)).length == 0)
@@ -564,11 +567,11 @@ export class Game {
           rolePrefix = action.player.getOriginalRole().fullName;
         }
 
-        this.bot.answerCallbackQuery(msg.id, `${rolePrefix} ${Emoji.get('arrow_right')} ${action.toString()}`);
+        this.msgInterface.bot.answerCallbackQuery(msg.id, `${rolePrefix} ${Emoji.get('arrow_right')} ${action.toString()}`);
 
       }
       else
-        this.bot.answerCallbackQuery(msg.id, `${Emoji.get('middle_finger')}  Hey! Stop doing that!`);
+        this.msgInterface.bot.answerCallbackQuery(msg.id, `${Emoji.get('middle_finger')}  Hey! Stop doing that!`);
     }
     else {
       const id = parseInt(event);
@@ -675,7 +678,7 @@ export class Game {
       rtnMsg = `Invalid player selected !`;
     }
 
-    this.bot.answerCallbackQuery(msg.id, rtnMsg);
+    this.msgInterface.bot.answerCallbackQuery(msg.id, rtnMsg);
   }
 
   private setCountDown(msg, totalTime, intervalArray, unit: string) {
@@ -714,7 +717,7 @@ export class Game {
     if (!timerArray) return;
     let interval = timerArray.shift();
     this.votingTimer = setTimeout(() => {
-      this.bot.sendMessage(msg.chat.id, `${Emoji.get('microphone')} You have ${interval.count} ${unit} left...`);
+      this.msgInterface.sendMsg(`${Emoji.get('microphone')} You have ${interval.count} ${unit} left...`);
       if (timerArray.length > 0) this.countDown(msg, timerArray, unit);
     }, interval.time);
   }

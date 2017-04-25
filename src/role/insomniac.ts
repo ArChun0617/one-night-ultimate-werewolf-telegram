@@ -18,7 +18,7 @@ export class Insomniac extends Role implements RoleInterface {
       [{ text: `Wake Up${Emoji.get('eyes')}`, callback_data: "WAKE_UP" }]
     ];
 
-    bot.sendMessage(msg.chat.id, `${this.fullName}, wake up.`, {
+    bot.editAction(`${this.fullName}, wake up.`, {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {

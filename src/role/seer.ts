@@ -33,7 +33,7 @@ export class Seer extends Role implements RoleInterface {
     ]);
 
     //bot.sendMessage(msg.chat.id, `${this.emoji}  ${this.name}, wake up. You may look at another player's card or two of the center cards.`, {
-    bot.sendMessage(msg.chat.id, `${this.fullName}, wake up.`, {
+    bot.editAction(`${this.fullName}, wake up.`, {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {

@@ -25,7 +25,7 @@ export class Troublemaker extends Role implements RoleInterface {
       pos++;
     });
 
-    bot.sendMessage(msg.chat.id, `${this.fullName}, wake up. Please select 2 player to swap their role. To cancel your selection, select the same again.`, {
+    bot.editAction(`${this.fullName}, wake up. Please select 2 player to swap their role. To cancel your selection, select the same again.`, {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {

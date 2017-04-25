@@ -26,7 +26,7 @@ export class Werewolf extends Role implements RoleInterface {
     ];
 
     //bot.sendMessage(msg.chat.id, `${this.emoji}  ${this.name}, wake up and look for other werewolves. If there is only one Werewolf, you may look at a card from the center.`, {
-    bot.sendMessage(msg.chat.id, `${this.fullName}, wake up.`, {
+    bot.editAction(`${this.fullName}, wake up.`, {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {

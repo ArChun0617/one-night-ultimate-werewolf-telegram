@@ -92,7 +92,6 @@ bot.onText(/\/newgame/, (msg) => {
     gameSetting = { id: msg.chat.id, roles: [] };
     gameSettings.push(gameSetting);
 
-    addGameSettingRole(msg.id, gameSetting, RoleClass.COPYCAT);          // 8 - 5p
     addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 1 - 0
     addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 2 - 0
     addGameSettingRole(msg.id, gameSetting, RoleClass.SEER);             // 3 - 0
@@ -100,11 +99,12 @@ bot.onText(/\/newgame/, (msg) => {
     addGameSettingRole(msg.id, gameSetting, RoleClass.INSOMNIAC);        // 5 - 0
     addGameSettingRole(msg.id, gameSetting, RoleClass.TROUBLEMAKER);     // 6 - 3p
     addGameSettingRole(msg.id, gameSetting, RoleClass.MINION);           // 7 - 4p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.COPYCAT);          // 8 - 5p
     //addGameSettingRole(msg.id, gameSetting, RoleClass.DOPPELGANGER);     // 8 - 5p
     addGameSettingRole(msg.id, gameSetting, RoleClass.TANNER);           // 9 - 6p
     addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 10- 7p
     addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 11- 8p
-    addGameSettingRole(msg.id, gameSetting, RoleClass.DRUNK);            // 12- 9p
+    //addGameSettingRole(msg.id, gameSetting, RoleClass.DRUNK);            // 12- 9p
     addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
   }
 
@@ -123,10 +123,10 @@ bot.onText(/\/join/, (msg) => {
   if (!game) return askForCreateNewGame(msg.chat.id);
 
   // validation game isStarted
-  if (game.isStarted()) return bot.sendMessage(
-    msg.chat.id,
-    `${Emoji.get('no_entry_sign')}  Sorry. The game has been started, please wait until next game`
-  );
+  if (game && game.isStarted()) {
+    sendGameHasBeenStartedMessage(msg.chat.id);
+    return;
+  }
 
   const player = new Player({
     id: msg.from.id,
@@ -146,12 +146,16 @@ bot.onText(/\/start/, (msg) => {
   }
 
   if (!game) return askForCreateNewGame(msg.chat.id);
+  // validation game isStarted
+  if (game && game.isStarted()) {
+    sendGameHasBeenStartedMessage(msg.chat.id);
+    return;
+  }
+
   console.log('gameSetting.roles', gameSetting.roles);
 
-  let readyPlayers: number = game.setPlayerReady(msg.from.id);
-  let totalPlayers: number = game.players.length;
-
-  if (readyPlayers == totalPlayers) {
+  let rtnReady: string = game.setPlayerReady(msg.from.id);
+  if (rtnReady == "") {
     game.start(msg)
       .then(() => {
         killGame(msg.chat.id);
@@ -175,7 +179,7 @@ bot.onText(/\/start/, (msg) => {
       });
   }
   else {
-    bot.sendMessage(msg.chat.id, `${Emoji.get('microphone')} Wait for player to \/start... ${readyPlayers}/${totalPlayers}`);
+    bot.sendMessage(msg.chat.id, `${rtnReady}`);
   }
 });
 

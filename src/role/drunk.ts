@@ -23,7 +23,7 @@ export class Drunk extends Role implements RoleInterface {
       ]
     ];
     
-    bot.sendMessage(msg.chat.id, `${this.fullName}, wake up.`, {
+    bot.editAction(`${this.fullName}, wake up.`, {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {
