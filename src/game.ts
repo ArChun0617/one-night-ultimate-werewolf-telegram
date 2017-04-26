@@ -561,12 +561,12 @@ export class Game {
         {
           rolePrefix = action.player.getOriginalRole().fullName;
         }
-
         this.msgInterface.showNotification(msg.id, `${rolePrefix} ${Emoji.get('arrow_right')} ${action.toString()}`);
-
       }
+      else if (action && !action.dozed)
+        this.msgInterface.showNotification(msg.id, `${Emoji.get('middle_finger')}  You have woken up at night, LIAR !!`);
       else
-        this.msgInterface.showNotification(msg.id, `${Emoji.get('middle_finger')}  Hey! Stop doing that!`);
+        this.msgInterface.showNotification(msg.id, `${player.getOriginalRole().fullName} ${Emoji.get('arrow_right')} ${Emoji.get('zzz')}`);  //  For those has no action Village, Tanner, Hunter
     }
     else if (parseInt(event)) {
       //if the command = integer, it should be a Vote.

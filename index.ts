@@ -99,15 +99,15 @@ bot.onText(/\/newgame/, (msg) => {
     addGameSettingRole(msg.id, gameSetting, RoleClass.INSOMNIAC);        // 5 - 0
     addGameSettingRole(msg.id, gameSetting, RoleClass.TROUBLEMAKER);     // 6 - 3p
     addGameSettingRole(msg.id, gameSetting, RoleClass.MINION);           // 7 - 4p
-    //addGameSettingRole(msg.id, gameSetting, RoleClass.COPYCAT);          // 8 - 5p
-    addGameSettingRole(msg.id, gameSetting, RoleClass.DOPPELGANGER);     // 8 - 5p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.COPYCAT);          // 8 - 5p
+    //addGameSettingRole(msg.id, gameSetting, RoleClass.DOPPELGANGER);     // 8 - 5p
     addGameSettingRole(msg.id, gameSetting, RoleClass.TANNER);           // 9 - 6p
     addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 10- 7p
     addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 11- 8p
     //addGameSettingRole(msg.id, gameSetting, RoleClass.DRUNK);            // 12- 9p
+    /*addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
     addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
-    addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
-    addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p*/
   }
 
   const players: Player[] = [
