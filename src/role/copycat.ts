@@ -12,7 +12,7 @@ export class Copycat extends Role implements RoleInterface {
     super(RoleClass.COPYCAT);
   }
 
-  wakeUp(bot, msg, players, table, host) {
+  wakeUp(bot, msg, players, table) {
     console.log(`${this.name} wake up called`);
 
     const key = [

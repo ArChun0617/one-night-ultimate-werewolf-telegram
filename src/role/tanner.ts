@@ -5,7 +5,7 @@ export class Tanner extends Role implements RoleInterface {
     super(RoleClass.TANNER);
   }
 
-  wakeUp(bot, msg, players, table, host) {
+  wakeUp(bot, msg, players, table) {
     console.log(`${this.name} wake up called`);
 
   }

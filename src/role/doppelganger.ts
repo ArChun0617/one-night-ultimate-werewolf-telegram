@@ -12,7 +12,7 @@ export class Doppelganger extends Role implements RoleInterface {
     super(RoleClass.DOPPELGANGER);
   }
 
-  wakeUp(bot, msg, players, table, host) {
+  wakeUp(bot, msg, players, table) {
     console.log(`${this.name} wake up called`);
     // clone a user
     // apply that role ability

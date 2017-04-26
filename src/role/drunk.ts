@@ -11,7 +11,7 @@ export class Drunk extends Role implements RoleInterface {
     super(RoleClass.DRUNK);
   }
 
-  wakeUp(bot, msg, players, table, host) {
+  wakeUp(bot, msg, players, table) {
     console.log(`${this.name} wake up called`);
     // sendMessage [left] [center] [right], choose one of the center card to exchange
 

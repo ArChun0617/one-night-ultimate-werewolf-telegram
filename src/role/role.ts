@@ -58,7 +58,7 @@ export class Role implements RoleInterface {
     this.ordering = roleClass.ordering;
   }
 
-  wakeUp(bot, msg, players, table, host) {
+  wakeUp(bot, msg, players, table) {
     throw new Error('WakeUp function does not implemented');
   }
 

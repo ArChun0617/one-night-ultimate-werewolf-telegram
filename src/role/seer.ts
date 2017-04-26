@@ -11,7 +11,7 @@ export class Seer extends Role implements RoleInterface {
     super(RoleClass.SEER);
   }
 
-  wakeUp(bot, msg, players, table, host) {
+  wakeUp(bot, msg, players, table) {
     console.log(`${this.name} wake up called`);
     // sendMessage [AB] [BC] [AC] [Player1] [Player2] ...
     // lock the option when callback_query

@@ -1,3 +1,4 @@
+const util = require('util');
 import { GameEndError } from "./error/gameend";
 import * as Emoji from 'node-emoji';
 import * as _ from 'lodash';
@@ -63,11 +64,6 @@ export class Game {
     this.players = players;
   }
 
-  show() {
-    console.log('[Table]', this.table);
-    console.log('[Players]', this.players);
-  }
-
   start(msg) {
     if (this.getPhase() != Game.PHASE_WAITING_PLAYER) return; //Prevent double start game
 
@@ -113,8 +109,8 @@ export class Game {
         // debug
         console.log('[announcePlayerRole]');
         console.log('[Deck]', this.deck);
-        console.log('[Table]', this.table);
-        console.log('[Players]', this.players);
+        console.log('[Table]', util.inspect(this.table, { colors: true }));
+        console.log('[Players]', util.inspect(this.players, { colors: true }));
       })
       .then(() => console.log(`Start night`))
       .then(() => this.startNight(msg, this.actionTime))
@@ -122,9 +118,9 @@ export class Game {
         // debug
         console.log('[startDay]');
         console.log('[Deck]', this.deck);
-        console.log('[Table]', this.table);
-        console.log('[Players]', this.players);
-        console.log('[ActionStack]', this.actionStack);
+        console.log('[Table]', util.inspect(this.table, { colors: true }));
+        console.log('[Players]', util.inspect(this.players, { colors: true }));
+        console.log('[ActionStack]', util.inspect(this.actionStack, { colors: true }));
       })
       .then(() => console.log(`Start conversation`))
       .then(() => this.startConversation(msg, this.gameTime * (this.players.length > 6 ? 2 : 1)))  // If more than 6 player, then game time *2
@@ -164,7 +160,6 @@ export class Game {
     });
 
     this.msgInterface.sendMsg(`Player joined:\n${rtnMsg}`);
-    console.log(this.players);
   }
 
   getPlayer(id: number) {
@@ -277,7 +272,7 @@ export class Game {
         {
           reply_markup: JSON.stringify({
             inline_keyboard: [
-              [{ text: 'View your role', callback_data: 'view_role' }]
+              [{ text: `View your role${Emoji.get("black_joker")}`, callback_data: 'view_role' }]
             ]
           })
         }
@@ -313,10 +308,10 @@ export class Game {
     this.setWakeUpPhase(role);
 
     return new Promise((resolve, reject) => {
-      const player: Player = _.find(this.players, (p) => p.getOriginalRole().checkRole(role, false));
+      const players: Player[] = _.filter(this.players, (p) => p.getOriginalRole().checkRole(role, false));
 
-      if (player) {
-        player.getOriginalRole().wakeUp(this.msgInterface, msg, this.players, this.table, player);
+      if (players && players.length > 0) {
+        players[0].getOriginalRole().wakeUp(this.msgInterface, msg, this.players, this.table);
       } else {
         let roleCard = _.find(this.table.getRoles(), (r: Role) => r.checkRole(role, false));
 
@@ -327,16 +322,18 @@ export class Game {
           else
             roleCard = tempPlayer.getRole();
         }
-        roleCard.wakeUp(this.msgInterface, msg, this.players, this.table, player);
+        roleCard.wakeUp(this.msgInterface, msg, this.players, this.table,);
       }
 
       setTimeout(() => {
-        if (player) {
-          let footprint: ActionFootprint;
-          footprint = player.getOriginalRole().endTurn(this.msgInterface, msg, this.players, this.table, player);
+        if (players && players.length > 0) {
+          _.map(players, (player) => {
+            let footprint: ActionFootprint;
+            footprint = player.getOriginalRole().endTurn(this.msgInterface, msg, this.players, this.table, player);
 
-          if (footprint && footprint.action)
-            this.actionStack.push(footprint);
+            if (footprint && footprint.action)
+              this.actionStack.push(footprint);
+          });
         }
 
         resolve();
@@ -429,19 +426,16 @@ export class Game {
 
       result += `${Emoji.get('skull')}\n`;
       _.map(this.deathPlayers, (death) => {
-        console.log(`showResult.death: ${death.name}`);
         result += `${death.name} ${death.getOriginalRole().emoji} ${Emoji.get('arrow_right')} ${death.getRole().emoji}  ${Emoji.get('point_left')} ${death.count} \n`;
       });
 
       result += `\n${Emoji.get('trophy')}${Emoji.get('full_moon_with_face')}\n`;
       _.map(this.winners, (winner: Player) => {
-        console.log(`showResult.winner: ${winner.name}`);
         result += `${winner.name} ${winner.getOriginalRole().emoji} ${Emoji.get('arrow_right')} ${winner.getRole().emoji}  ${Emoji.get('point_right')} ${winner.getKillTarget().name} \n`;
       });
 
       result += `\n${Emoji.get('new_moon_with_face')}\n`;
       _.map(this.losers, (loser: Player) => {
-        console.log(`showResult.loser: ${loser.name}`);
         result += `${loser.name} ${loser.getOriginalRole().emoji} ${Emoji.get('arrow_right')} ${loser.getRole().emoji}  ${Emoji.get('point_right')} ${loser.getKillTarget().name} \n`;
       });
 
@@ -632,11 +626,11 @@ export class Game {
       RoleClass.WEREWOLF.name, RoleClass.MINION.name, RoleClass.TANNER.name
     ], player.getRole().name) < 0);
 
-    console.log('this.deathPlayers', deathPlayers);
-    console.log('deathTanners', deathTanners);
-    console.log('deathWerewolfs', deathWerewolfs);
-    console.log('deathVillages', deathVillages);
-    console.log('hasWerewolfOnTable()', this.hasWerewolfOnTable());
+    console.log('>> determineWinners.deathPlayers', deathPlayers);
+    console.log('>> determineWinners.deathTanners', deathTanners);
+    console.log('>> determineWinners.deathWerewolfs', deathWerewolfs);
+    console.log('>> determineWinners.deathVillages', deathVillages);
+    console.log('>> determineWinners.hasWerewolfOnTable()', this.hasWerewolfOnTable());
 
     // Tanner always win when he die
     winners = _.concat(winners, deathTanners);

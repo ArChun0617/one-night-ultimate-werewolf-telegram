@@ -11,7 +11,7 @@ export class Insomniac extends Role implements RoleInterface {
     super(RoleClass.INSOMNIAC);
   }
 
-  wakeUp(bot, msg, players, table, host) {
+  wakeUp(bot, msg, players, table) {
     console.log(`${this.name} wake up called`);
     // sendMessage [view] click to know the final role
     const key = [

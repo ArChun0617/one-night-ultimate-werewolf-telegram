@@ -11,7 +11,7 @@ export class Minion extends Role implements RoleInterface {
     super(RoleClass.MINION);
   }
 
-  wakeUp(bot, msg, players, table, host) {
+  wakeUp(bot, msg, players, table) {
     console.log(`${this.name} wake up called`);
     // notify werewolf buddies
     const key = [

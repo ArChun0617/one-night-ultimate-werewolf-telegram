@@ -5,7 +5,7 @@ export class Hunter extends Role implements RoleInterface {
     super(RoleClass.HUNTER);
   }
 
-  wakeUp(bot, msg, players, table, host) {
+  wakeUp(bot, msg, players, table) {
     console.log(`${this.name} wake up called`);
     // use only on vote phrase
     // kill the people when user vote

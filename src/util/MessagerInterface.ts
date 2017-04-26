@@ -36,17 +36,32 @@ export class MessagerInterface {
   }
 
   sendMsg(text, option = {}) {
-    return this.bot.sendMessage(this.gameChatID, text, option);
+    try {
+      return this.bot.sendMessage(this.gameChatID, text, option);
+    }
+    catch (err) {
+      console.log(`ERROR !!! [sendMsg] : `, err.substring(0, 10) + "...");
+    }
   }
 
   editAction(text, options = {}) {
-    return this.bot.editMessageText(text, _.extend(options, {
+    try {
+      return this.bot.editMessageText(text, _.extend(options, {
         chat_id: this.gameChatID,
         message_id: this.gameActionID
       }));
+    }
+    catch (err) {
+      console.log(`ERROR !!! [editAction] : `, err.substring(0, 10) + "...");
+    }
   }
 
   showNotification(callbackQueryId, text, showAlert = false, form = {}) {
-    return this.bot.answerCallbackQuery(callbackQueryId, text, showAlert, form);
+    try {
+      this.bot.answerCallbackQuery(callbackQueryId, text, showAlert, form);
+    }
+    catch (err) {
+      console.log(`ERROR !!! [showNotification] : `, err.substring(0, 10)+"...");
+    }
   }
 }

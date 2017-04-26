@@ -99,12 +99,14 @@ bot.onText(/\/newgame/, (msg) => {
     addGameSettingRole(msg.id, gameSetting, RoleClass.INSOMNIAC);        // 5 - 0
     addGameSettingRole(msg.id, gameSetting, RoleClass.TROUBLEMAKER);     // 6 - 3p
     addGameSettingRole(msg.id, gameSetting, RoleClass.MINION);           // 7 - 4p
-    addGameSettingRole(msg.id, gameSetting, RoleClass.COPYCAT);          // 8 - 5p
-    //addGameSettingRole(msg.id, gameSetting, RoleClass.DOPPELGANGER);     // 8 - 5p
+    //addGameSettingRole(msg.id, gameSetting, RoleClass.COPYCAT);          // 8 - 5p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.DOPPELGANGER);     // 8 - 5p
     addGameSettingRole(msg.id, gameSetting, RoleClass.TANNER);           // 9 - 6p
     addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 10- 7p
     addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 11- 8p
     //addGameSettingRole(msg.id, gameSetting, RoleClass.DRUNK);            // 12- 9p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
     addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
   }
 
@@ -236,9 +238,9 @@ function addGameSettingRole(msgId: number, gameSetting: any, role: RoleClassInte
 
   if (_.filter(gameSetting.roles, (r) => r === role).length < roleSetting.max) {
     gameSetting.roles.push(role);
-    bot.answerCallbackQuery(msgId, `${Emoji.get('white_check_mark')}  Added ${role}`);
+    //bot.answerCallbackQuery(msgId, `${Emoji.get('white_check_mark')}  Added ${role}`);
   } else {
-    bot.answerCallbackQuery(msgId, `${Emoji.get('no_entry_sign')}  Too many ${role}`);
+    //bot.answerCallbackQuery(msgId, `${Emoji.get('no_entry_sign')}  Too many ${role}`);
   }
 
 }
@@ -264,7 +266,7 @@ function killGame(id: number) {
   console.log('games', _.map(games, (game: Game) => game.id));
 }
 
-bot.onText(/\/iisreset/, (msg) => {
+/*bot.onText(/\/iisreset/, (msg) => {
   console.log("IISReset");
   bot.sendMessage(msg.chat.id, `${Emoji.get('bomb')}  Game Server Reset.`);
   if (games.length > 0)
@@ -272,7 +274,7 @@ bot.onText(/\/iisreset/, (msg) => {
     games.length = 0;
     process.exit(0);
   }
-});
+});*/
 
 function getGame(id: number) {
   return _.find(games, (game) => game.id === id);
