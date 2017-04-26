@@ -103,32 +103,32 @@ export class Game {
     }
 
     return this.prepareDeck()
-      .then(() => console.log(`Announce player role`))
+      .then(() => console.log(`>> [Announce player role]`))
       .then(() => this.announcePlayerRole(msg, this.actionTime * 2))
       .then(() => {
         // debug
-        console.log('[announcePlayerRole]');
-        console.log('[Deck]', this.deck);
-        console.log('[Table]', util.inspect(this.table, { colors: true }));
-        console.log('[Players]', util.inspect(this.players, { colors: true }));
+        console.log('>> [announcePlayerRole]');
+        console.log('>> [Deck]', this.deck);
+        console.log('>> [Table]', util.inspect(this.table, { colors: true }));
+        console.log('>> [Players]', util.inspect(this.players, { colors: true }));
       })
-      .then(() => console.log(`Start night`))
+      .then(() => console.log(`>> [Start night]`))
       .then(() => this.startNight(msg, this.actionTime))
       .then(() => {
         // debug
-        console.log('[startDay]');
-        console.log('[Deck]', this.deck);
-        console.log('[Table]', util.inspect(this.table, { colors: true }));
-        console.log('[Players]', util.inspect(this.players, { colors: true }));
-        console.log('[ActionStack]', util.inspect(this.actionStack, { colors: true }));
+        console.log('>> [Start Day]');
+        console.log('>> [Deck]', this.deck);
+        console.log('>> [Table]', util.inspect(this.table, { colors: true }));
+        console.log('>> [Players]', util.inspect(this.players, { colors: true }));
+        console.log('>> [ActionStack]', util.inspect(this.actionStack, { colors: true }));
       })
-      .then(() => console.log(`Start conversation`))
+      .then(() => console.log(`>> [Start conversation]`))
       .then(() => this.startConversation(msg, this.gameTime * (this.players.length > 6 ? 2 : 1)))  // If more than 6 player, then game time *2
-      .then(() => console.log(`Begin voting`))
+      .then(() => console.log(`>> [Begin voting]`))
       .then(() => this.beginVoting(msg, this.actionTime))
-      .then(() => console.log(`Kill player`))
+      .then(() => console.log(`>> [Kill player]`))
       .then(() => this.killPlayer())
-      .then(() => console.log(`Show result`))
+      .then(() => console.log(`>> [Show result]`))
       .then(() => this.showResult(msg));
   }
 

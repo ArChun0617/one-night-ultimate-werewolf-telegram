@@ -39,6 +39,31 @@ export class Copycat extends Role implements RoleInterface {
     console.log(`${this.name} useAbility.${(this.shadowChoice ? this.shadowChoice.name : this.name)}: ${msg.data}`);
     console.log(`${this.name} useAbility.choice: ${this.choice}`);
 
+    if (!this.shadowChoice) {
+      if (_.includes(["CARD_A", "CARD_B", "CARD_C"], msg.data)) {
+        switch (msg.data) {
+          case "CARD_A":
+            this.shadowChoice = _.clone(table.getLeft());
+            rtnMsg += `${this.shadowChoice.emoji}${Emoji.get('question')}${Emoji.get('question')}`;
+            break;
+          case "CARD_B":
+            this.shadowChoice = _.clone(table.getCenter());
+            rtnMsg += `${Emoji.get('question')}${this.shadowChoice.emoji}${Emoji.get('question')}`;
+            break;
+          case "CARD_C":
+            this.shadowChoice = _.clone(table.getRight());
+            rtnMsg += `${Emoji.get('question')}${Emoji.get('question')}${this.shadowChoice.emoji}`;
+            break;
+        }
+
+        console.log(`${this.name} useAbility.Assign: ${this.shadowChoice.name}`);
+        rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, `cloned ${rtnMsg}`);
+      }
+    }
+    else {
+      rtnMsg = "You already make your choice.";
+    }
+    /*
     switch (this.shadowChoice ? this.shadowChoice.name : "") {
       case RoleClass.WEREWOLF.name:
         if (msg.data == "WAKE_UP") {
@@ -153,6 +178,7 @@ export class Copycat extends Role implements RoleInterface {
       default:
         break;
     }
+    */
 
     bot.showNotification(msg.id, rtnMsg);
     return rtnActionEvt;
