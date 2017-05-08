@@ -145,6 +145,23 @@ export class Game {
     return (this.getPhase() === Game.PHASE_END_GAME);
   }
 
+  showRole() {
+    let roleList: any[];
+    let role: string[];
+
+    for (var key in RoleClass) {
+      if (RoleClass.hasOwnProperty(key)) {
+        roleList.push(RoleClass[key]);
+      }
+    }
+
+    _.map(_.sortBy(roleList, (r: Role) => r.ordering), (r: Role) => {
+      role.push(r.fullName);
+    });
+
+    return role.join("\n");
+  }
+
   getPhase(): string {
     return this.phase;
   }

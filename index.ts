@@ -19,7 +19,7 @@ console.log(`port: ${port}`);
 const gameSettings: GameSetting[] = [];
 const games = [];
 const token = '331592410:AAHy9uA7PLWBHmIcNcyNt78hT6XLarrOjHM';
-const bot = new TelegramBot(token, { polling: true });
+let bot = new TelegramBot(token, { polling: true });
 const roles = [
   { name: RoleClass.COPYCAT.name, max: 1 },
   { name: RoleClass.DOPPELGANGER.name, max: 1 },
@@ -245,12 +245,21 @@ function addGameSettingRole(msgId: number, gameSetting: any, role: RoleClassInte
 
 }
 
-bot.onText(/\/show/, (msg, match) => {
-  const game = getGame(msg.chat.id);
+bot.onText(/\/showRole/, (msg, match) => {
+  let roleList: RoleClassInterface[] = [];
+  let role: string[] = [];
 
-  if (!game) return askForCreateNewGame(msg.chat.id);
+  for (var key in RoleClass) {
+    if (RoleClass.hasOwnProperty(key)) {
+      roleList.push(RoleClass[key]);
+    }
+  }
 
-  game.show();
+  _.map(_.sortBy(roleList, (r: Role) => r.ordering), (r: Role) => {
+    role.push(r.emoji + r.name);
+  });
+
+  bot.sendMessage(msg.chat.id, `The game has following roles:\n` + role.join("\n"));
 });
 
 function killGame(id: number) {
@@ -266,15 +275,14 @@ function killGame(id: number) {
   console.log('games', _.map(games, (game: Game) => game.id));
 }
 
-/*bot.onText(/\/iisreset/, (msg) => {
-  console.log("IISReset");
+bot.onText(/\/iisreset/, (msg) => {
+  console.log("IIS Reset");
+  bot = new TelegramBot(token, { polling: true });  //Rebuild the telegram connection
+
+  killGame(msg.chat.id);
+
   bot.sendMessage(msg.chat.id, `${Emoji.get('bomb')}  Game Server Reset.`);
-  if (games.length > 0)
-  {
-    games.length = 0;
-    process.exit(0);
-  }
-});*/
+});
 
 function getGame(id: number) {
   return _.find(games, (game) => game.id === id);
