@@ -17,9 +17,9 @@ export class Copycat extends Role implements RoleInterface {
 
     const key = [
       [
-        { text: `${this.emoji}${Emoji.get('question')}${Emoji.get('question')}`, callback_data: "CARD_A" },
-        { text: `${Emoji.get('question')}${this.emoji}${Emoji.get('question')}`, callback_data: "CARD_B" },
-        { text: `${Emoji.get('question')}${Emoji.get('question')}${this.emoji}`, callback_data: "CARD_C" }
+        { text: `${this.emoji}${Emoji.get('question')}${Emoji.get('question')}`, callback_data: "COPYCAT_CARD_A" },
+        { text: `${Emoji.get('question')}${this.emoji}${Emoji.get('question')}`, callback_data: "COPYCAT_CARD_B" },
+        { text: `${Emoji.get('question')}${Emoji.get('question')}${this.emoji}`, callback_data: "COPYCAT_CARD_C" }
       ]
     ];
 
@@ -34,11 +34,10 @@ export class Copycat extends Role implements RoleInterface {
 
   useAbility(bot, msg, players, table, host) {
     let rtnMsg = '';
-    let target: any;
     let rtnActionEvt: ActionFootprint;
     console.log(`${this.name} useAbility.${(this.shadowChoice ? this.shadowChoice.name : this.name)}: ${msg.data}`);
     console.log(`${this.name} useAbility.choice: ${this.choice}`);
-
+    /*
     if (!this.shadowChoice) {
       if (_.includes(["CARD_A", "CARD_B", "CARD_C"], msg.data)) {
         switch (msg.data) {
@@ -63,122 +62,144 @@ export class Copycat extends Role implements RoleInterface {
     else {
       rtnMsg = "You already make your choice.";
     }
-    /*
-    switch (this.shadowChoice ? this.shadowChoice.name : "") {
-      case RoleClass.WEREWOLF.name:
-        if (msg.data == "WAKE_UP") {
-          this.choice = rtnMsg = this.getRolePlayers(RoleClass.WEREWOLF, players);
-          rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
-        }
-        break;
-      case RoleClass.MINION.name:
-        if (msg.data == "WAKE_UP") {
-          this.choice = rtnMsg = this.getRolePlayers(RoleClass.WEREWOLF, players);
-          rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
-        }
-        break;
-      case RoleClass.MASON.name:
-        if (msg.data == "WAKE_UP") {
-          this.choice = rtnMsg = this.getRolePlayers(RoleClass.MASON, players);
-          rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
-        }
-        break;
-      case RoleClass.SEER.name:
-        if (!this.choice) {
-          if (/^\d+$/.test(msg.data) || _.includes(["CARD_AB", "CARD_AC", "CARD_BC"], msg.data)) {
-            this.choice = msg.data;
-            rtnMsg = this.watchRole(this.choice, host, table);
-            rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
-          }
-        }
-        else
-          rtnMsg = "You already make your choice.";
-        break;
-      case RoleClass.ROBBER.name:
-        if (!this.choice) {
-          this.choice = msg.data;
-          rtnMsg = this.swapPlayer(this.choice, host, players);
-          rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
-        }
-        else
-          rtnMsg = "You already make your choice.";
-        break;
-      case RoleClass.TROUBLEMAKER.name:
-        const regex = new RegExp(/^\d+_\d+/);
-        if (regex.test(this.choice)) {
-          //Already chose both player
-          rtnMsg = "You already make your choice.";
-        }
-        else if (this.choice) {
-          //Chose only 1 player
-          if (host.id == parseInt(msg.data)) {
-            rtnMsg = "Buddy, You cannot choose yourself.";
-          }
-          else if (this.choice == msg.data) {
-            this.choice = "";
-            rtnMsg = "You have cancelled, choose 2 players to swap.";
-          }
-          else {
-            this.choice += "_" + msg.data;
-            rtnMsg = this.swapPlayers(this.choice, players);
-            rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
-          }
-        }
-        else {
-          //Both not yet chose, now set the first player.
-          if (host.id == parseInt(msg.data)) {
-            rtnMsg = "Buddy, You cannot choose yourself.";
-          }
-          else {
-            this.choice = msg.data;
-            const target: Player = _.find(players, (player: Player) => player.id == parseInt(this.choice));
-            rtnMsg = `You have choose ${target.name}, choose 1 more player to swap.`;
-          }
-        }
-        break;
-      case RoleClass.DRUNK.name:
-        if (!this.choice) {
-          if (_.includes(["CARD_A", "CARD_B", "CARD_C"], msg.data)) {
-            this.choice = msg.data;
-            rtnMsg = this.swapTable(this.choice, host, table);
-            rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
-          }
-        }
-        else
-          rtnMsg = "You already make your choice.";
-        break;
-      case RoleClass.INSOMNIAC.name:
-        if (msg.data == "WAKE_UP") {
-          this.choice = host.getRole().name;
-          rtnMsg = host.getRole().fullName;
-          rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
-        }
-        break;
-      case "":
-        if (_.includes(["CARD_A", "CARD_B", "CARD_C"], msg.data)) {
-          switch (msg.data) {
-            case "CARD_A":
-              this.shadowChoice = _.clone(table.getLeft());
-              rtnMsg += `${this.shadowChoice.emoji}${Emoji.get('question')}${Emoji.get('question')}`;
-              break;
-            case "CARD_B":
-              this.shadowChoice = _.clone(table.getCenter());
-              rtnMsg += `${Emoji.get('question')}${this.shadowChoice.emoji}${Emoji.get('question')}`;
-              break;
-            case "CARD_C":
-              this.shadowChoice = _.clone(table.getRight());
-              rtnMsg += `${Emoji.get('question')}${Emoji.get('question')}${this.shadowChoice.emoji}`;
-              break;
-          }
-
-          console.log(`${this.name} useAbility.Assign: ${this.shadowChoice.name}`);
-          rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, `cloned ${rtnMsg}`);
-        }
-        break;
-      default:
-        break;
-    }
     */
+
+    if (this.shadowChoice && _.includes(["COPYCAT_CARD_A", "COPYCAT_CARD_B", "COPYCAT_CARD_C"], msg.data)) {
+      rtnMsg = "You already make your choice.";
+    }
+    else
+    {
+
+      switch (this.shadowChoice ? this.shadowChoice.name : "") {
+        case RoleClass.WEREWOLF.name:
+          if (msg.data == "WAKE_UP") {
+            this.choice = rtnMsg = this.getRolePlayers(RoleClass.WEREWOLF, players);
+            rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
+          }
+          else if ((msg.data == "CARD_A" || msg.data == "CARD_B" || msg.data == "CARD_C")) {
+            const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(RoleClass.WEREWOLF));
+
+            if (this.choice) {
+              rtnMsg = "You already make your choice.";
+            }
+            else if (target.length == 1) {
+              this.choice = msg.data;
+              rtnMsg = this.watchRole(this.choice, players, table);
+              rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
+            }
+            else {
+              rtnMsg = "You cannot view the card.";
+            }
+          }
+          break;
+        case RoleClass.MINION.name:
+          if (msg.data == "WAKE_UP") {
+            this.choice = rtnMsg = this.getRolePlayers(RoleClass.WEREWOLF, players);
+            rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
+          }
+          break;
+        case RoleClass.MASON.name:
+          if (msg.data == "WAKE_UP") {
+            this.choice = rtnMsg = this.getRolePlayers(RoleClass.MASON, players);
+            rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
+          }
+          break;
+        case RoleClass.SEER.name:
+          if (!this.choice) {
+            if (/^\d+$/.test(msg.data) || _.includes(["CARD_AB", "CARD_AC", "CARD_BC"], msg.data)) {
+              this.choice = msg.data;
+              rtnMsg = this.watchRole(this.choice, players, table);
+              rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
+            }
+          }
+          else
+            rtnMsg = "You already make your choice.";
+          break;
+        case RoleClass.ROBBER.name:
+          if (!this.choice) {
+            this.choice = msg.data;
+            rtnMsg = this.swapPlayer(this.choice, host, players);
+            rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
+          }
+          else
+            rtnMsg = "You already make your choice.";
+          break;
+        case RoleClass.TROUBLEMAKER.name:
+          const regex = new RegExp(/^\d+_\d+/);
+          if (regex.test(this.choice)) {
+            //Already chose both player
+            rtnMsg = "You already make your choice.";
+          }
+          else if (this.choice) {
+            //Chose only 1 player
+            if (host.id == parseInt(msg.data)) {
+              rtnMsg = "Buddy, You cannot choose yourself.";
+            }
+            else if (this.choice == msg.data) {
+              this.choice = "";
+              rtnMsg = "You have cancelled, choose 2 players to swap.";
+            }
+            else {
+              this.choice += "_" + msg.data;
+              rtnMsg = this.swapPlayers(this.choice, players);
+              rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
+            }
+          }
+          else {
+            //Both not yet chose, now set the first player.
+            if (host.id == parseInt(msg.data)) {
+              rtnMsg = "Buddy, You cannot choose yourself.";
+            }
+            else {
+              this.choice = msg.data;
+              const target: Player = _.find(players, (player: Player) => player.id == parseInt(this.choice));
+              rtnMsg = `You have choose ${target.name}, choose 1 more player to swap.`;
+            }
+          }
+          break;
+        case RoleClass.DRUNK.name:
+          if (!this.choice) {
+            if (_.includes(["CARD_A", "CARD_B", "CARD_C"], msg.data)) {
+              this.choice = msg.data;
+              rtnMsg = this.swapTable(this.choice, host, table);
+              rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
+            }
+          }
+          else
+            rtnMsg = "You already make your choice.";
+          break;
+        case RoleClass.INSOMNIAC.name:
+          if (msg.data == "WAKE_UP") {
+            this.choice = host.getRole().name;
+            rtnMsg = host.getRole().fullName;
+            rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
+          }
+          break;
+        case "":
+          if (_.includes(["COPYCAT_CARD_A", "COPYCAT_CARD_B", "COPYCAT_CARD_C"], msg.data)) {
+            switch (msg.data) {
+              case "COPYCAT_CARD_A":
+                this.shadowChoice = _.clone(table.getLeft());
+                rtnMsg += `${this.shadowChoice.emoji}${Emoji.get('question')}${Emoji.get('question')}`;
+                break;
+              case "COPYCAT_CARD_B":
+                this.shadowChoice = _.clone(table.getCenter());
+                rtnMsg += `${Emoji.get('question')}${this.shadowChoice.emoji}${Emoji.get('question')}`;
+                break;
+              case "COPYCAT_CARD_C":
+                this.shadowChoice = _.clone(table.getRight());
+                rtnMsg += `${Emoji.get('question')}${Emoji.get('question')}${this.shadowChoice.emoji}`;
+                break;
+            }
+
+            console.log(`${this.name} useAbility.Assign: ${this.shadowChoice.name}`);
+            rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, `cloned ${rtnMsg}`);
+          }
+          break;
+        default:
+          break;
+      }
+    }
 
     bot.showNotification(msg.id, rtnMsg);
     return rtnActionEvt;
@@ -192,7 +213,7 @@ export class Copycat extends Role implements RoleInterface {
     console.log(`${this.name} endTurn:shadowChoice ${(this.shadowChoice ? this.shadowChoice.name : "undefined")}`);
     console.log(`${this.name} endTurn:choice ${this.choice}`);
     switch (this.shadowChoice ? this.shadowChoice.name : "") {
-      /*case RoleClass.WEREWOLF.name:
+      case RoleClass.WEREWOLF.name:
         if (!this.choice) {
           this.choice = rtnMsg = this.getRolePlayers(RoleClass.WEREWOLF, players);
           rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
@@ -278,7 +299,7 @@ export class Copycat extends Role implements RoleInterface {
           rtnMsg = host.getRole().fullName;
           rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
         }
-        break;*/
+        break;
       case "":
         //do nothing
         console.log(`${this.name} endTurn:choice_Shuffle_empty zzz`);
@@ -328,6 +349,15 @@ export class Copycat extends Role implements RoleInterface {
     }
     else {
       switch (picked) {
+        case 'CARD_A':
+          rtnMsg = `${table.getLeft().fullName}${Emoji.get('question')}${Emoji.get('question')}`;
+          break;
+        case 'CARD_B':
+          rtnMsg = `${Emoji.get('question')}${table.getCenter().fullName}${Emoji.get('question')}`;
+          break;
+        case 'CARD_C':
+          rtnMsg = `${Emoji.get('question')}${Emoji.get('question')}${table.getRight().fullName}`;
+          break;
         case 'CARD_AB':
           rtnMsg = `${table.getLeft().fullName}${table.getCenter().fullName}${Emoji.get('question')}`;
           break;

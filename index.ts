@@ -36,6 +36,37 @@ const roles = [
   { name: RoleClass.TANNER.name, max: 1 }
 ];
 
+bot.onText(/\/adminlist/, (msg) => {
+  if (msg.chat.id <= 0) return; //Prevent the action run in group
+
+  const gameIds: string[] = _.map(games, (g: Game) => g.id + "");
+  console.log("/adminlist >> Avaliable Games.Count: " + games.length);
+  bot.sendMessage(msg.chat.id, `${Emoji.get('microphone')} Running Game: \n ${gameIds.join("\n")}`);
+});
+
+bot.onText(/\/adminsay\s\d+\s\w+/, (msg) => {
+  if (msg.chat.id <= 0) return; //Prevent the action run in group
+
+  console.log(`Announ: ${msg.text}`);
+  const regex = /\/announ\s(\d+)\s(\w+)/;
+  const para: string[] = regex.exec(msg.text);
+  const chatId: number = parseInt(para[1]);
+  const text: string = para[2];
+
+  if (chatId)
+  {
+    const game = getGame(chatId);
+    if (game)
+      bot.sendMessage(chatId, `${Emoji.get('microphone')} (${chatId}) => ${text}`);
+    else
+      bot.sendMessage(msg.chat.id, `${Emoji.get('bomb')}  Invalid Chat ID '${chatId}' !`);
+  }
+  else
+  {
+    bot.sendMessage(msg.chat.id, `${Emoji.get('bomb')}  Invalid request pattern '${msg.text}' !`);
+  }
+});
+
 bot.onText(/\/setting/, (msg) => {
   const game = getGame(msg.chat.id);
 

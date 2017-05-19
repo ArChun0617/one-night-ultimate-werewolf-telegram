@@ -79,7 +79,7 @@ export class Doppelganger extends Role implements RoleInterface {
         if (!this.choice) {
           if (/^\d+$/.test(msg.data) || _.includes(["CARD_AB", "CARD_AC", "CARD_BC"], msg.data)) {
             this.choice = msg.data;
-            rtnMsg = this.watchRole(this.choice, host, table);
+            rtnMsg = this.watchRole(this.choice, players, table);
             rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
           }
         }
