@@ -44,11 +44,11 @@ bot.onText(/\/adminlist/, (msg) => {
   bot.sendMessage(msg.chat.id, `${Emoji.get('microphone')} Running Game: \n ${gameIds.join("\n")}`);
 });
 
-bot.onText(/\/adminsay\s\d+\s\w+/, (msg) => {
+bot.onText(/\/adminsay\s\d+\s.+/, (msg) => {
   if (msg.chat.id <= 0) return; //Prevent the action run in group
 
   console.log(`/adminsay >> Announ: ${msg.text}`);
-  const regex = /\/adminsay\s(\d+)\s(\w+)/;
+  const regex = /\/adminsay\s(\d+)\s(.+)/;
   const para: string[] = regex.exec(msg.text);
   const chatId: number = parseInt(para[1]);
   const text: string = para[2];
