@@ -43,7 +43,7 @@ export class Werewolf extends Role implements RoleInterface {
 
     console.log(`${this.name} useAbility:choice ${this.choice}`);
     let rtnMsg: string = "";
-    const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(RoleClass.WEREWOLF));
+    const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().checkRole([RoleClass.WEREWOLF]));
 
     if (msg.data == "WAKE_UP") {
       rtnMsg = this.getRolePlayers(RoleClass.WEREWOLF, players);
@@ -75,7 +75,7 @@ export class Werewolf extends Role implements RoleInterface {
 
     console.log(`${this.name} endTurn:choice ${this.choice}`);
     if (!this.choice) {
-      const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(RoleClass.WEREWOLF));
+      const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().checkRole([RoleClass.WEREWOLF]));
 
       if (target.length >= 2) {
         rtnMsg = this.getRolePlayers(RoleClass.WEREWOLF, players);
@@ -99,7 +99,7 @@ export class Werewolf extends Role implements RoleInterface {
   private getRolePlayers(role: RoleClassInterface, players) {
     let target: Player[];
     let rtnMsg: string;
-    target = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(role));
+    target = _.filter(players, (player: Player) => player.getOriginalRole().checkRole([role]));
     rtnMsg = _.map(target, (player: Player) => role.emoji + player.name).join(" ");
 
     return rtnMsg;

@@ -325,17 +325,17 @@ export class Game {
     this.setWakeUpPhase(role);
 
     return new Promise((resolve, reject) => {
-      const players: Player[] = _.filter(this.players, (p) => p.getOriginalRole().checkRole(role, false));
+      let players: Player[] = _.filter(this.players, (p) => p.getOriginalRole().checkRole([role], false));
 
       if (players && players.length > 0) {
         players[0].getOriginalRole().wakeUp(this.msgInterface, msg, this.players, this.table);
       } else {
-        let roleCard = _.find(this.table.getRoles(), (r: Role) => r.checkRole(role, false));
+        let roleCard = _.find(this.table.getRoles(), (r: Role) => r.checkRole([role], false));
 
         if (!roleCard) {
-          let tempPlayer = _.find(this.players, (p: Player) => p.getRole().checkRole(role, false));
+          let tempPlayer = _.find(this.players, (p: Player) => p.getRole().checkRole([role], false));
           if (!tempPlayer)
-            throw new TypeError(`${role} is not found in both Table & Player !`);
+            throw new TypeError(`${role.name} is not found in both Table & Player !`);
           else
             roleCard = tempPlayer.getRole();
         }
@@ -343,15 +343,21 @@ export class Game {
       }
 
       setTimeout(() => {
-        if (players && players.length > 0) {
-          _.map(players, (player) => {
+        _.map(_.filter(this.players, (p) => p.getOriginalRole().checkRole([role])),
+          (player) => {
+            // Start - prevent auto shadow action in Copycat.endTurn()
+            let role: any = player.getOriginalRole();
+            let shadowRoleName: string = (role.shadowChoice ? role.shadowChoice.name.toLowerCase() : "");
+            if (this.getPhase() == Game.PHASE_WAKEUP_COPYCAT && shadowRoleName)
+              return; // If the already shadow someone, then skip endTurn;
+            // End - prevent auto shadow action in Copycat.endTurn()
+
             let footprint: ActionFootprint;
             footprint = player.getOriginalRole().endTurn(this.msgInterface, msg, this.players, this.table, player);
 
             if (footprint && footprint.action)
               this.actionStack.push(footprint);
           });
-        }
 
         resolve();
       }, timeDuration);
@@ -422,7 +428,7 @@ export class Game {
       
       //console.log('this.result', util.inspect(this.result, false, 3));
       _.map(deaths, (death: Result) => {
-        if (death.target.getOriginalRole().checkRole(RoleClass.HUNTER)) {
+        if (death.target.getOriginalRole().checkRole([RoleClass.HUNTER])) {
           this.deathPlayers.push(_.assignIn(death.target.getKillTarget(), {"count": "HUNTER"}));
         }
         this.deathPlayers.push(_.assignIn(death.target, { "count": death.count }));
@@ -460,7 +466,7 @@ export class Game {
       result += _.map(this.actionStack, (step: ActionFootprint) => {
         let rolePrefix = "";
         let role: any;
-        if (step.player.getOriginalRole().name == RoleClass.DOPPELGANGER.name) {
+        if (step.player.getOriginalRole().name == RoleClass.DOPPELGANGER.name || step.player.getOriginalRole().name == RoleClass.COPYCAT.name ) {
           role = step.player.getOriginalRole();
           rolePrefix = (role.shadowChoice ? role.shadowChoice.emoji : "");
         }
@@ -517,7 +523,7 @@ export class Game {
 
   private handleWakeUpEvent(event: string, msg: any, player: Player) {
     let footprint: ActionFootprint;
-    if (player.getOriginalRole().checkRole(RoleClass.DOPPELGANGER)) { // The player is Doppelganger
+    if (player.getOriginalRole().checkRole([RoleClass.DOPPELGANGER])) { // The player is Doppelganger
       let role: any = player.getOriginalRole();
       let shadowRoleName: string = (role.shadowChoice ? role.shadowChoice.name.toLowerCase() : "");
 
@@ -532,7 +538,7 @@ export class Game {
         return;
       }
     }
-    else if (player.getOriginalRole().checkRole(RoleClass.COPYCAT)) { // The player is Copycat
+    else if (player.getOriginalRole().checkRole([RoleClass.COPYCAT])) { // The player is Copycat
       let role: any = player.getOriginalRole();
       let shadowRoleName: string = (role.shadowChoice ? role.shadowChoice.name.toLowerCase() : "");
 
@@ -637,8 +643,8 @@ export class Game {
   private determineWinners(deathPlayers: Player[]) {
     let winners: Player[] = [];
 
-    const deathTanners = _.filter(deathPlayers, player => player.getRole().checkRole(RoleClass.TANNER));
-    const deathWerewolfs = _.filter(deathPlayers, player => player.getRole().checkRole(RoleClass.WEREWOLF));
+    const deathTanners = _.filter(deathPlayers, player => player.getRole().checkRole([RoleClass.TANNER]));
+    const deathWerewolfs = _.filter(deathPlayers, player => player.getRole().checkRole([RoleClass.WEREWOLF]));
     const deathVillages = _.filter(deathPlayers, player => _.indexOf([
       RoleClass.WEREWOLF.name, RoleClass.MINION.name, RoleClass.TANNER.name
     ], player.getRole().name) < 0);
@@ -680,7 +686,7 @@ export class Game {
   }
 
   private hasWerewolfOnTable() {
-    const werewolfs = _.filter(this.players, player => player.getRole().checkRole(RoleClass.WEREWOLF));
+    const werewolfs = _.filter(this.players, player => player.getRole().checkRole([RoleClass.WEREWOLF]));
     return werewolfs.length > 0;
   }
 

@@ -156,7 +156,7 @@ export class Doppelganger extends Role implements RoleInterface {
           if (target) {
             this.shadowChoice = _.clone(target.getRole());
             console.log(`${this.name} useAbility.Assign: ${this.shadowChoice.name}`);
-            //this.emoji += this.shadowChoice.emoji;
+            
             rtnMsg = `${target.name} : ${target.getRole().fullName}`;
             rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, `cloned ${target.getRole().emoji}${target.name}`);
           }
@@ -278,21 +278,18 @@ export class Doppelganger extends Role implements RoleInterface {
     return rtnActionEvt;
   }
 
-  checkRole(roleName, chkDoppelGanger: boolean = true) {
-    //chkShadow is deduce use shadowChoice or real role(DoppelGanger)
-    if (!(roleName instanceof Array) && roleName.name.toUpperCase() == RoleClass.DOPPELGANGER.name.toUpperCase())// If role checked is DoppelGanger, always true for this
+  checkRole(roleName: RoleClassInterface[], chkShadow: boolean = true) {
+    if (roleName.length == 1 && roleName[0].name.toUpperCase() == RoleClass.DOPPELGANGER.name.toUpperCase())
       return true;
-    else if (roleName instanceof Array) // Otherwise check depends on chkShadow
-      return _.includes(_.map(roleName, (r) => r.name.toUpperCase()), (chkDoppelGanger ? (this.shadowChoice ? this.shadowChoice.name : this.name) : this.name).toUpperCase());
     else
-      return (chkDoppelGanger ? (this.shadowChoice ? this.shadowChoice.name : this.name) : this.name).toUpperCase() == roleName.name.toUpperCase();
+      return !!(_.find(roleName, { name: (chkShadow ? (this.shadowChoice ? this.shadowChoice.name : this.name) : this.name) }));
   }
 
   // Werewolf, Minion, Mason Handler
   private getRolePlayers(role: RoleClassInterface, players) {
     let target: Player[];
     let rtnMsg: string;
-    target = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(role));
+    target = _.filter(players, (player: Player) => player.getOriginalRole().checkRole([role]));
     rtnMsg = _.map(target, (player: Player) => role.emoji + player.name).join(" ");
 
     return rtnMsg;

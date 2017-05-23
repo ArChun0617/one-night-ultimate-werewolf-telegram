@@ -23,7 +23,7 @@ export interface RoleInterface {
   useAbility(bot, msg, players: Player[], table: Table, host: Player);
   endTurn(bot, msg, players: Player[], table, host: Player);
   notifyRole(bot, msg);
-  checkRole(roleName);
+  checkRole(roleName: RoleClassInterface[], chkShadow: boolean);
 }
 
 export class RoleClass {
@@ -74,10 +74,8 @@ export class Role implements RoleInterface {
     bot.showNotification(msg.id, `Your role is ${this.fullName}`);
   }
 
-  checkRole(roleName, chkShadow: boolean = true) {  //chkShadow is used for doppelganger, for other role no difference
-    if (roleName instanceof Array)
-      return _.includes(_.map(roleName, (r: RoleClassInterface) => r.name.toUpperCase()), this.name.toUpperCase());
-    else
-      return this.name.toUpperCase() == roleName.name.toUpperCase();
+  checkRole(roleName: RoleClassInterface[], chkShadow: boolean = true) {  //chkShadow is used for doppelganger, for other role no difference
+    //return _.includes(_.map(roleName, (r: RoleClassInterface) => r.name.toUpperCase()), this.name.toUpperCase());
+    return !!(_.find(roleName, { name: this.name }));
   }
 }

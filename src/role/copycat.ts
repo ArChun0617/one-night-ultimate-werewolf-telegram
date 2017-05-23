@@ -69,7 +69,6 @@ export class Copycat extends Role implements RoleInterface {
     }
     else
     {
-
       switch (this.shadowChoice ? this.shadowChoice.name : "") {
         case RoleClass.WEREWOLF.name:
           if (msg.data == "WAKE_UP") {
@@ -77,7 +76,7 @@ export class Copycat extends Role implements RoleInterface {
             rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
           }
           else if ((msg.data == "CARD_A" || msg.data == "CARD_B" || msg.data == "CARD_C")) {
-            const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(RoleClass.WEREWOLF));
+            const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().checkRole([RoleClass.WEREWOLF]));
 
             if (this.choice) {
               rtnMsg = "You already make your choice.";
@@ -316,21 +315,19 @@ export class Copycat extends Role implements RoleInterface {
     return rtnActionEvt;
   }
 
-  checkRole(roleName, chkDoppelGanger: boolean = true) {
+  checkRole(roleName: RoleClassInterface[], chkShadow: boolean = true) {
     //chkShadow is deduce use shadowChoice or real role(DoppelGanger)
-    if (!(roleName instanceof Array) && roleName.name.toUpperCase() == RoleClass.COPYCAT.name.toUpperCase())// If role checked is Copycat, always true for this
+    if (roleName.length == 1 && roleName[0].name.toUpperCase() == RoleClass.COPYCAT.name.toUpperCase())
       return true;
-    else if (roleName instanceof Array) // Otherwise check depends on chkShadow
-      return _.includes(_.map(roleName, (r) => r.name.toUpperCase()), (chkDoppelGanger ? (this.shadowChoice ? this.shadowChoice.name : this.name) : this.name).toUpperCase());
     else
-      return (chkDoppelGanger ? (this.shadowChoice ? this.shadowChoice.name : this.name) : this.name).toUpperCase() == roleName.name.toUpperCase();
+      return !!(_.find(roleName, { name: (chkShadow ? (this.shadowChoice ? this.shadowChoice.name : this.name) : this.name) }));
   }
 
   // Werewolf, Minion, Mason Handler
   private getRolePlayers(role: RoleClassInterface, players) {
     let target: Player[];
     let rtnMsg: string;
-    target = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(role));
+    target = _.filter(players, (player: Player) => player.getOriginalRole().checkRole([role]));
     rtnMsg = _.map(target, (player: Player) => role.emoji + player.name).join(" ");
 
     return rtnMsg;

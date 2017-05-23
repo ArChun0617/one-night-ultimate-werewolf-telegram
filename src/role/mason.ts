@@ -58,7 +58,7 @@ export class Mason extends Role implements RoleInterface {
   private getRolePlayers(role: RoleClassInterface, players) {
     let target: Player[];
     let rtnMsg: string;
-    target = _.filter(players, (player: Player) => player.getOriginalRole().checkRole(role));
+    target = _.filter(players, (player: Player) => player.getOriginalRole().checkRole([role]));
     rtnMsg = _.map(target, (player: Player) => role.emoji + player.name).join(" ");
 
     return rtnMsg;
