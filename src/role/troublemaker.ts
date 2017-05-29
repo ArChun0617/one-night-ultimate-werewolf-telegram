@@ -121,7 +121,7 @@ export class Troublemaker extends Role implements RoleInterface {
     }
     else if (this.choice) {
       //Random second player
-      const targets = _.filter(players, p => p.id !== host.id); // not host
+      const targets = _.filter(players, p => (p.id !== host.id && p.id !== parseInt(this.choice))); // not host && first choice
       const pos = _.random(0, targets.length - 1);
       this.choice += "_" + targets[pos].id;
 
