@@ -44,11 +44,11 @@ bot.onText(/\/adminlist/, (msg) => {
   bot.sendMessage(msg.chat.id, `${Emoji.get('microphone')} Running Game: \n ${gameIds.join("\n")}`);
 });
 
-bot.onText(/\/adminsay\s\d+\s.+/, (msg) => {
+bot.onText(/\/adminsay\s[-]*\d+\s.+/, (msg) => {
   if (msg.chat.id <= 0) return; //Prevent the action run in group
 
   console.log(`/adminsay >> Announ: ${msg.text}`);
-  const regex = /\/adminsay\s(\d+)\s(.+)/;
+  const regex = /\/adminsay\s([-]*\d+)\s(.+)/;
   const para: string[] = regex.exec(msg.text);
   const chatId: number = parseInt(para[1]);
   const text: string = para[2];
@@ -126,13 +126,13 @@ bot.onText(/\/newgame/, (msg) => {
     gameSettings.push(gameSetting);
 
     addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 1 - 0
-    addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 2 - 0
-    addGameSettingRole(msg.id, gameSetting, RoleClass.SEER);             // 3 - 0
-    addGameSettingRole(msg.id, gameSetting, RoleClass.ROBBER);           // 4 - 0
-    addGameSettingRole(msg.id, gameSetting, RoleClass.INSOMNIAC);        // 5 - 0
-    addGameSettingRole(msg.id, gameSetting, RoleClass.TROUBLEMAKER);     // 6 - 3p
-    addGameSettingRole(msg.id, gameSetting, RoleClass.MINION);           // 7 - 4p
-    addGameSettingRole(msg.id, gameSetting, RoleClass.COPYCAT);          // 8 - 5p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.SEER);             // 2 - 0
+    addGameSettingRole(msg.id, gameSetting, RoleClass.ROBBER);           // 3 - 0
+    addGameSettingRole(msg.id, gameSetting, RoleClass.INSOMNIAC);        // 4 - 0
+    addGameSettingRole(msg.id, gameSetting, RoleClass.TROUBLEMAKER);     // 5 - 0
+    addGameSettingRole(msg.id, gameSetting, RoleClass.MINION);           // 6 - 3p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.COPYCAT);          // 7 - 4p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 8 - 5p
     //addGameSettingRole(msg.id, gameSetting, RoleClass.DOPPELGANGER);     // 8 - 5p
     addGameSettingRole(msg.id, gameSetting, RoleClass.TANNER);           // 9 - 6p
     addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 10- 7p

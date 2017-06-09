@@ -7,11 +7,13 @@ import { ActionFootprint } from "../util/ActionFootprint";
 export class RoleClassInterface {
   emoji: string;
   name: string;
-  ordering: number
+  max_per_game: number;
+  ordering: number;
 
-  constructor(_emoji: string, _name: string, _ordering) {
+  constructor(_emoji: string, _name: string, _max_per_game: number, _ordering: number) {
     this.emoji = _emoji;
     this.name = _name;
+    this.max_per_game = _max_per_game;
     this.ordering = _ordering;
   }
 }
@@ -27,19 +29,19 @@ export interface RoleInterface {
 }
 
 export class RoleClass {
-  public static COPYCAT: RoleClassInterface = new RoleClassInterface(`${Emoji.get('beer')}`, 'Copycat', 9);
-  public static DOPPELGANGER: RoleClassInterface = new RoleClassInterface(`${Emoji.get('ghost')}`, 'Doppelganger', 10);
-  public static WEREWOLF: RoleClassInterface = new RoleClassInterface(`${Emoji.get('smirk_cat')}`, 'Werewolf', 20);
-  public static MINION: RoleClassInterface = new RoleClassInterface(`${Emoji.get('dog')}`, 'Minion', 30);
-  public static MASON: RoleClassInterface = new RoleClassInterface(`${Emoji.get('two_men_holding_hands')}`, 'Mason', 40);
-  public static SEER: RoleClassInterface = new RoleClassInterface(`${Emoji.get('crystal_ball')}`, 'Seer', 50);
-  public static ROBBER: RoleClassInterface = new RoleClassInterface(`${Emoji.get('knife')}`, 'Robber', 60);
-  public static TROUBLEMAKER: RoleClassInterface = new RoleClassInterface(`${Emoji.get('smiling_imp')}`, 'Troublemaker', 70);
-  public static DRUNK: RoleClassInterface = new RoleClassInterface(`${Emoji.get('beer')}`, 'Drunk', 80);
-  public static INSOMNIAC: RoleClassInterface = new RoleClassInterface(`${Emoji.get('alarm_clock')}`, 'Insomniac', 90);
-  public static VILLAGER: RoleClassInterface = new RoleClassInterface(`${Emoji.get('boy')}`, 'Villager', 999);
-  public static TANNER: RoleClassInterface = new RoleClassInterface(`${Emoji.get('hammer')}`, 'Tanner', 997);
-  public static HUNTER: RoleClassInterface = new RoleClassInterface(`${Emoji.get('gun')}`, 'Hunter', 998);
+  public static COPYCAT: RoleClassInterface = new RoleClassInterface(`${Emoji.get('beer')}`, 'Copycat', 1, 9);
+  public static DOPPELGANGER: RoleClassInterface = new RoleClassInterface(`${Emoji.get('ghost')}`, 'Doppelganger', 1, 10);
+  public static WEREWOLF: RoleClassInterface = new RoleClassInterface(`${Emoji.get('smirk_cat')}`, 'Werewolf', 2, 20);
+  public static MINION: RoleClassInterface = new RoleClassInterface(`${Emoji.get('dog')}`, 'Minion', 1, 30);
+  public static MASON: RoleClassInterface = new RoleClassInterface(`${Emoji.get('two_men_holding_hands')}`, 'Mason', 2, 40);
+  public static SEER: RoleClassInterface = new RoleClassInterface(`${Emoji.get('crystal_ball')}`, 'Seer', 1, 50);
+  public static ROBBER: RoleClassInterface = new RoleClassInterface(`${Emoji.get('knife')}`, 'Robber', 1, 60);
+  public static TROUBLEMAKER: RoleClassInterface = new RoleClassInterface(`${Emoji.get('smiling_imp')}`, 'Troublemaker', 1, 70);
+  public static DRUNK: RoleClassInterface = new RoleClassInterface(`${Emoji.get('beer')}`, 'Drunk', 1, 80);
+  public static INSOMNIAC: RoleClassInterface = new RoleClassInterface(`${Emoji.get('alarm_clock')}`, 'Insomniac', 1, 90);
+  public static VILLAGER: RoleClassInterface = new RoleClassInterface(`${Emoji.get('boy')}`, 'Villager', 3, 999);
+  public static TANNER: RoleClassInterface = new RoleClassInterface(`${Emoji.get('hammer')}`, 'Tanner', 1, 997);
+  public static HUNTER: RoleClassInterface = new RoleClassInterface(`${Emoji.get('gun')}`, 'Hunter', 1, 998);
 }
 
 export class Role implements RoleInterface {
