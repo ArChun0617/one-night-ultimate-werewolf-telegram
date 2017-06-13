@@ -257,7 +257,7 @@ export class Copycat extends Role implements RoleInterface {
         }
         break;
       case RoleClass.TROUBLEMAKER.name:
-        const regex = new RegExp(/^\d_\d/);
+        const regex = new RegExp(/^\d+_\d+/);
         let targets: string[];
         if (regex.test(this.choice)) {
           //Already chose both player
