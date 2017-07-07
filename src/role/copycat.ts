@@ -13,7 +13,7 @@ export class Copycat extends Role implements RoleInterface {
   }
 
   wakeUp(bot, msg, players, table) {
-    console.log(`${this.name} wake up called`);
+    console.log(`${this.code} wake up called`);
 
     const key = [
       [
@@ -23,20 +23,20 @@ export class Copycat extends Role implements RoleInterface {
       ]
     ];
 
-    bot.editAction(`${this.fullName}, wake up.`, {
+    bot.editAction(this.fullName + this.lang.getString("ROLE_WAKE_UP"), {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {
         // `sended` is the sent message.
-        console.log(`${this.name} sended >> MessageID:${sended.message_id} Text:${sended.text}`);
+        console.log(`${this.code} sended >> MessageID:${sended.message_id} Text:${sended.text}`);
       });
   }
 
   useAbility(bot, msg, players, table, host) {
     let rtnMsg = '';
     let rtnActionEvt: ActionFootprint;
-    console.log(`${this.name} useAbility.${(this.shadowChoice ? this.shadowChoice.name : this.name)}: ${msg.data}`);
-    console.log(`${this.name} useAbility.choice: ${this.choice}`);
+    console.log(`${this.code} useAbility.${(this.shadowChoice ? this.shadowChoice.code : this.code)}: ${msg.data}`);
+    console.log(`${this.code} useAbility.choice: ${this.choice}`);
     /*
     if (!this.shadowChoice) {
       if (_.includes(["CARD_A", "CARD_B", "CARD_C"], msg.data)) {
@@ -55,22 +55,22 @@ export class Copycat extends Role implements RoleInterface {
             break;
         }
 
-        console.log(`${this.name} useAbility.Assign: ${this.shadowChoice.name}`);
+        console.log(`${this.code} useAbility.Assign: ${this.shadowChoice.name}`);
         rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, `cloned ${rtnMsg}`);
       }
     }
     else {
-      rtnMsg = "You already make your choice.";
+      rtnMsg = this.lang.getString("ROLE_ALREADY_CHOOSE");
     }
     */
 
     if (this.shadowChoice && _.includes(["COPYCAT_CARD_A", "COPYCAT_CARD_B", "COPYCAT_CARD_C"], msg.data)) {
-      rtnMsg = "You already make your choice.";
+      rtnMsg = this.lang.getString("ROLE_ALREADY_CHOOSE");
     }
     else
     {
-      switch (this.shadowChoice ? this.shadowChoice.name : "") {
-        case RoleClass.WEREWOLF.name:
+      switch (this.shadowChoice ? this.shadowChoice.code : "") {
+        case RoleClass.WEREWOLF.code:
           if (msg.data == "WAKE_UP") {
             this.choice = rtnMsg = this.getRolePlayers(RoleClass.WEREWOLF, players);
             rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
@@ -79,7 +79,7 @@ export class Copycat extends Role implements RoleInterface {
             const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().checkRole([RoleClass.WEREWOLF]));
 
             if (this.choice) {
-              rtnMsg = "You already make your choice.";
+              rtnMsg = this.lang.getString("ROLE_ALREADY_CHOOSE");
             }
             else if (target.length == 1) {
               this.choice = msg.data;
@@ -87,23 +87,23 @@ export class Copycat extends Role implements RoleInterface {
               rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
             }
             else {
-              rtnMsg = "You cannot view the card.";
+              rtnMsg = this.lang.getString("ROLE_ACTION_VIEW_ERROR");
             }
           }
           break;
-        case RoleClass.MINION.name:
+        case RoleClass.MINION.code:
           if (msg.data == "WAKE_UP") {
             this.choice = rtnMsg = this.getRolePlayers(RoleClass.WEREWOLF, players);
             rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
           }
           break;
-        case RoleClass.MASON.name:
+        case RoleClass.MASON.code:
           if (msg.data == "WAKE_UP") {
             this.choice = rtnMsg = this.getRolePlayers(RoleClass.MASON, players);
             rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
           }
           break;
-        case RoleClass.SEER.name:
+        case RoleClass.SEER.code:
           if (!this.choice) {
             if (/^\d+$/.test(msg.data) || _.includes(["CARD_AB", "CARD_AC", "CARD_BC"], msg.data)) {
               this.choice = msg.data;
@@ -112,31 +112,31 @@ export class Copycat extends Role implements RoleInterface {
             }
           }
           else
-            rtnMsg = "You already make your choice.";
+            rtnMsg = this.lang.getString("ROLE_ALREADY_CHOOSE");
           break;
-        case RoleClass.ROBBER.name:
+        case RoleClass.ROBBER.code:
           if (!this.choice) {
             this.choice = msg.data;
             rtnMsg = this.swapPlayer(this.choice, host, players);
             rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
           }
           else
-            rtnMsg = "You already make your choice.";
+            rtnMsg = this.lang.getString("ROLE_ALREADY_CHOOSE");
           break;
-        case RoleClass.TROUBLEMAKER.name:
+        case RoleClass.TROUBLEMAKER.code:
           const regex = new RegExp(/^\d+_\d+/);
           if (regex.test(this.choice)) {
             //Already chose both player
-            rtnMsg = "You already make your choice.";
+            rtnMsg = this.lang.getString("ROLE_ALREADY_CHOOSE");
           }
           else if (this.choice) {
             //Chose only 1 player
             if (host.id == parseInt(msg.data)) {
-              rtnMsg = "Buddy, You cannot choose yourself.";
+              rtnMsg = this.lang.getString("ROLE_ACTION_TROUBLEMAKER_ERROR");
             }
             else if (this.choice == msg.data) {
               this.choice = "";
-              rtnMsg = "You have cancelled, choose 2 players to swap.";
+              rtnMsg = this.lang.getString("ROLE_ACTION_TROUBLEMAKER_CANCEL");
             }
             else {
               this.choice += "_" + msg.data;
@@ -147,16 +147,16 @@ export class Copycat extends Role implements RoleInterface {
           else {
             //Both not yet chose, now set the first player.
             if (host.id == parseInt(msg.data)) {
-              rtnMsg = "Buddy, You cannot choose yourself.";
+              rtnMsg = this.lang.getString("ROLE_ACTION_TROUBLEMAKER_ERROR");
             }
             else {
               this.choice = msg.data;
               const target: Player = _.find(players, (player: Player) => player.id == parseInt(this.choice));
-              rtnMsg = `You have choose ${target.name}, choose 1 more player to swap.`;
+              rtnMsg = this.lang.getString("ROLE_ACTION_TROUBLEMAKER_FIRST") + target.name;
             }
           }
           break;
-        case RoleClass.DRUNK.name:
+        case RoleClass.DRUNK.code:
           if (!this.choice) {
             if (_.includes(["CARD_A", "CARD_B", "CARD_C"], msg.data)) {
               this.choice = msg.data;
@@ -165,9 +165,9 @@ export class Copycat extends Role implements RoleInterface {
             }
           }
           else
-            rtnMsg = "You already make your choice.";
+            rtnMsg = this.lang.getString("ROLE_ALREADY_CHOOSE");
           break;
-        case RoleClass.INSOMNIAC.name:
+        case RoleClass.INSOMNIAC.code:
           if (msg.data == "WAKE_UP") {
             this.choice = host.getRole().name;
             rtnMsg = host.getRole().fullName;
@@ -191,8 +191,8 @@ export class Copycat extends Role implements RoleInterface {
                 break;
             }
 
-            console.log(`${this.name} useAbility.Assign: ${this.shadowChoice.name}`);
-            rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, `cloned ${rtnMsg}`);
+            console.log(`${this.code} useAbility.Assign: ${this.shadowChoice.code}`);
+            rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, ` ${rtnMsg}`);
           }
           break;
         default:
@@ -205,32 +205,32 @@ export class Copycat extends Role implements RoleInterface {
   }
 
   endTurn(bot, msg, players, table, host) {
-    console.log(`${this.name} endTurn`);
+    console.log(`${this.code} endTurn`);
     let rtnMsg = "";
     let rtnActionEvt: ActionFootprint;
 
-    console.log(`${this.name} endTurn:shadowChoice ${(this.shadowChoice ? this.shadowChoice.name : "undefined")}`);
-    console.log(`${this.name} endTurn:choice ${this.choice}`);
-    switch (this.shadowChoice ? this.shadowChoice.name : "") {
-      case RoleClass.WEREWOLF.name:
+    console.log(`${this.code} endTurn:shadowChoice ${(this.shadowChoice ? this.shadowChoice.code : "undefined")}`);
+    console.log(`${this.code} endTurn:choice ${this.choice}`);
+    switch (this.shadowChoice ? this.shadowChoice.code : "") {
+      case RoleClass.WEREWOLF.code:
         if (!this.choice) {
           this.choice = rtnMsg = this.getRolePlayers(RoleClass.WEREWOLF, players);
           rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
         }
         break;
-      case RoleClass.MINION.name:
+      case RoleClass.MINION.code:
         if (!this.choice) {
           this.choice = rtnMsg = this.getRolePlayers(RoleClass.WEREWOLF, players);
           rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
         }
         break;
-      case RoleClass.MASON.name:
+      case RoleClass.MASON.code:
         if (!this.choice) {
           this.choice = rtnMsg = this.getRolePlayers(RoleClass.MASON, players);
           rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
         }
         break;
-      case RoleClass.SEER.name:
+      case RoleClass.SEER.code:
         if (!this.choice) {
           const key = ["CARD_AB", "CARD_AC", "CARD_BC"];
 
@@ -240,23 +240,23 @@ export class Copycat extends Role implements RoleInterface {
           });
 
           this.choice = _.shuffle(key)[0];
-          console.log(`${this.name} endTurn:choice_Shuffle ${this.choice}`);
+          console.log(`${this.code} endTurn:choice_Shuffle ${this.choice}`);
           rtnMsg = this.watchRole(this.choice, players, table);
 
           bot.answerCallbackQuery(msg.id, rtnMsg);
           rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
         }
         break;
-      case RoleClass.ROBBER.name:
+      case RoleClass.ROBBER.code:
         if (!this.choice) {
           const key = _.map(players, (player: Player) => player.id + "");
           this.choice = _.shuffle(key)[0];
-          console.log(`${this.name} endTurn:choice_Shuffle ${this.choice}`);
+          console.log(`${this.code} endTurn:choice_Shuffle ${this.choice}`);
           rtnMsg = this.swapPlayer(this.choice, host, players);
           rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
         }
         break;
-      case RoleClass.TROUBLEMAKER.name:
+      case RoleClass.TROUBLEMAKER.code:
         const regex = new RegExp(/^\d+_\d+/);
         let targets: string[];
         if (regex.test(this.choice)) {
@@ -269,7 +269,7 @@ export class Copycat extends Role implements RoleInterface {
           targets = _.filter(key, (k) => k !== host.id); // not host
           this.choice += "_" + _.shuffle(targets)[0];
 
-          console.log(`${this.name} endTurn:choice_Shuffle ${this.choice}`);
+          console.log(`${this.code} endTurn:choice_Shuffle ${this.choice}`);
           rtnMsg = this.swapPlayers(this.choice, players);
           rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
         }
@@ -279,20 +279,20 @@ export class Copycat extends Role implements RoleInterface {
           targets = _.shuffle(targets);
           this.choice = targets.pop() + "_" + targets.pop();
 
-          console.log(`${this.name} endTurn:choice_Shuffle ${this.choice}`);
+          console.log(`${this.code} endTurn:choice_Shuffle ${this.choice}`);
           rtnMsg = this.swapPlayers(this.choice, players);
           rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
         }
         break;
-      case RoleClass.DRUNK.name:
+      case RoleClass.DRUNK.code:
         if (!this.choice) {
           this.choice = _.shuffle(["CARD_A", "CARD_B", "CARD_C"])[0];
-          console.log(`${this.name} endTurn:choice_Shuffle ${this.choice}`);
+          console.log(`${this.code} endTurn:choice_Shuffle ${this.choice}`);
           rtnMsg = this.swapTable(this.choice, host, table);
           rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
         }
         break;
-      case RoleClass.INSOMNIAC.name:
+      case RoleClass.INSOMNIAC.code:
         if (!this.choice) {
           this.choice = host.getRole().name;
           rtnMsg = host.getRole().fullName;
@@ -301,12 +301,12 @@ export class Copycat extends Role implements RoleInterface {
         break;
       case "":
         //do nothing
-        console.log(`${this.name} endTurn:choice_Shuffle_empty zzz`);
+        console.log(`${this.code} endTurn:choice_Shuffle_empty zzz`);
         rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, `${Emoji.get('zzz')}`, true);
         break;
       default:
         //do nothing
-        console.log(`${this.name} endTurn:choice_Shuffle_empty zzz`);
+        console.log(`${this.code} endTurn:choice_Shuffle_empty zzz`);
         rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, `${Emoji.get('zzz')}`, true);
         break;
     }
@@ -317,10 +317,10 @@ export class Copycat extends Role implements RoleInterface {
 
   checkRole(roleName: RoleClassInterface[], chkShadow: boolean = true) {
     //chkShadow is deduce use shadowChoice or real role(DoppelGanger)
-    if (roleName.length == 1 && roleName[0].name.toUpperCase() == RoleClass.COPYCAT.name.toUpperCase())
+    if (roleName.length == 1 && roleName[0].code == RoleClass.COPYCAT.code)
       return true;
     else
-      return !!(_.find(roleName, { name: (chkShadow ? (this.shadowChoice ? this.shadowChoice.name : this.name) : this.name) }));
+      return !!(_.find(roleName, { code: (chkShadow ? (this.shadowChoice ? this.shadowChoice.code : this.code) : this.code) }));
   }
 
   // Werewolf, Minion, Mason Handler
@@ -335,7 +335,7 @@ export class Copycat extends Role implements RoleInterface {
 
   // Seer Handler
   private watchRole(picked: string, players, table) {
-    console.log(`${this.name} watchRole: ${picked}`);
+    console.log(`${this.code} watchRole: ${picked}`);
     let rtnMsg = "";
 
     const target: Player = _.find(players, (player: Player) => player.id == parseInt(picked));
@@ -374,7 +374,7 @@ export class Copycat extends Role implements RoleInterface {
 
   // Robber Handler
   private swapPlayer(picked: string, host, players) {
-    console.log(`${this.name} swapPlayer: ${picked}`);
+    console.log(`${this.code} swapPlayer: ${picked}`);
     let tableRole: Role;
     let rtnMsg = "";
     const target: Player = _.find(players, (player: Player) => player.id == parseInt(this.choice));
@@ -389,7 +389,7 @@ export class Copycat extends Role implements RoleInterface {
 
   // Troublemaker Handler
   private swapPlayers(picked: string, players) {
-    console.log(`${this.name} swapPlayers: ${picked}`);
+    console.log(`${this.code} swapPlayers: ${picked}`);
     let tableRole: Role;
     let rtnMsg = "";
     let chosenPlayer = picked.split('_');
@@ -408,7 +408,7 @@ export class Copycat extends Role implements RoleInterface {
 
   // Drunk Handler
   private swapTable(picked: string, host, table) {
-    console.log(`${this.name} swapTable: ${picked}`);
+    console.log(`${this.code} swapTable: ${picked}`);
     let tableRole: Role;
     let rtnMsg = "";
 
@@ -435,7 +435,7 @@ export class Copycat extends Role implements RoleInterface {
         rtnMsg += `${Emoji.get('question')}${Emoji.get('question')}${this.emoji}`;
         break;
       default:
-        rtnMsg = "Invalid action";
+        rtnMsg = this.lang.getString("ROLE_INVALID_ACTION");
         break;
     }
 

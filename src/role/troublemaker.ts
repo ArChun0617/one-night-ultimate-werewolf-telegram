@@ -12,7 +12,7 @@ export class Troublemaker extends Role implements RoleInterface {
   }
 
   wakeUp(bot, msg, players, table) {
-    console.log(`${this.name} wake up called`);
+    console.log(`${this.code} wake up called`);
     // sendMessage [Player1 <> Player2] [Player1 <> Player3] ...
     const key = [];
     let pos = 0;
@@ -25,12 +25,12 @@ export class Troublemaker extends Role implements RoleInterface {
       pos++;
     });
 
-    bot.editAction(`${this.fullName}, wake up. Please select 2 player to swap their role. To cancel your selection, select the same again.`, {
+    bot.editAction(this.fullName + this.lang.getString("ROLE_WAKE_UP_TROUBLEMAKER"), {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {
         // `sended` is the sent message.
-        console.log(`${this.name} sended >> MessageID:${sended.message_id} Text:${sended.text}`);
+        console.log(`${this.code} sended >> MessageID:${sended.message_id} Text:${sended.text}`);
       });
 
     /*_.map(players, (playerFrom: Player) => {
@@ -53,33 +53,33 @@ export class Troublemaker extends Role implements RoleInterface {
     })
       .then((sended) => {
         // `sended` is the sent message.
-        console.log(`${this.name} sended >> MessageID:${sended.message_id} Text:${sended.text}`);
+        console.log(`${this.code} sended >> MessageID:${sended.message_id} Text:${sended.text}`);
       });*/
   }
 
   useAbility(bot, msg, players, table, host) {
-    console.log(`${this.name} useAbility.msg.data: ${msg.data}`);
+    console.log(`${this.code} useAbility.msg.data: ${msg.data}`);
     let rtnActionEvt: ActionFootprint;
     let rtnMsg = '';
 
     const regex = new RegExp(/^\d+_\d+/);
 
-    console.log(`${this.name} useAbility:choice ${this.choice}`);
+    console.log(`${this.code} useAbility:choice ${this.choice}`);
     if (regex.test(this.choice)) {
       //Already chose both player
-      rtnMsg = "You already make your choice.";
+      rtnMsg = this.lang.getString("ROLE_ALREADY_CHOOSE");
     }
     else if (this.choice) {
       if (!/^\d+$/.test(msg.data))
-        rtnMsg = "Invalid action";
+        rtnMsg = this.lang.getString("ROLE_INVALID_ACTION");
       else {
         //Chose only 1 player
         if (host.id == parseInt(msg.data)) {
-          rtnMsg = "Buddy, You cannot choose yourself.";
+          rtnMsg = this.lang.getString("ROLE_ACTION_TROUBLEMAKER_ERROR");
         }
         else if (this.choice == msg.data) {
           this.choice = "";
-          rtnMsg = "You have cancelled, choose 2 players to swap.";
+          rtnMsg = this.lang.getString("ROLE_ACTION_TROUBLEMAKER_CANCEL");
         }
         else {
           this.choice += "_" + msg.data;
@@ -90,16 +90,16 @@ export class Troublemaker extends Role implements RoleInterface {
     }
     else {
       if (!/^\d+$/.test(msg.data))
-        rtnMsg = "Invalid action";
+        rtnMsg = this.lang.getString("ROLE_INVALID_ACTION");
       else {
         //Both not yet chose, now set the first player.
         if (host.id == parseInt(msg.data)) {
-          rtnMsg = "Buddy, You cannot choose yourself.";
+          rtnMsg = this.lang.getString("ROLE_ACTION_TROUBLEMAKER_ERROR");
         }
         else {
           this.choice = msg.data;
           const target: Player = _.find(players, (player: Player) => player.id == msg.data);
-          rtnMsg = `You have choose ${target.name}, choose 1 more player to swap.`;
+          rtnMsg = this.lang.getString("ROLE_ACTION_TROUBLEMAKER_FIRST") + target.name;
         }
       }
     }
@@ -108,13 +108,13 @@ export class Troublemaker extends Role implements RoleInterface {
   }
 
   endTurn(bot, msg, players: Player[], table, host: Player) {
-    console.log(`${this.name} endTurn`);
+    console.log(`${this.code} endTurn`);
     let rtnMsg = '';
     let actionEvt: any;
 
     const regex = new RegExp(/^\d+_\d+/);
 
-    console.log(`${this.name} endTurn:choice ${this.choice}`);
+    console.log(`${this.code} endTurn:choice ${this.choice}`);
     if (regex.test(this.choice)) {
       //Already chose both player
       //do nothing
@@ -125,7 +125,7 @@ export class Troublemaker extends Role implements RoleInterface {
       const pos = _.random(0, targets.length - 1);
       this.choice += "_" + targets[pos].id;
 
-      console.log(`${this.name} endTurn:choice_Shuffle ${this.choice}`);
+      console.log(`${this.code} endTurn:choice_Shuffle ${this.choice}`);
       rtnMsg = this.swapPlayers(this.choice, players);
       this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
     }
@@ -140,7 +140,7 @@ export class Troublemaker extends Role implements RoleInterface {
       pos = _.random(0, targets.length - 1);
       this.choice += "_" + targets[pos].id;
 
-      console.log(`${this.name} endTurn:choice_Shuffle ${this.choice}`);
+      console.log(`${this.code} endTurn:choice_Shuffle ${this.choice}`);
       rtnMsg = this.swapPlayers(this.choice, players);
       this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
     }

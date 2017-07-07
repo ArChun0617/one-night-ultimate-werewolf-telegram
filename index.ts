@@ -1,10 +1,11 @@
-import * as _ from 'lodash';
+﻿import * as _ from 'lodash';
 import * as TelegramBot from 'node-telegram-bot-api';
 import * as Emoji from 'node-emoji';
 import { Game } from './src/game';
 import { Role, RoleClass, RoleClassInterface } from "./src/role/role";
 import { Player } from "./src/player/player";
 import { GameEndError } from "./src/error/gameend";
+import { Language } from "./src/util/language";
 
 interface GameSetting {
   id: string;
@@ -20,6 +21,7 @@ const gameSettings: GameSetting[] = [];
 const games = [];
 const token = '331592410:AAHy9uA7PLWBHmIcNcyNt78hT6XLarrOjHM';
 let bot = new TelegramBot(token, { polling: true });
+let lang = new Language();
 const roles = [
   { name: RoleClass.COPYCAT.name, max: 1 },
   { name: RoleClass.DOPPELGANGER.name, max: 1 },
@@ -70,6 +72,8 @@ bot.onText(/\/adminsay\s[-]*\d+\s.+/, (msg) => {
 });
 
 bot.onText(/\/setting/, (msg) => {
+  return;
+  /*
   const game = getGame(msg.chat.id);
 
   // validation game isStarted
@@ -92,7 +96,7 @@ bot.onText(/\/setting/, (msg) => {
   _.map(roles, (role) => {
     let row = pos / btnPerLine | 0;
     if (!key[row]) key[row] = [];
-    key[row].push({ text: role.name, callback_data: `SET_ROLE_${role.name}` });
+    key[row].push({ text: role.name, callback_data: `SET_ROLE_${role.code}` });
     pos++;
   });
 
@@ -103,6 +107,25 @@ bot.onText(/\/setting/, (msg) => {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     }
   );
+  */
+});
+
+bot.onText(/\/setlang/, (msg) => {
+  const game = getGame(msg.chat.id);
+
+  if (!game) return askForCreateNewGame(msg.chat.id);
+  if (game.isStarted()) return sendGameHasBeenStartedMessage(msg.chat.id);
+  
+  bot.sendMessage(
+    msg.chat.id, lang.getString("SET_LANG"),
+    {
+      reply_markup: JSON.stringify({
+        inline_keyboard: [
+          [{ text: "English", callback_data: `SET_LANG_EN`},{ text: "繁體中文", callback_data: `SET_LANG_ZHHK`}]
+        ]
+      })
+    }
+  );
 });
 
 bot.onText(/\/newgame/, (msg) => {
@@ -110,10 +133,7 @@ bot.onText(/\/newgame/, (msg) => {
   console.log(`newgame: chat.id: `, id);
   // validation and make sure one channel only have one game
   if (_.find(games, (g) => g.id === id)) {
-    bot.sendMessage(
-      msg.chat.id,
-      `${Emoji.get('no_entry_sign')}  Sorry. There is a game start in this channel, please \/join the game`
-    );
+    bot.sendMessage(msg.chat.id, lang.getString("GAME_FOUND"));
     return;
   }
 
@@ -125,22 +145,22 @@ bot.onText(/\/newgame/, (msg) => {
     gameSetting = { id: msg.chat.id, roles: [] };
     gameSettings.push(gameSetting);
 
+    addGameSettingRole(msg.id, gameSetting, RoleClass.COPYCAT);          // 7 - 4p
     addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 1 - 0
     addGameSettingRole(msg.id, gameSetting, RoleClass.SEER);             // 2 - 0
     addGameSettingRole(msg.id, gameSetting, RoleClass.ROBBER);           // 3 - 0
     addGameSettingRole(msg.id, gameSetting, RoleClass.INSOMNIAC);        // 4 - 0
     addGameSettingRole(msg.id, gameSetting, RoleClass.TROUBLEMAKER);     // 5 - 0
     addGameSettingRole(msg.id, gameSetting, RoleClass.MINION);           // 6 - 3p
-    addGameSettingRole(msg.id, gameSetting, RoleClass.COPYCAT);          // 7 - 4p
     addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 8 - 5p
     //addGameSettingRole(msg.id, gameSetting, RoleClass.DOPPELGANGER);     // 8 - 5p
     addGameSettingRole(msg.id, gameSetting, RoleClass.TANNER);           // 9 - 6p
     addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 10- 7p
     addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 11- 8p
     //addGameSettingRole(msg.id, gameSetting, RoleClass.DRUNK);            // 12- 9p
-    /*addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
-    addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
-    addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p*/
+    //addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
+    //addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
+    //addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
   }
 
   const players: Player[] = [
@@ -148,7 +168,7 @@ bot.onText(/\/newgame/, (msg) => {
   ];
 
   games.push(new Game(id, bot, players, gameSetting.roles));
-  bot.sendMessage(msg.chat.id, `${Emoji.get('star')}  Created a new game, please \/join the game or \/start the game.`);
+  bot.sendMessage(msg.chat.id, lang.getString("NEW_GAME"));
   console.log(`GAME ${id} has been created`);
 });
 
@@ -220,7 +240,7 @@ bot.onText(/\/start/, (msg) => {
 
 bot.onText(/\/delgame/, (msg) => {
   killGame(msg.chat.id);
-  bot.sendMessage(msg.chat.id, `${Emoji.get('bomb')}  Game terminated.`);
+  bot.sendMessage(msg.chat.id, lang.getString("GAME_TERMINATED"));
 });
 
 bot.onText(/\/vote/, (msg) => {
@@ -240,21 +260,20 @@ bot.on('callback_query', (msg) => {
   }
 
   const regex = new RegExp(/^SET_ROLE_(.+?)/);
-
   if (regex.test(msg.data)) {
     // game setting - set role
     switch (msg.data) {
-      case `SET_ROLE_${RoleClass.WEREWOLF.name}`: addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF); break;
-      case `SET_ROLE_${RoleClass.MINION.name}`: addGameSettingRole(msg.id, gameSetting, RoleClass.MINION); break;
-      case `SET_ROLE_${RoleClass.MASON.name}`: addGameSettingRole(msg.id, gameSetting, RoleClass.MASON); break;
-      case `SET_ROLE_${RoleClass.SEER.name}`: addGameSettingRole(msg.id, gameSetting, RoleClass.SEER); break;
-      case `SET_ROLE_${RoleClass.ROBBER.name}`: addGameSettingRole(msg.id, gameSetting, RoleClass.ROBBER); break;
-      case `SET_ROLE_${RoleClass.TROUBLEMAKER.name}`: addGameSettingRole(msg.id, gameSetting, RoleClass.TROUBLEMAKER); break;
-      case `SET_ROLE_${RoleClass.DRUNK.name}`: addGameSettingRole(msg.id, gameSetting, RoleClass.DRUNK); break;
-      case `SET_ROLE_${RoleClass.INSOMNIAC.name}`: addGameSettingRole(msg.id, gameSetting, RoleClass.INSOMNIAC); break;
-      case `SET_ROLE_${RoleClass.VILLAGER.name}`: addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER); break;
-      case `SET_ROLE_${RoleClass.HUNTER.name}`: addGameSettingRole(msg.id, gameSetting, RoleClass.HUNTER); break;
-      case `SET_ROLE_${RoleClass.TANNER.name}`: addGameSettingRole(msg.id, gameSetting, RoleClass.TANNER); break;
+      case `SET_ROLE_${RoleClass.WEREWOLF.code}`: addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF); break;
+      case `SET_ROLE_${RoleClass.MINION.code}`: addGameSettingRole(msg.id, gameSetting, RoleClass.MINION); break;
+      case `SET_ROLE_${RoleClass.MASON.code}`: addGameSettingRole(msg.id, gameSetting, RoleClass.MASON); break;
+      case `SET_ROLE_${RoleClass.SEER.code}`: addGameSettingRole(msg.id, gameSetting, RoleClass.SEER); break;
+      case `SET_ROLE_${RoleClass.ROBBER.code}`: addGameSettingRole(msg.id, gameSetting, RoleClass.ROBBER); break;
+      case `SET_ROLE_${RoleClass.TROUBLEMAKER.code}`: addGameSettingRole(msg.id, gameSetting, RoleClass.TROUBLEMAKER); break;
+      case `SET_ROLE_${RoleClass.DRUNK.code}`: addGameSettingRole(msg.id, gameSetting, RoleClass.DRUNK); break;
+      case `SET_ROLE_${RoleClass.INSOMNIAC.code}`: addGameSettingRole(msg.id, gameSetting, RoleClass.INSOMNIAC); break;
+      case `SET_ROLE_${RoleClass.VILLAGER.code}`: addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER); break;
+      case `SET_ROLE_${RoleClass.HUNTER.code}`: addGameSettingRole(msg.id, gameSetting, RoleClass.HUNTER); break;
+      case `SET_ROLE_${RoleClass.TANNER.code}`: addGameSettingRole(msg.id, gameSetting, RoleClass.TANNER); break;
     }
 
     return;
@@ -262,7 +281,22 @@ bot.on('callback_query', (msg) => {
 
   // find the user and callback the Game on handler
   const game = getGame(msg.message.chat.id);
-  if (game) game.on(msg.data, msg); // Game event
+  if (game) 
+  {
+    if (msg.data == "SET_LANG_EN") {
+      lang.setLang("en");
+      game.setLang("en");
+      bot.sendMessage(msg.message.chat.id, lang.getString("LANG_SET"));
+    }
+    else if (msg.data == "SET_LANG_ZHHK") {
+      lang.setLang("zhHK");
+      game.setLang("zhHK");
+      bot.sendMessage(msg.message.chat.id, lang.getString("LANG_SET"));
+    }
+    else {
+      game.on(msg.data, msg); // Game event
+    }
+  }
   // return askForCreateNewGame(msg.message.chat.id);
 });
 
@@ -292,7 +326,7 @@ bot.onText(/\/showRole/, (msg, match) => {
     role.push(r.emoji + r.name);
   });
 
-  bot.sendMessage(msg.chat.id, `The game has following roles:\n` + role.join("\n"));
+  bot.sendMessage(msg.chat.id, lang.getString("GAME_ROLE_LIST") + role.join("\n"));
 });
 
 function killGame(id: number) {
@@ -308,29 +342,20 @@ function killGame(id: number) {
   console.log('games', _.map(games, (game: Game) => game.id));
 }
 
-bot.onText(/\/iisreset/, (msg) => {
-  console.log("IIS Reset");
-  bot = new TelegramBot(token, { polling: true });  //Rebuild the telegram connection
-
-  killGame(msg.chat.id);
-
-  bot.sendMessage(msg.chat.id, `${Emoji.get('bomb')}  Game Server Reset.`);
-});
-
 function getGame(id: number) {
   return _.find(games, (game) => game.id === id);
 }
 
 function askForCreateNewGame(msgId: number) {
-  return bot.sendMessage(msgId, `${Emoji.get('bomb')}  Sorry. Please create a new game (/newgame)`);
+  return bot.sendMessage(msgId, lang.getString("ASK_NEW_GAME"));
 }
 
 function sendGameHasBeenStartedMessage(msgId) {
-  bot.sendMessage(msgId, `${Emoji.get('no_entry_sign')}  Sorry. The game has been started, please wait until next game`);
+  bot.sendMessage(msgId, lang.getString("GAME_STARTED"));
 }
 
 function sendAskForSettingMessage(msgId) {
-  bot.sendMessage(msgId, `${Emoji.get('no_entry_sign')}  Sorry. Please run /setting first`);
+  bot.sendMessage(msgId, lang.getString("ASK_SETTING"));
 }
 
 console.log(`${Emoji.get('robot_face')}  Hi! I am up`);

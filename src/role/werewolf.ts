@@ -12,12 +12,12 @@ export class Werewolf extends Role implements RoleInterface {
   }
 
   wakeUp(bot, msg) {
-    console.log(`${this.name} wake up called`);
+    console.log(`${this.code} wake up called`);
     // notify buddies
     // IF single wolf, sendMessage Three buttons to choose
     // on callback_query lock the card
     const key = [
-      [{ text: `Wake Up${Emoji.get('eyes')}`, callback_data: "WAKE_UP" }],
+      [{ text: this.lang.getString("ROLE_ACTION_WAKE_UP"), callback_data: "WAKE_UP" }],
       [
         { text: `${this.emoji}${Emoji.get('question')}${Emoji.get('question')}`, callback_data: "CARD_A" },
         { text: `${Emoji.get('question')}${this.emoji}${Emoji.get('question')}`, callback_data: "CARD_B" },
@@ -26,12 +26,12 @@ export class Werewolf extends Role implements RoleInterface {
     ];
 
     //bot.sendMessage(msg.chat.id, `${this.emoji}  ${this.name}, wake up and look for other werewolves. If there is only one Werewolf, you may look at a card from the center.`, {
-    bot.editAction(`${this.fullName}, wake up.`, {
+    bot.editAction(this.fullName + this.lang.getString("ROLE_WAKE_UP"), {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {
         // `sended` is the sent message.
-        console.log(`${this.name} sended >> MessageID:${sended.message_id} Text:${sended.text}`);
+        console.log(`${this.code} sended >> MessageID:${sended.message_id} Text:${sended.text}`);
       });
   }
 
@@ -39,9 +39,9 @@ export class Werewolf extends Role implements RoleInterface {
     let rtnActionEvt: ActionFootprint;
 
     // TODO: avoid syntax error for testing first
-    console.log(`${this.name} useAbility.msg.data: ${msg.data}`);
+    console.log(`${this.code} useAbility.msg.data: ${msg.data}`);
 
-    console.log(`${this.name} useAbility:choice ${this.choice}`);
+    console.log(`${this.code} useAbility:choice ${this.choice}`);
     let rtnMsg: string = "";
     const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().checkRole([RoleClass.WEREWOLF]));
 
@@ -52,7 +52,7 @@ export class Werewolf extends Role implements RoleInterface {
     }
     else if ((msg.data == "CARD_A" || msg.data == "CARD_B" || msg.data == "CARD_C") && target.length == 1) {
       if (this.choice) {
-        rtnMsg = "You already make your choice.";
+        rtnMsg = this.lang.getString("ROLE_ALREADY_CHOOSE");
       }
       else {
         this.choice = msg.data;
@@ -61,7 +61,7 @@ export class Werewolf extends Role implements RoleInterface {
       }
     }
     else {
-      rtnMsg = "You cannot view the card.";
+      rtnMsg = this.lang.getString("ROLE_ACTION_VIEW_ERROR");
     }
 
     bot.showNotification(msg.id, rtnMsg);
@@ -70,10 +70,10 @@ export class Werewolf extends Role implements RoleInterface {
 
   endTurn(bot, msg, players, table, host) {
     // TODO: avoid syntax error for testing first
-    console.log(`${this.name} endTurn`);
+    console.log(`${this.code} endTurn`);
     let rtnMsg = "";
 
-    console.log(`${this.name} endTurn:choice ${this.choice}`);
+    console.log(`${this.code} endTurn:choice ${this.choice}`);
     if (!this.choice) {
       const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().checkRole([RoleClass.WEREWOLF]));
 
@@ -83,7 +83,7 @@ export class Werewolf extends Role implements RoleInterface {
       }
       else if (target.length == 1) {
         this.choice = _.shuffle(["CARD_A", "CARD_B", "CARD_C"])[0];
-        console.log(`${this.name} endTurn:choice_Shuffle ${this.choice}`);
+        console.log(`${this.code} endTurn:choice_Shuffle ${this.choice}`);
         rtnMsg = this.watchTable(this.choice, table);
       }
       else {
@@ -119,7 +119,7 @@ export class Werewolf extends Role implements RoleInterface {
         rtnMsg += `${Emoji.get('question')}${Emoji.get('question')}${table.getRight().fullName}`;
         break;
       default:
-        rtnMsg += "You cannot view the card in centre."
+        rtnMsg += this.lang.getString("ROLE_ACTION_WEREWOLF_VIEW_ERROR");
         break;
     }
 

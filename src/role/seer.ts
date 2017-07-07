@@ -12,7 +12,7 @@ export class Seer extends Role implements RoleInterface {
   }
 
   wakeUp(bot, msg, players, table) {
-    console.log(`${this.name} wake up called`);
+    console.log(`${this.code} wake up called`);
     // sendMessage [AB] [BC] [AC] [Player1] [Player2] ...
     // lock the option when callback_query
     const key = [];
@@ -33,26 +33,26 @@ export class Seer extends Role implements RoleInterface {
     ]);
 
     //bot.sendMessage(msg.chat.id, `${this.emoji}  ${this.name}, wake up. You may look at another player's card or two of the center cards.`, {
-    bot.editAction(`${this.fullName}, wake up.`, {
+    bot.editAction(this.fullName + this.lang.getString("ROLE_WAKE_UP"), {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {
         // `sended` is the sent message.
-        console.log(`${this.name} sended >> MessageID:${sended.message_id} Text:${sended.text}`);
+        console.log(`${this.code} sended >> MessageID:${sended.message_id} Text:${sended.text}`);
       });
   }
 
   useAbility(bot, msg, players, table, host) {
-    console.log(`${this.name} useAbility.msg.data: ${msg.data}`);
+    console.log(`${this.code} useAbility.msg.data: ${msg.data}`);
     let rtnActionEvt: ActionFootprint;
     let rtnMsg = '';
 
     if (this.choice) {
-      rtnMsg = "You already make your choice.";
+      rtnMsg = this.lang.getString("ROLE_ALREADY_CHOOSE");
     }
     else {
       if (!/^\d+$/.test(msg.data) && !_.includes(["CARD_AB", "CARD_AC", "CARD_BC"], msg.data))
-        rtnMsg = "Invalid action";
+        rtnMsg = this.lang.getString("ROLE_INVALID_ACTION");
       else {
         // TODO: avoid syntax error for testing first
         this.choice = msg.data;
@@ -66,10 +66,10 @@ export class Seer extends Role implements RoleInterface {
   }
 
   endTurn(bot, msg, players, table, host) {
-    console.log(`${this.name} endTurn`);
+    console.log(`${this.code} endTurn`);
     let rtnMsg = "";
 
-    console.log(`${this.name} endTurn:choice ${this.choice}`);
+    console.log(`${this.code} endTurn:choice ${this.choice}`);
     if (!this.choice) {
       const key = ["CARD_AB", "CARD_AC", "CARD_BC"];
 
@@ -79,7 +79,7 @@ export class Seer extends Role implements RoleInterface {
       });
 
       this.choice = _.shuffle(key)[0];
-      console.log(`${this.name} endTurn:choice_Shuffle ${this.choice}`);
+      console.log(`${this.code} endTurn:choice_Shuffle ${this.choice}`);
       rtnMsg = this.watchRole(this.choice, players, table);
 
       //bot.showNotification(msg.id, rtnMsg);

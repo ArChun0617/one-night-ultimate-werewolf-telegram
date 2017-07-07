@@ -9,6 +9,7 @@ import { Player } from "./player/player";
 import { Table } from "./npc/table";
 import { ActionFootprint } from "./util/ActionFootprint";
 import { MessagerInterface } from "./util/MessagerInterface";
+import { Language } from "./util/language";
 
 interface Result {
   target: Player;
@@ -22,21 +23,22 @@ export class Game {
   public static PHASE_PREPARE_DECK: string = 'prepare_deck';
   public static PHASE_ANNOUNCE_PLAYER_ROLE: string = 'announce_player_role';
   public static PHASE_START_NIGHT: string = 'start_night';
-  public static PHASE_WAKEUP_COPYCAT: string = 'wakeup_copycat';
-  public static PHASE_WAKEUP_DOPPELGANGER: string = 'wakeup_doppelganger';
-  public static PHASE_WAKEUP_WEREWOLF: string = 'wakeup_werewolf';
-  public static PHASE_WAKEUP_MINION: string = 'wakeup_minion';
-  public static PHASE_WAKEUP_MASON: string = 'wakeup_mason';
-  public static PHASE_WAKEUP_SEER: string = 'wakeup_seer';
-  public static PHASE_WAKEUP_ROBBER: string = 'wakeup_robber';
-  public static PHASE_WAKEUP_TROUBLEMAKER: string = 'wakeup_troublemaker';
-  public static PHASE_WAKEUP_DRUNK: string = 'wakeup_drunk';
-  public static PHASE_WAKEUP_INSOMNIAC: string = 'wakeup_insomniac';
+  public static PHASE_WAKEUP_COPYCAT: string = 'wakeup_role_copycat';
+  public static PHASE_WAKEUP_DOPPELGANGER: string = 'wakeup_role_doppelganger';
+  public static PHASE_WAKEUP_WEREWOLF: string = 'wakeup_role_werewolf';
+  public static PHASE_WAKEUP_MINION: string = 'wakeup_role_minion';
+  public static PHASE_WAKEUP_MASON: string = 'wakeup_role_mason';
+  public static PHASE_WAKEUP_SEER: string = 'wakeup_role_seer';
+  public static PHASE_WAKEUP_ROBBER: string = 'wakeup_role_robber';
+  public static PHASE_WAKEUP_TROUBLEMAKER: string = 'wakeup_role_troublemaker';
+  public static PHASE_WAKEUP_DRUNK: string = 'wakeup_role_drunk';
+  public static PHASE_WAKEUP_INSOMNIAC: string = 'wakeup_role_insomniac';
   public static PHASE_CONVERSATION: string = 'conversation';
   public static PHASE_VOTING: string = 'voting';
   public static PHASE_KILL_PLAYER: string = 'kill_player';
   public static PHASE_END_GAME: string = 'endgame';
-
+  
+  lang: Language = new Language();
   id: number;
   players: any[];
   table: Table = new Table();
@@ -66,9 +68,8 @@ export class Game {
 
   start(msg) {
     if (this.getPhase() != Game.PHASE_WAITING_PLAYER) return; //Prevent double start game
-
     console.log(`Game started: ${this.id}`);
-    this.msgInterface.sendMsg(`${Emoji.get('game_die')}  Game start`);
+    this.msgInterface.sendMsg(this.lang.getString("GAME_START"));
 
     if (this.players.length >= 3) {
       this.gameRoles = this.gameRoles.slice(0, this.players.length + 3);  // Auto apply role by number of user, *unless* user below 3, then debug mode.
@@ -102,7 +103,7 @@ export class Game {
       return Promise.reject('Number of players and roles doesn\'t match');
     }
 
-    return this.prepareDeck()
+    return this.prepareDeck(this.lang.culture)
       .then(() => console.log(`>> [Announce player role]`))
       .then(() => this.announcePlayerRole(msg, this.actionTime * 2))
       .then(() => {
@@ -162,11 +163,20 @@ export class Game {
     return role.join("\n");
   }
 
+  setLang(_lang: string) {
+    this.lang.setLang(_lang);
+  }
+
   getPhase(): string {
     return this.phase;
   }
 
   addPlayer(msg, player: Player) {
+    if (this.players.length >= 8) {
+      this.msgInterface.sendMsg(this.lang.getString("TOO_MANY_PLAYER"));
+      return;
+    }
+
     if (!this.getPlayer(player.id)) {
       this.players.push(player);
     }
@@ -176,7 +186,7 @@ export class Game {
       rtnMsg += `${player.name}\n`;
     });
 
-    this.msgInterface.sendMsg(`Player joined:\n${rtnMsg}`);
+    this.msgInterface.sendMsg(this.lang.getString("PLAYER_LIST") + rtnMsg);
   }
 
   getPlayer(id: number) {
@@ -189,7 +199,7 @@ export class Game {
     let readyPlayers: number = _.filter(this.players, (player: Player) => player.readyStart).length;
     let totalPlayers: number = this.players.length;
 
-    return (readyPlayers == totalPlayers ? "" : `${Emoji.get('microphone')} Wait for player to \/start... ${readyPlayers}/${totalPlayers}`);
+    return (readyPlayers == totalPlayers ? "" : this.lang.getString("WAIT_FOR_START") + readyPlayers + "/" + totalPlayers);
   }
 
   sendVotingList(msgId) {
@@ -207,9 +217,9 @@ export class Game {
       pos++;
     });
 
-    key.push([{ text: "Blank vote", callback_data: `-1` }]);
+    key.push([{ text: this.lang.getString("VOTE_BLANK"), callback_data: `-1` }]);
 
-    this.msgInterface.sendMsg(`${Emoji.get('arrow_right')}  Voting list ${Emoji.get('arrow_left')}`,
+    this.msgInterface.sendMsg(this.lang.getString("VOTE_LIST"),
       {
         reply_markup: JSON.stringify({ inline_keyboard: key })
       });
@@ -245,11 +255,16 @@ export class Game {
     }
   }
 
-  private prepareDeck() {
+  private prepareDeck(lang: string) {
     this.setPhase(Game.PHASE_PREPARE_DECK);
 
     return new Promise((resolve, reject) => {
       this.deck = DeckFactory.generate(this.gameRoles);
+
+      //Set the language
+      _.map(this.deck.getRoles(), (r: Role) => {
+        r.setLang(lang);
+      })
 
       // assign role
       _.map(this.players, (player) => {
@@ -285,11 +300,11 @@ export class Game {
       });
 
       this.msgInterface.sendMsg(
-        `${Emoji.get('eyeglasses')}  Everyone, please check your role. The game has below role\n  ` + role.join("\n  "),
+        this.lang.getString("GAME_CHECK_ROLE") + role.join("\n  "),
         {
           reply_markup: JSON.stringify({
             inline_keyboard: [
-              [{ text: `View your role${Emoji.get("black_joker")}`, callback_data: 'view_role' }]
+              [{ text: this.lang.getString("GAME_VIEW_ROLE"), callback_data: 'view_role' }]
             ]
           })
         }
@@ -303,8 +318,8 @@ export class Game {
   private startNight(msg, timeDuration: number) {
     this.setPhase(Game.PHASE_START_NIGHT);
 
-    return this.msgInterface.sendMsg(`${Emoji.get('crescent_moon')}  Night start, Everyone close your eye.`)
-      .then(() => this.msgInterface.sendMsg(`Game Start`))
+    return this.msgInterface.sendMsg(this.lang.getString("GAME_NIGHT_START"))
+      .then(() => this.msgInterface.sendMsg(this.lang.getString("GAME_START")))
       .then((sended) => this.msgInterface.actionID = sended.message_id)
       .then(() => this.wakeUp(msg, RoleClass.COPYCAT, timeDuration))
       .then(() => this.wakeUp(msg, RoleClass.DOPPELGANGER, timeDuration * 2))  // 2x action time for DoppelGanger
@@ -347,7 +362,7 @@ export class Game {
           (player) => {
             // Start - prevent auto shadow action in Copycat.endTurn()
             let role: any = player.getOriginalRole();
-            let shadowRoleName: string = (role.shadowChoice ? role.shadowChoice.name.toLowerCase() : "");
+            let shadowRoleName: string = (role.shadowChoice ? role.shadowChoice.code.toLowerCase() : "");
             if (this.getPhase() == Game.PHASE_WAKEUP_COPYCAT && shadowRoleName)
               return; // If the already shadow someone, then skip endTurn;
             // End - prevent auto shadow action in Copycat.endTurn()
@@ -368,9 +383,9 @@ export class Game {
     let now: Date = new Date(new Date().getTime() + gameDuration);
     this.setPhase(Game.PHASE_CONVERSATION);
 
-    this.msgInterface.editAction(
-      `${Emoji.get('hourglass_flowing_sand')}  Everyone wake up, you have ${gameDuration / 60 / 1000} mins to discuss ... \/vote at ${now.getHours() + ":" + ("0" + now.getMinutes()).slice(-2) + ":" + now.getSeconds()}\n If you dozed, try the button, It'll help.`, {
-        reply_markup: JSON.stringify({ inline_keyboard: [[{ text: `Oops... I dozed ${Emoji.get('zzz')}`, callback_data: "DOZED_WAKE_UP" }]] })
+    this.msgInterface.editAction(this.lang.getString("GAME_DAY_START") + (gameDuration / 60 / 1000) + this.lang.getString("GAME_DAY_START_VOTE") + (now.getHours() + ":" + ("0" + now.getMinutes()).slice(-2) + ":" + now.getSeconds()) + this.lang.getString("GAME_DAY_START_DOZED")
+      , {
+        reply_markup: JSON.stringify({ inline_keyboard: [[{ text: this.lang.getString("GAME_DAY_DOZED"), callback_data: "DOZED_WAKE_UP" }]] })
       }
     );
 
@@ -394,7 +409,7 @@ export class Game {
         resolve();
       }
       else {
-        this.msgInterface.sendMsg(`${Emoji.get('alarm_clock')}  Time\'s up. Everyone please vote.`)
+        this.msgInterface.sendMsg(this.lang.getString("VOTE_START"))
           .then(this.sendVotingList(msg.chat.id))
           .then(setTimeout(() => {
             // make sure every vote a player, random vote if needed
@@ -462,11 +477,11 @@ export class Game {
         result += `${loser.name} ${loser.getOriginalRole().emoji} ${Emoji.get('arrow_right')} ${loser.getRole().emoji}  ${Emoji.get('point_right')} ${loser.getKillTarget().name} \n`;
       });
 
-      result += `\nAction Stack \n`;
+      result += `\n${this.lang.getString("ACTION_STACK")} \n`;
       result += _.map(this.actionStack, (step: ActionFootprint) => {
         let rolePrefix = "";
         let role: any;
-        if (step.player.getOriginalRole().name == RoleClass.DOPPELGANGER.name || step.player.getOriginalRole().name == RoleClass.COPYCAT.name ) {
+        if (step.player.getOriginalRole().code == RoleClass.DOPPELGANGER.code || step.player.getOriginalRole().code == RoleClass.COPYCAT.code ) {
           role = step.player.getOriginalRole();
           rolePrefix = (role.shadowChoice ? role.shadowChoice.emoji : "");
         }
@@ -507,7 +522,7 @@ export class Game {
   }
 
   private sendInvalidActionMessage(msgId) {
-    return this.msgInterface.showNotification(msgId, `${Emoji.get('middle_finger')}  Hey! Stop doing that!`);
+    return this.msgInterface.showNotification(msgId, this.lang.getString("INVALID_ACTION"));
   }
 
   private viewPlayerRole(player, msg) {
@@ -525,7 +540,7 @@ export class Game {
     let footprint: ActionFootprint;
     if (player.getOriginalRole().checkRole([RoleClass.DOPPELGANGER])) { // The player is Doppelganger
       let role: any = player.getOriginalRole();
-      let shadowRoleName: string = (role.shadowChoice ? role.shadowChoice.name.toLowerCase() : "");
+      let shadowRoleName: string = (role.shadowChoice ? role.shadowChoice.code.toLowerCase() : "");
 
       if (this.getPhase() == Game.PHASE_WAKEUP_DOPPELGANGER && !shadowRoleName) {
         //If (DOPPELGANGER and not picked), Okay
@@ -540,7 +555,7 @@ export class Game {
     }
     else if (player.getOriginalRole().checkRole([RoleClass.COPYCAT])) { // The player is Copycat
       let role: any = player.getOriginalRole();
-      let shadowRoleName: string = (role.shadowChoice ? role.shadowChoice.name.toLowerCase() : "");
+      let shadowRoleName: string = (role.shadowChoice ? role.shadowChoice.code.toLowerCase() : "");
 
       if (this.getPhase() == Game.PHASE_WAKEUP_COPYCAT && !shadowRoleName) {
         //If (COPYCAT and not picked), Okay
@@ -554,7 +569,7 @@ export class Game {
         return;
       }
     }
-    else if (this.getPhase() !== 'wakeup_' + player.getOriginalRole().name.toLowerCase()) {
+    else if (this.getPhase() !== 'wakeup_' + player.getOriginalRole().code.toLowerCase()) {
       this.sendInvalidActionMessage(msg.id);
       return;
     }
@@ -576,7 +591,7 @@ export class Game {
         let rolePrefix = "";
         let role: any;
 
-        if (action.player.getOriginalRole().name == RoleClass.DOPPELGANGER.name) {
+        if (action.player.getOriginalRole().code == RoleClass.DOPPELGANGER.code) {
           role = action.player.getOriginalRole();
           rolePrefix = role.emoji + role.shadowChoice.emoji + role.shadowChoice.name;
         }
@@ -587,7 +602,7 @@ export class Game {
         this.msgInterface.showNotification(msg.id, `${rolePrefix} ${Emoji.get('arrow_right')} ${action.toString()}`);
       }
       else if (action && !action.dozed)
-        this.msgInterface.showNotification(msg.id, `${Emoji.get('middle_finger')}  You have woken up at night, LIAR !!`);
+        this.msgInterface.showNotification(msg.id, this.lang.getString("DAY_DOZED_FAKE"));
       else
         this.msgInterface.showNotification(msg.id, `${player.getOriginalRole().fullName} ${Emoji.get('arrow_right')} ${Emoji.get('zzz')}`);  //  For those has no action Village, Tanner, Hunter
     }
@@ -646,8 +661,8 @@ export class Game {
     const deathTanners = _.filter(deathPlayers, player => player.getRole().checkRole([RoleClass.TANNER]));
     const deathWerewolfs = _.filter(deathPlayers, player => player.getRole().checkRole([RoleClass.WEREWOLF]));
     const deathVillages = _.filter(deathPlayers, player => _.indexOf([
-      RoleClass.WEREWOLF.name, RoleClass.MINION.name, RoleClass.TANNER.name
-    ], player.getRole().name) < 0);
+      RoleClass.WEREWOLF.code, RoleClass.MINION.code, RoleClass.TANNER.code
+    ], player.getRole().code) < 0);
 
     console.log('>> determineWinners.deathPlayers', deathPlayers);
     console.log('>> determineWinners.deathTanners', deathTanners);
@@ -699,7 +714,7 @@ export class Game {
       rtnMsg = `${Emoji.get('arrow_right')} ${target.name}`;
     }
     else {
-      rtnMsg = `Invalid player selected !`;
+      rtnMsg = this.lang.getString("VOTE_ERROR");
     }
 
     this.msgInterface.showNotification(msg.id, rtnMsg);
@@ -741,7 +756,7 @@ export class Game {
     if (!timerArray) return;
     let interval = timerArray.shift();
     this.votingTimer = setTimeout(() => {
-      this.msgInterface.sendMsg(`${Emoji.get('microphone')} You have ${interval.count} ${unit} left...`);
+      this.msgInterface.sendMsg(this.lang.getString("COUNT_DOWN") + interval.count + " " + unit + "...");
       if (timerArray.length > 0) this.countDown(msg, timerArray, unit);
     }, interval.time);
   }
