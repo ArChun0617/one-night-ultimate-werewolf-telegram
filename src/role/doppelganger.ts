@@ -230,7 +230,6 @@ export class Doppelganger extends Role implements RoleInterface {
           else
             rtnMsg = this.lang.getString("ROLE_ACTION_ROLE_PLAYER") + rtnMsg;
 
-          bot.showNotification(msg.id, rtnMsg);
           rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
         }
         break;

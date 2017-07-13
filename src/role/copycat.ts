@@ -160,15 +160,15 @@ export class Copycat extends Role implements RoleInterface {
             switch (msg.data) {
               case "COPYCAT_CARD_A":
                 this.shadowChoice = _.clone(table.getLeft());
-                rtnMsg += `${this.shadowChoice.emoji}${Emoji.get('question')}${Emoji.get('question')}`;
+                rtnMsg += `${this.shadowChoice.fullName}${Emoji.get('question')}${Emoji.get('question')}`;
                 break;
               case "COPYCAT_CARD_B":
                 this.shadowChoice = _.clone(table.getCenter());
-                rtnMsg += `${Emoji.get('question')}${this.shadowChoice.emoji}${Emoji.get('question')}`;
+                rtnMsg += `${Emoji.get('question')}${this.shadowChoice.fullName}${Emoji.get('question')}`;
                 break;
               case "COPYCAT_CARD_C":
                 this.shadowChoice = _.clone(table.getRight());
-                rtnMsg += `${Emoji.get('question')}${Emoji.get('question')}${this.shadowChoice.emoji}`;
+                rtnMsg += `${Emoji.get('question')}${Emoji.get('question')}${this.shadowChoice.fullName}`;
                 break;
             }
 
@@ -248,7 +248,6 @@ export class Copycat extends Role implements RoleInterface {
           else
             rtnMsg = this.lang.getString("ROLE_ACTION_ROLE_PLAYER") + rtnMsg;
 
-          bot.answerCallbackQuery(msg.id, rtnMsg);
           rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
         }
         break;
