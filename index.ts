@@ -305,7 +305,7 @@ bot.on('callback_query', (msg) => {
 function addGameSettingRole(msgId: number, gameSetting: any, role: RoleClassInterface) {
   const roleSetting = _.find(roles, r => r.name === role.name);
 
-  if (_.filter(gameSetting.roles, (r) => r === role).length < roleSetting.max) {
+  if (_.filter(gameSetting.roles, (r) => r === role).length <= roleSetting.max) {
     gameSetting.roles.push(role);
     //bot.answerCallbackQuery(msgId, `${Emoji.get('white_check_mark')}  Added ${role}`);
   } else {
