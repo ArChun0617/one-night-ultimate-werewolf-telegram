@@ -23,7 +23,7 @@ export class Drunk extends Role implements RoleInterface {
       ]
     ];
     
-    bot.editAction(this.fullName + this.lang.getString("ROLE_WAKE_UP"), {
+    bot.editAction(this.fullName + this.lang.getString("ROLE_WAKE_UP") + this.lang.getString("ROLE_WAKE_UP_DRUNK"), {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {
@@ -47,6 +47,7 @@ export class Drunk extends Role implements RoleInterface {
       else {
         this.choice = msg.data;
         rtnMsg = this.swapTable(this.choice, host, table);
+        rtnMsg = this.lang.getString("ROLE_ACTION_WATCH_TABLE") + rtnMsg;
         rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
       }
     }
@@ -66,6 +67,7 @@ export class Drunk extends Role implements RoleInterface {
       rtnMsg = this.swapTable(this.choice, host, table);
 
       //bot.showNotification(msg.id, rtnMsg);
+      rtnMsg = this.lang.getString("ROLE_ACTION_WATCH_TABLE") + rtnMsg;
       this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
       return this.actionEvt;
     }

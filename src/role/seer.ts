@@ -33,7 +33,7 @@ export class Seer extends Role implements RoleInterface {
     ]);
 
     //bot.sendMessage(msg.chat.id, `${this.emoji}  ${this.name}, wake up. You may look at another player's card or two of the center cards.`, {
-    bot.editAction(this.fullName + this.lang.getString("ROLE_WAKE_UP"), {
+    bot.editAction(this.fullName + this.lang.getString("ROLE_WAKE_UP") + this.lang.getString("ROLE_WAKE_UP_SEER"), {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {
@@ -57,6 +57,12 @@ export class Seer extends Role implements RoleInterface {
         // TODO: avoid syntax error for testing first
         this.choice = msg.data;
         rtnMsg = this.watchRole(this.choice, players, table);
+
+        if (_.includes(["CARD_AB", "CARD_AC", "CARD_BC"], this.choice))
+          rtnMsg = this.lang.getString("ROLE_ACTION_WATCH_TABLE") + rtnMsg;
+        else
+          rtnMsg = this.lang.getString("ROLE_ACTION_ROLE_PLAYER") + rtnMsg;
+
         rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
       }
     }
@@ -81,6 +87,13 @@ export class Seer extends Role implements RoleInterface {
       this.choice = _.shuffle(key)[0];
       console.log(`${this.code} endTurn:choice_Shuffle ${this.choice}`);
       rtnMsg = this.watchRole(this.choice, players, table);
+
+      if (_.includes(["CARD_AB", "CARD_AC", "CARD_BC"], this.choice))
+        rtnMsg = this.lang.getString("ROLE_ACTION_WATCH_TABLE") + rtnMsg;
+      else
+        rtnMsg = this.lang.getString("ROLE_ACTION_ROLE_PLAYER") + rtnMsg;
+
+      console.log(`${this.code} endTurn.rtnMsg: ${rtnMsg}`);
 
       //bot.showNotification(msg.id, rtnMsg);
       this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);

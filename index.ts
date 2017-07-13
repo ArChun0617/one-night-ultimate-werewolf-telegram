@@ -18,7 +18,7 @@ let host = process.env.HOST;
 console.log(`port: ${port}`);
 
 const gameSettings: GameSetting[] = [];
-const games = [];
+const games: Game[] = [];
 const token = '331592410:AAHy9uA7PLWBHmIcNcyNt78hT6XLarrOjHM';
 let bot = new TelegramBot(token, { polling: true });
 let lang = new Language();
@@ -132,7 +132,9 @@ bot.onText(/\/newgame/, (msg) => {
   const id = msg.chat.id;
   console.log(`newgame: chat.id: `, id);
   // validation and make sure one channel only have one game
-  if (_.find(games, (g) => g.id === id)) {
+  const game = getGame(msg.chat.id);
+
+  if (game) {
     bot.sendMessage(msg.chat.id, lang.getString("GAME_FOUND"));
     return;
   }
@@ -207,7 +209,7 @@ bot.onText(/\/start/, (msg) => {
     return;
   }
 
-  console.log('gameSetting.roles', gameSetting.roles);
+  //console.log('gameSetting.roles', gameSetting.roles);
 
   let rtnReady: string = game.setPlayerReady(msg.from.id);
   if (rtnReady == "") {
@@ -244,7 +246,7 @@ bot.onText(/\/delgame/, (msg) => {
 });
 
 bot.onText(/\/vote/, (msg) => {
-  const game = _.find(games, (g) => g.id === msg.chat.id);
+  const game = getGame(msg.chat.id);
 
   if (!game) return askForCreateNewGame(msg.chat.id);
 
@@ -342,8 +344,8 @@ function killGame(id: number) {
   console.log('games', _.map(games, (game: Game) => game.id));
 }
 
-function getGame(id: number) {
-  return _.find(games, (game) => game.id === id);
+function getGame(id: number) : Game {
+  return _.find(games, (game: Game) => game.id === id);
 }
 
 function askForCreateNewGame(msgId: number) {

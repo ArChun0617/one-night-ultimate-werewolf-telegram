@@ -40,12 +40,12 @@ export class Doppelganger extends Role implements RoleInterface {
       { text: `${Emoji.get('question')}${Emoji.get('question')}${this.emoji}`, callback_data: "CARD_C" }
     ]);
 
-    bot.editAction(`${this.fullName}, wake up. Choose a player to copy his role.\n If you are ${RoleClass.SEER.emoji}${RoleClass.ROBBER.emoji}${RoleClass.TROUBLEMAKER.emoji}${RoleClass.DRUNK.emoji}, do your action now.\nIf you are ${RoleClass.WEREWOLF.emoji}${RoleClass.MINION.emoji}${RoleClass.MASON.emoji}${RoleClass.INSOMNIAC.emoji}, wait until their turn.`, {
+    bot.editAction(this.fullName + this.lang.getString("ROLE_WAKE_UP") + this.lang.getString("ROLE_WAKE_UP_COPYCAT"), {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {
         // `sended` is the sent message.
-        //console.log(`${this.code} sended >> MessageID:${sended.message_id} Text:${sended.text}`);
+        console.log(`${this.code} sended >> MessageID:${sended.message_id} Text:${sended.text}`);
       });
   }
 
@@ -60,18 +60,21 @@ export class Doppelganger extends Role implements RoleInterface {
       case RoleClass.WEREWOLF.code:
         if (msg.data == "WAKE_UP") {
           this.choice = rtnMsg = this.getRolePlayers(RoleClass.WEREWOLF, players);
+          rtnMsg = this.lang.getString(RoleClass.WEREWOLF.code) + this.lang.getString("ROLE_ACTION_ROLE_PLAYER") + rtnMsg;
           rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
         }
         break;
       case RoleClass.MINION.code:
         if (msg.data == "WAKE_UP") {
           this.choice = rtnMsg = this.getRolePlayers(RoleClass.WEREWOLF, players);
+          rtnMsg = this.lang.getString(RoleClass.WEREWOLF.code) + this.lang.getString("ROLE_ACTION_ROLE_PLAYER") + rtnMsg;
           rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
         }
         break;
       case RoleClass.MASON.code:
         if (msg.data == "WAKE_UP") {
           this.choice = rtnMsg = this.getRolePlayers(RoleClass.MASON, players);
+          rtnMsg = this.lang.getString(RoleClass.MASON.code) + this.lang.getString("ROLE_ACTION_ROLE_PLAYER") + rtnMsg;
           rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
         }
         break;
@@ -80,6 +83,12 @@ export class Doppelganger extends Role implements RoleInterface {
           if (/^\d+$/.test(msg.data) || _.includes(["CARD_AB", "CARD_AC", "CARD_BC"], msg.data)) {
             this.choice = msg.data;
             rtnMsg = this.watchRole(this.choice, players, table);
+
+            if (_.includes(["CARD_AB", "CARD_AC", "CARD_BC"], msg.data))
+              rtnMsg = this.lang.getString("ROLE_ACTION_WATCH_TABLE") + rtnMsg;
+            else
+              rtnMsg = this.lang.getString("ROLE_ACTION_ROLE_PLAYER") + rtnMsg;
+
             rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
           }
         }
@@ -90,6 +99,7 @@ export class Doppelganger extends Role implements RoleInterface {
         if (!this.choice) {
           this.choice = msg.data;
           rtnMsg = this.swapPlayer(this.choice, host, players);
+          rtnMsg = this.lang.getString("ROLE_ACTION_ROBBER") + rtnMsg;
           rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
         }
         else
@@ -133,6 +143,7 @@ export class Doppelganger extends Role implements RoleInterface {
           if (_.includes(["CARD_A", "CARD_B", "CARD_C"], msg.data)) {
             this.choice = msg.data;
             rtnMsg = this.swapTable(this.choice, host, table);
+            rtnMsg = this.lang.getString("ROLE_ACTION_WATCH_TABLE") + rtnMsg;
             rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
           }
         }
@@ -143,6 +154,7 @@ export class Doppelganger extends Role implements RoleInterface {
         if (msg.data == "WAKE_UP") {
           this.choice = host.getRole().name;
           rtnMsg = host.getRole().fullName;
+          rtnMsg = this.lang.getString("ROLE_ACTION_INSOMNIAC") + rtnMsg;
           rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
         }
         break;
@@ -158,6 +170,7 @@ export class Doppelganger extends Role implements RoleInterface {
             console.log(`${this.code} useAbility.Assign: ${this.shadowChoice.name}`);
             
             rtnMsg = `${target.name} : ${target.getRole().fullName}`;
+            rtnMsg = this.lang.getString("ROLE_ACTION_DOPPELGANGER") + rtnMsg;
             rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, `cloned ${target.getRole().emoji}${target.name}`);
           }
         }
@@ -182,17 +195,20 @@ export class Doppelganger extends Role implements RoleInterface {
         if (!this.choice) {
           this.choice = rtnMsg = this.getRolePlayers(RoleClass.WEREWOLF, players);
           rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
+          rtnMsg = this.lang.getString(RoleClass.WEREWOLF.code) + this.lang.getString("ROLE_ACTION_ROLE_PLAYER") + rtnMsg;
         }
         break;
       case RoleClass.MINION.code:
         if (!this.choice) {
           this.choice = rtnMsg = this.getRolePlayers(RoleClass.WEREWOLF, players);
+          rtnMsg = this.lang.getString(RoleClass.WEREWOLF.code) + this.lang.getString("ROLE_ACTION_ROLE_PLAYER") + rtnMsg;
           rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
         }
         break;
       case RoleClass.MASON.code:
         if (!this.choice) {
           this.choice = rtnMsg = this.getRolePlayers(RoleClass.MASON, players);
+          rtnMsg = this.lang.getString(RoleClass.MASON.code) + this.lang.getString("ROLE_ACTION_ROLE_PLAYER") + rtnMsg;
           rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
         }
         break;
@@ -209,6 +225,11 @@ export class Doppelganger extends Role implements RoleInterface {
           console.log(`${this.code} endTurn:choice_Shuffle ${this.choice}`);
           rtnMsg = this.watchRole(this.choice, players, table);
 
+          if (_.includes(["CARD_AB", "CARD_AC", "CARD_BC"], msg.data))
+            rtnMsg = this.lang.getString("ROLE_ACTION_WATCH_TABLE") + rtnMsg;
+          else
+            rtnMsg = this.lang.getString("ROLE_ACTION_ROLE_PLAYER") + rtnMsg;
+
           bot.showNotification(msg.id, rtnMsg);
           rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
         }
@@ -219,6 +240,7 @@ export class Doppelganger extends Role implements RoleInterface {
           this.choice = _.shuffle(key)[0];
           console.log(`${this.code} endTurn:choice_Shuffle ${this.choice}`);
           rtnMsg = this.swapPlayer(this.choice, host, players);
+          rtnMsg = this.lang.getString("ROLE_ACTION_ROBBER") + rtnMsg;
           rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
         }
         break;
@@ -255,6 +277,7 @@ export class Doppelganger extends Role implements RoleInterface {
           this.choice = _.shuffle(["CARD_A", "CARD_B", "CARD_C"])[0];
           console.log(`${this.code} endTurn:choice_Shuffle ${this.choice}`);
           rtnMsg = this.swapTable(this.choice, host, table);
+          rtnMsg = this.lang.getString("ROLE_ACTION_WATCH_TABLE") + rtnMsg;
           rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
         }
         break;
@@ -262,6 +285,7 @@ export class Doppelganger extends Role implements RoleInterface {
         if (!this.choice) {
           this.choice = host.getRole().name;
           rtnMsg = host.getRole().fullName;
+          rtnMsg = this.lang.getString("ROLE_ACTION_INSOMNIAC") + rtnMsg;
           rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
         }
         break;
@@ -334,7 +358,7 @@ export class Doppelganger extends Role implements RoleInterface {
 
     if (host && target) {
       // swap the role
-      rtnMsg = `${target.getRole().emoji}${target.name}`;
+      rtnMsg = `${target.name} ${target.getRole().fullName}`;
       if (host.id != target.id) host.swapRole(target);
     }
     return rtnMsg;

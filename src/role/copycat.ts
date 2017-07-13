@@ -23,7 +23,7 @@ export class Copycat extends Role implements RoleInterface {
       ]
     ];
 
-    bot.editAction(this.fullName + this.lang.getString("ROLE_WAKE_UP"), {
+    bot.editAction(this.fullName + this.lang.getString("ROLE_WAKE_UP") + this.lang.getString("ROLE_WAKE_UP_COPYCAT"), {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {
@@ -37,32 +37,6 @@ export class Copycat extends Role implements RoleInterface {
     let rtnActionEvt: ActionFootprint;
     console.log(`${this.code} useAbility.${(this.shadowChoice ? this.shadowChoice.code : this.code)}: ${msg.data}`);
     console.log(`${this.code} useAbility.choice: ${this.choice}`);
-    /*
-    if (!this.shadowChoice) {
-      if (_.includes(["CARD_A", "CARD_B", "CARD_C"], msg.data)) {
-        switch (msg.data) {
-          case "CARD_A":
-            this.shadowChoice = _.clone(table.getLeft());
-            rtnMsg += `${this.shadowChoice.emoji}${Emoji.get('question')}${Emoji.get('question')}`;
-            break;
-          case "CARD_B":
-            this.shadowChoice = _.clone(table.getCenter());
-            rtnMsg += `${Emoji.get('question')}${this.shadowChoice.emoji}${Emoji.get('question')}`;
-            break;
-          case "CARD_C":
-            this.shadowChoice = _.clone(table.getRight());
-            rtnMsg += `${Emoji.get('question')}${Emoji.get('question')}${this.shadowChoice.emoji}`;
-            break;
-        }
-
-        console.log(`${this.code} useAbility.Assign: ${this.shadowChoice.name}`);
-        rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, `cloned ${rtnMsg}`);
-      }
-    }
-    else {
-      rtnMsg = this.lang.getString("ROLE_ALREADY_CHOOSE");
-    }
-    */
 
     if (this.shadowChoice && _.includes(["COPYCAT_CARD_A", "COPYCAT_CARD_B", "COPYCAT_CARD_C"], msg.data)) {
       rtnMsg = this.lang.getString("ROLE_ALREADY_CHOOSE");
@@ -73,6 +47,7 @@ export class Copycat extends Role implements RoleInterface {
         case RoleClass.WEREWOLF.code:
           if (msg.data == "WAKE_UP") {
             this.choice = rtnMsg = this.getRolePlayers(RoleClass.WEREWOLF, players);
+            rtnMsg = this.lang.getString(RoleClass.WEREWOLF.code) + this.lang.getString("ROLE_ACTION_ROLE_PLAYER") + rtnMsg;
             rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
           }
           else if ((msg.data == "CARD_A" || msg.data == "CARD_B" || msg.data == "CARD_C")) {
@@ -84,6 +59,7 @@ export class Copycat extends Role implements RoleInterface {
             else if (target.length == 1) {
               this.choice = msg.data;
               rtnMsg = this.watchRole(this.choice, players, table);
+              rtnMsg = this.lang.getString("ROLE_ACTION_WATCH_TABLE") + rtnMsg;
               rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
             }
             else {
@@ -94,12 +70,14 @@ export class Copycat extends Role implements RoleInterface {
         case RoleClass.MINION.code:
           if (msg.data == "WAKE_UP") {
             this.choice = rtnMsg = this.getRolePlayers(RoleClass.WEREWOLF, players);
+            rtnMsg = this.lang.getString(RoleClass.WEREWOLF.code) + this.lang.getString("ROLE_ACTION_ROLE_PLAYER") + rtnMsg;
             rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
           }
           break;
         case RoleClass.MASON.code:
           if (msg.data == "WAKE_UP") {
             this.choice = rtnMsg = this.getRolePlayers(RoleClass.MASON, players);
+            rtnMsg = this.lang.getString(RoleClass.MASON.code) + this.lang.getString("ROLE_ACTION_ROLE_PLAYER") + rtnMsg;
             rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
           }
           break;
@@ -118,6 +96,7 @@ export class Copycat extends Role implements RoleInterface {
           if (!this.choice) {
             this.choice = msg.data;
             rtnMsg = this.swapPlayer(this.choice, host, players);
+            rtnMsg = this.lang.getString("ROLE_ACTION_ROBBER") + rtnMsg;
             rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
           }
           else
@@ -161,6 +140,7 @@ export class Copycat extends Role implements RoleInterface {
             if (_.includes(["CARD_A", "CARD_B", "CARD_C"], msg.data)) {
               this.choice = msg.data;
               rtnMsg = this.swapTable(this.choice, host, table);
+              rtnMsg = this.lang.getString("ROLE_ACTION_WATCH_TABLE") + rtnMsg;
               rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
             }
           }
@@ -171,6 +151,7 @@ export class Copycat extends Role implements RoleInterface {
           if (msg.data == "WAKE_UP") {
             this.choice = host.getRole().name;
             rtnMsg = host.getRole().fullName;
+            rtnMsg = this.lang.getString("ROLE_ACTION_INSOMNIAC") + rtnMsg;
             rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
           }
           break;
@@ -192,6 +173,7 @@ export class Copycat extends Role implements RoleInterface {
             }
 
             console.log(`${this.code} useAbility.Assign: ${this.shadowChoice.code}`);
+            rtnMsg = this.lang.getString("ROLE_ACTION_COPYCAT") + rtnMsg;
             rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, ` ${rtnMsg}`);
           }
           break;
@@ -214,8 +196,26 @@ export class Copycat extends Role implements RoleInterface {
     switch (this.shadowChoice ? this.shadowChoice.code : "") {
       case RoleClass.WEREWOLF.code:
         if (!this.choice) {
-          this.choice = rtnMsg = this.getRolePlayers(RoleClass.WEREWOLF, players);
-          rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
+          const target: Player[] = _.filter(players, (player: Player) => player.getOriginalRole().checkRole([RoleClass.WEREWOLF]));
+
+          if (target.length >= 2) {
+            rtnMsg = this.getRolePlayers(RoleClass.WEREWOLF, players);
+            this.choice = rtnMsg;
+            rtnMsg = this.lang.getString(RoleClass.WEREWOLF.code) + this.lang.getString("ROLE_ACTION_ROLE_PLAYER") + rtnMsg;
+          }
+          else if (target.length == 1) {
+            this.choice = _.shuffle(["CARD_A", "CARD_B", "CARD_C"])[0];
+            console.log(`${this.code} endTurn:choice_Shuffle ${this.choice}`);
+            rtnMsg = this.watchRole(this.choice, players, table);
+            rtnMsg = this.lang.getString("ROLE_ACTION_WATCH_TABLE") + rtnMsg;
+          }
+          else {
+            // unreachable for no wolf
+          }
+
+          //bot.showNotification(msg.id, rtnMsg);
+          this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
+          return this.actionEvt;
         }
         break;
       case RoleClass.MINION.code:
@@ -243,6 +243,11 @@ export class Copycat extends Role implements RoleInterface {
           console.log(`${this.code} endTurn:choice_Shuffle ${this.choice}`);
           rtnMsg = this.watchRole(this.choice, players, table);
 
+          if (_.includes(["CARD_AB", "CARD_AC", "CARD_BC"], msg.data))
+            rtnMsg = this.lang.getString("ROLE_ACTION_WATCH_TABLE") + rtnMsg;
+          else
+            rtnMsg = this.lang.getString("ROLE_ACTION_ROLE_PLAYER") + rtnMsg;
+
           bot.answerCallbackQuery(msg.id, rtnMsg);
           rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
         }
@@ -253,6 +258,7 @@ export class Copycat extends Role implements RoleInterface {
           this.choice = _.shuffle(key)[0];
           console.log(`${this.code} endTurn:choice_Shuffle ${this.choice}`);
           rtnMsg = this.swapPlayer(this.choice, host, players);
+          rtnMsg = this.lang.getString("ROLE_ACTION_ROBBER") + rtnMsg;
           rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
         }
         break;
@@ -289,6 +295,7 @@ export class Copycat extends Role implements RoleInterface {
           this.choice = _.shuffle(["CARD_A", "CARD_B", "CARD_C"])[0];
           console.log(`${this.code} endTurn:choice_Shuffle ${this.choice}`);
           rtnMsg = this.swapTable(this.choice, host, table);
+          rtnMsg = this.lang.getString("ROLE_ACTION_WATCH_TABLE") + rtnMsg;
           rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
         }
         break;
@@ -296,6 +303,7 @@ export class Copycat extends Role implements RoleInterface {
         if (!this.choice) {
           this.choice = host.getRole().name;
           rtnMsg = host.getRole().fullName;
+          rtnMsg = this.lang.getString("ROLE_ACTION_INSOMNIAC") + rtnMsg;
           rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
         }
         break;
@@ -381,7 +389,7 @@ export class Copycat extends Role implements RoleInterface {
 
     if (host && target) {
       // swap the role
-      rtnMsg = `${target.getRole().emoji}${target.name}`;
+      rtnMsg = `${target.name} ${target.getRole().fullName}`;
       if (host.id != target.id) host.swapRole(target);
     }
     return rtnMsg;

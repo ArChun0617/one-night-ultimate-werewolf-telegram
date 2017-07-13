@@ -18,7 +18,7 @@ export class Insomniac extends Role implements RoleInterface {
       [{ text: this.lang.getString("ROLE_ACTION_WAKE_UP"), callback_data: "WAKE_UP" }]
     ];
 
-    bot.editAction(this.fullName + this.lang.getString("ROLE_WAKE_UP"), {
+    bot.editAction(this.fullName + this.lang.getString("ROLE_WAKE_UP") + this.lang.getString("ROLE_WAKE_UP_INSOMNIAC"), {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {
@@ -35,6 +35,7 @@ export class Insomniac extends Role implements RoleInterface {
     if (msg.data == "WAKE_UP") {
       this.choice = host.getRole().name;
       rtnMsg = host.getRole().fullName;
+      rtnMsg = this.lang.getString("ROLE_ACTION_INSOMNIAC") + rtnMsg;
       rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
     }
     bot.showNotification(msg.id, rtnMsg);
@@ -48,8 +49,7 @@ export class Insomniac extends Role implements RoleInterface {
     if (!this.choice) {
       this.choice = host.getRole().name;
       rtnMsg = host.getRole().fullName;
-
-      //bot.showNotification(msg.id, rtnMsg);
+      rtnMsg = this.lang.getString("ROLE_ACTION_INSOMNIAC") + rtnMsg;
       this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
       return this.actionEvt;
     }

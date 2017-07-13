@@ -18,7 +18,7 @@ export class Mason extends Role implements RoleInterface {
       [{ text: this.lang.getString("ROLE_ACTION_WAKE_UP"), callback_data: "WAKE_UP" }]
     ];
     
-    bot.editAction(this.fullName + this.lang.getString("ROLE_WAKE_UP"), {
+    bot.editAction(this.fullName + this.lang.getString("ROLE_WAKE_UP") + this.lang.getString("ROLE_WAKE_UP_MASON"), {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {
@@ -35,6 +35,7 @@ export class Mason extends Role implements RoleInterface {
     if (msg.data == "WAKE_UP") {
       this.choice = rtnMsg = this.getRolePlayers(RoleClass.MASON, players);
       rtnMsg = (rtnMsg || `[${this.fullName}${this.lang.getString("ROLE_ACTION_ROLE_NOT_EXISTS")}]`);
+      rtnMsg = this.lang.getString(RoleClass.MASON.code) + this.lang.getString("ROLE_ACTION_ROLE_PLAYER") + rtnMsg;
       rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
     }
     bot.showNotification(msg.id, rtnMsg);
@@ -48,6 +49,7 @@ export class Mason extends Role implements RoleInterface {
     if (!this.choice) {
       this.choice = rtnMsg = this.getRolePlayers(RoleClass.MASON, players);
       rtnMsg = (rtnMsg || `[${this.fullName}${this.lang.getString("ROLE_ACTION_ROLE_NOT_EXISTS")}]`);
+      rtnMsg = this.lang.getString(RoleClass.MASON.code) + this.lang.getString("ROLE_ACTION_ROLE_PLAYER") + rtnMsg;
 
       //bot.showNotification(msg.id, rtnMsg);
       this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);

@@ -26,7 +26,7 @@ export class Robber extends Role implements RoleInterface {
       pos++;
     });
 
-    bot.editAction(this.fullName + this.lang.getString("ROLE_WAKE_UP"), {
+    bot.editAction(this.fullName + this.lang.getString("ROLE_WAKE_UP") + this.lang.getString("ROLE_WAKE_UP_ROBBER"), {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {
@@ -49,6 +49,7 @@ export class Robber extends Role implements RoleInterface {
       else {
         this.choice = msg.data;
         rtnMsg = this.swapPlayer(this.choice, host, players);
+        rtnMsg = this.lang.getString("ROLE_ACTION_ROBBER") + rtnMsg;
         rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
       }
     }
@@ -67,6 +68,7 @@ export class Robber extends Role implements RoleInterface {
       this.choice = _.shuffle(key)[0];
       console.log(`${this.code} endTurn:choice_Shuffle ${this.choice}`);
       rtnMsg = this.swapPlayer(this.choice, host, players);
+      rtnMsg = this.lang.getString("ROLE_ACTION_ROBBER") + rtnMsg;
 
       //bot.showNotification(msg.id, rtnMsg);
       this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg, true);
@@ -81,7 +83,7 @@ export class Robber extends Role implements RoleInterface {
 
     if (host && target) {
       // swap the role
-      rtnMsg = `${target.getRole().emoji}${target.name}`;
+      rtnMsg = `${target.name} ${target.getRole().fullName}`;
       if (host.id != target.id) host.swapRole(target);
     }
     return rtnMsg;

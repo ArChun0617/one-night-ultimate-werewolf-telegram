@@ -46,7 +46,7 @@ export class Game {
   deck: Deck;
   gameRoles: RoleClassInterface[];
   gameTime: number = 10 * 60 * 1000;
-  actionTime: number = 10 * 1000;
+  actionTime: number = 20 * 1000;
   btnPerLine: number = 3;
   phase: string = Game.PHASE_WAITING_PLAYER;
   result: Result[] = [];
@@ -196,10 +196,21 @@ export class Game {
   setPlayerReady(_id: number) {
     _.map(_.filter(this.players, (player: Player) => player.id == _id), (player: Player) => player.readyStart = true);
 
-    let readyPlayers: number = _.filter(this.players, (player: Player) => player.readyStart).length;
+    /*let readyPlayers: number = _.filter(this.players, (player: Player) => player.readyStart).length;
     let totalPlayers: number = this.players.length;
 
-    return (readyPlayers == totalPlayers ? "" : this.lang.getString("WAIT_FOR_START") + readyPlayers + "/" + totalPlayers);
+    return (readyPlayers == totalPlayers ? "" : this.lang.getString("WAIT_FOR_START") + readyPlayers + "/" + totalPlayers);*/
+
+    //Return immediately if all ready
+    if (_.filter(this.players, (player: Player) => !player.readyStart).length == 0) return "";
+
+    //else show list of player
+    let rtnMsg: string = '';
+    _.map(this.players, (player: Player) => {
+      rtnMsg += `${player.name} ${(player.readyStart ? "[READY]" : "")}\n`;
+    });
+
+    return this.lang.getString("WAIT_FOR_START") + "\n" + rtnMsg;
   }
 
   sendVotingList(msgId) {
@@ -383,7 +394,7 @@ export class Game {
     let now: Date = new Date(new Date().getTime() + gameDuration);
     this.setPhase(Game.PHASE_CONVERSATION);
 
-    this.msgInterface.editAction(this.lang.getString("GAME_DAY_START") + (gameDuration / 60 / 1000) + this.lang.getString("GAME_DAY_START_VOTE") + (now.getHours() + ":" + ("0" + now.getMinutes()).slice(-2) + ":" + now.getSeconds()) + this.lang.getString("GAME_DAY_START_DOZED")
+    this.msgInterface.editAction(this.lang.getString("GAME_DAY_START") + (gameDuration / 60 / 1000) + this.lang.getString("GAME_DAY_START_VOTE") + (now.getHours() + ":" + ("0" + now.getMinutes()).slice(-2) + ":" + now.getSeconds())
       , {
         reply_markup: JSON.stringify({ inline_keyboard: [[{ text: this.lang.getString("GAME_DAY_DOZED"), callback_data: "DOZED_WAKE_UP" }]] })
       }
@@ -462,22 +473,22 @@ export class Game {
       this.winners = this.determineWinners(this.deathPlayers);
       this.losers = _.difference(this.players, this.winners);
 
-      result += `${Emoji.get('skull')}\n`;
+      result += `<b>${Emoji.get('skull')} ${this.lang.getString("RESULT_DEATHS")}</b>\n`;
       _.map(this.deathPlayers, (death) => {
-        result += `${death.name} ${death.getOriginalRole().emoji} ${Emoji.get('arrow_right')} ${death.getRole().emoji}  ${Emoji.get('point_left')} ${death.count} \n`;
+        result += `${death.name} ${death.getOriginalRole().fullName} ${Emoji.get('arrow_right')} ${death.getRole().fullName}  ${Emoji.get('point_left')} ${death.count} \n`;
       });
 
-      result += `\n${Emoji.get('trophy')}${Emoji.get('full_moon_with_face')}\n`;
+      result += `\n<b>${Emoji.get('trophy')}${Emoji.get('full_moon_with_face')} ${this.lang.getString("RESULT_WINNERS")}</b>\n`;
       _.map(this.winners, (winner: Player) => {
-        result += `${winner.name} ${winner.getOriginalRole().emoji} ${Emoji.get('arrow_right')} ${winner.getRole().emoji}  ${Emoji.get('point_right')} ${winner.getKillTarget().name} \n`;
+        result += `${winner.name} ${winner.getOriginalRole().fullName} ${Emoji.get('arrow_right')} ${winner.getRole().fullName}  ${Emoji.get('point_right')} ${winner.getKillTarget().name} \n`;
       });
 
-      result += `\n${Emoji.get('new_moon_with_face')}\n`;
+      result += `\n<b>${Emoji.get('new_moon_with_face')} ${this.lang.getString("RESULT_LOSERS")}</b>\n`;
       _.map(this.losers, (loser: Player) => {
-        result += `${loser.name} ${loser.getOriginalRole().emoji} ${Emoji.get('arrow_right')} ${loser.getRole().emoji}  ${Emoji.get('point_right')} ${loser.getKillTarget().name} \n`;
+        result += `${loser.name} ${loser.getOriginalRole().fullName} ${Emoji.get('arrow_right')} ${loser.getRole().fullName}  ${Emoji.get('point_right')} ${loser.getKillTarget().name} \n`;
       });
 
-      result += `\n${this.lang.getString("ACTION_STACK")} \n`;
+      result += `\n<b>${this.lang.getString("ACTION_STACK")}</b>\n`;
       result += _.map(this.actionStack, (step: ActionFootprint) => {
         let rolePrefix = "";
         let role: any;
@@ -485,10 +496,10 @@ export class Game {
           role = step.player.getOriginalRole();
           rolePrefix = (role.shadowChoice ? role.shadowChoice.emoji : "");
         }
-        return `${step.player.getOriginalRole().emoji}${rolePrefix}${step.player.name} : ${step.toString()}`
+        return `${step.player.getOriginalRole().fullName}${rolePrefix}${step.player.name} : ${step.toString()}`
       }).join("\n");
 
-      this.msgInterface.sendMsg(result);
+      this.msgInterface.sendMsg(result, { "parse_mode": "html" });
       console.log('Result', result);
       resolve();
     });
@@ -585,10 +596,10 @@ export class Game {
     if (event == "DOZED_WAKE_UP") {
       // command = "Dozed"
       let action: ActionFootprint = player.getOriginalRole().actionEvt;
+      let rolePrefix: string = "";
+      let actionMsg: string = "";
 
-      if (action && action.dozed)
-      {
-        let rolePrefix = "";
+      if (action) {
         let role: any;
 
         if (action.player.getOriginalRole().code == RoleClass.DOPPELGANGER.code) {
@@ -599,12 +610,17 @@ export class Game {
         {
           rolePrefix = action.player.getOriginalRole().fullName;
         }
-        this.msgInterface.showNotification(msg.id, `${rolePrefix} ${Emoji.get('arrow_right')} ${action.toString()}`);
+
+        actionMsg = action.toString();
       }
-      else if (action && !action.dozed)
-        this.msgInterface.showNotification(msg.id, this.lang.getString("DAY_DOZED_FAKE"));
-      else
-        this.msgInterface.showNotification(msg.id, `${player.getOriginalRole().fullName} ${Emoji.get('arrow_right')} ${Emoji.get('zzz')}`);  //  For those has no action Village, Tanner, Hunter
+      else {
+        //  For those has no action Village, Tanner, Hunter
+        rolePrefix = player.getOriginalRole().fullName;
+        actionMsg = Emoji.get('zzz');
+      }
+
+      //this.msgInterface.showNotification(msg.id, `${rolePrefix}${action.toString()}`);
+      this.msgInterface.showNotification(msg.id, `${this.lang.getString("DOZED_ROLE")}${rolePrefix}\n${this.lang.getString("DOZED_ACTION")}${actionMsg}`);
     }
     else if (parseInt(event)) {
       //if the command = integer, it should be a Vote.
@@ -684,7 +700,7 @@ export class Game {
     } else if (deathPlayers.length === 0) {
       // If no one die and there is no wolf, Village win
       winners = _.concat(winners, this.getNonTannerVillagesTeam());
-    } else if (deathVillages.length || deathTanners) {
+    } else if (deathVillages.length > 0 && deathTanners.length === 0) {
       // If no wolf + Village/Tanner die, Minion will win
       winners = _.concat(winners, this.getWerewolfTeam());
     }
@@ -717,7 +733,7 @@ export class Game {
       rtnMsg = this.lang.getString("VOTE_ERROR");
     }
 
-    this.msgInterface.showNotification(msg.id, rtnMsg);
+    this.msgInterface.showNotification(msg.id, rtnMsg, false);
   }
 
   private setCountDown(msg, totalTime, intervalArray, unit: string) {

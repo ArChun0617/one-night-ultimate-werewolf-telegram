@@ -26,7 +26,7 @@ export class Werewolf extends Role implements RoleInterface {
     ];
 
     //bot.sendMessage(msg.chat.id, `${this.emoji}  ${this.name}, wake up and look for other werewolves. If there is only one Werewolf, you may look at a card from the center.`, {
-    bot.editAction(this.fullName + this.lang.getString("ROLE_WAKE_UP"), {
+    bot.editAction(this.fullName + this.lang.getString("ROLE_WAKE_UP") + this.lang.getString("ROLE_WAKE_UP_WEREWOLF"), {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {
@@ -48,6 +48,7 @@ export class Werewolf extends Role implements RoleInterface {
     if (msg.data == "WAKE_UP") {
       rtnMsg = this.getRolePlayers(RoleClass.WEREWOLF, players);
       if (target.length >= 2) this.choice = rtnMsg;
+      rtnMsg = this.lang.getString(RoleClass.WEREWOLF.code) + this.lang.getString("ROLE_ACTION_ROLE_PLAYER") + rtnMsg;
       rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
     }
     else if ((msg.data == "CARD_A" || msg.data == "CARD_B" || msg.data == "CARD_C") && target.length == 1) {
@@ -57,6 +58,7 @@ export class Werewolf extends Role implements RoleInterface {
       else {
         this.choice = msg.data;
         rtnMsg = this.watchTable(this.choice, table);
+        rtnMsg = this.lang.getString("ROLE_ACTION_WATCH_TABLE") + rtnMsg;
         rtnActionEvt = this.actionEvt = new ActionFootprint(host, this.choice, rtnMsg);
       }
     }
@@ -80,11 +82,13 @@ export class Werewolf extends Role implements RoleInterface {
       if (target.length >= 2) {
         rtnMsg = this.getRolePlayers(RoleClass.WEREWOLF, players);
         this.choice = rtnMsg;
+        rtnMsg = this.lang.getString(RoleClass.WEREWOLF.code) + this.lang.getString("ROLE_ACTION_ROLE_PLAYER") + rtnMsg;
       }
       else if (target.length == 1) {
         this.choice = _.shuffle(["CARD_A", "CARD_B", "CARD_C"])[0];
         console.log(`${this.code} endTurn:choice_Shuffle ${this.choice}`);
         rtnMsg = this.watchTable(this.choice, table);
+        rtnMsg = this.lang.getString(RoleClass.WEREWOLF.code) + this.lang.getString("ROLE_ACTION_ROLE_PLAYER") + RoleClass.WEREWOLF.emoji + host.name + ", " + this.lang.getString("ROLE_ACTION_WATCH_TABLE") + rtnMsg;
       }
       else {
         // unreachable for no wolf

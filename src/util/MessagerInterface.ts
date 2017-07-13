@@ -56,7 +56,7 @@ export class MessagerInterface {
     }
   }
 
-  showNotification(callbackQueryId, text, showAlert = false, form = {}) {
+  showNotification(callbackQueryId, text, showAlert = true, form = {}) {
     try {
       this.bot.answerCallbackQuery(callbackQueryId, text, showAlert, form);
     }

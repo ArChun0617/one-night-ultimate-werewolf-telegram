@@ -25,7 +25,7 @@ export class Troublemaker extends Role implements RoleInterface {
       pos++;
     });
 
-    bot.editAction(this.fullName + this.lang.getString("ROLE_WAKE_UP_TROUBLEMAKER"), {
+    bot.editAction(this.fullName + this.lang.getString("ROLE_WAKE_UP") + this.lang.getString("ROLE_WAKE_UP_TROUBLEMAKER"), {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     })
       .then((sended) => {
