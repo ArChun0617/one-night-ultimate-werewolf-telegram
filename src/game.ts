@@ -457,7 +457,10 @@ export class Game {
     this.setCountDown(msg, gameDuration, [300000, 180000, 60000, 30000], "mins");
 
     const AIPlayers = _.filter(this.players, (player) => player.id <= 20);
-    _.map(AIPlayers, (ai) => this.randomVote(ai));  //Random vote for AI immediately
+    _.map(AIPlayers, (ai: Player) => {
+      this.randomVote(ai);            //Random vote for AI immediately
+      ai.setToken(ai.getRole());      //Set token for AI
+    });
 
     return new Promise((resolve, reject) => {
       this.votingResolve = resolve;
