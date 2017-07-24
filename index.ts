@@ -245,12 +245,20 @@ bot.onText(/\/delgame/, (msg) => {
   bot.sendMessage(msg.chat.id, lang.getString("GAME_TERMINATED"));
 });
 
+bot.onText(/\/showtoken/, (msg) => {
+  const game = getGame(msg.chat.id);
+
+  if (!game) return askForCreateNewGame(msg.chat.id);
+
+  game.showToken(msg);
+});
+
 bot.onText(/\/vote/, (msg) => {
   const game = getGame(msg.chat.id);
 
   if (!game) return askForCreateNewGame(msg.chat.id);
 
-  game.sendVotingList(msg.chat.id);
+  game.sendVotingList(msg);
 });
 
 bot.on('callback_query', (msg) => {
@@ -295,6 +303,9 @@ bot.on('callback_query', (msg) => {
       game.setLang("zhHK");
       bot.sendMessage(msg.message.chat.id, lang.getString("LANG_SET"));
     }
+    else if (new RegExp(/^SET_TOKEN_(.+?)/).test(msg.data)) {
+      game.setToken(msg); // Game event
+    }
     else {
       game.on(msg.data, msg); // Game event
     }
@@ -314,21 +325,13 @@ function addGameSettingRole(msgId: number, gameSetting: any, role: RoleClassInte
 
 }
 
-bot.onText(/\/showRole/, (msg, match) => {
-  let roleList: RoleClassInterface[] = [];
-  let role: string[] = [];
+bot.onText(/\/showrole/, (msg, match) => {
+  const game = getGame(msg.chat.id);
+  if (!game) return askForCreateNewGame(msg.chat.id);
 
-  for (var key in RoleClass) {
-    if (RoleClass.hasOwnProperty(key)) {
-      roleList.push(RoleClass[key]);
-    }
-  }
+  let roleList = game.showRole();
 
-  _.map(_.sortBy(roleList, (r: Role) => r.ordering), (r: Role) => {
-    role.push(r.emoji + r.name);
-  });
-
-  bot.sendMessage(msg.chat.id, lang.getString("GAME_ROLE_LIST") + role.join("\n"));
+  bot.sendMessage(msg.chat.id, lang.getString("GAME_ROLE_LIST") + roleList);
 });
 
 function killGame(id: number) {

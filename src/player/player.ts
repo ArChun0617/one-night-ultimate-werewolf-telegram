@@ -7,10 +7,17 @@ export class Player {
   role: Role;
   killTarget: Player;
   readyStart: boolean;
+  token: Role;
 
   constructor(options) {
     this.id = options.id;
     this.name = options.name;
+  }
+
+  setLang = (_lang: string) => {
+    if (this.originalRole) this.originalRole.setLang(_lang);
+    if (this.role) this.role.setLang(_lang);
+    if (this.token) this.token.setLang(_lang);
   }
 
   setRole(role: Role) {
@@ -42,5 +49,9 @@ export class Player {
   
   getKillTarget(): Player {
     return this.killTarget
+  }
+
+  setToken(r: Role) {
+    this.token = r;
   }
 }

@@ -48,7 +48,7 @@ export class MessagerInterface {
     try {
       return this.bot.editMessageText(text, _.extend(options, {
         chat_id: this.gameChatID,
-        message_id: this.gameActionID
+        message_id: (options["gameActionID"] || this.gameActionID)
       }));
     }
     catch (err) {

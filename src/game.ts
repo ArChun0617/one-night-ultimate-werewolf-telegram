@@ -46,7 +46,7 @@ export class Game {
   deck: Deck;
   gameRoles: RoleClassInterface[];
   gameTime: number = 10 * 60 * 1000;
-  actionTime: number = 20 * 1000;
+  actionTime: number = 10 * 1000;
   btnPerLine: number = 3;
   phase: string = Game.PHASE_WAITING_PLAYER;
   result: Result[] = [];
@@ -147,16 +147,8 @@ export class Game {
   }
 
   showRole() {
-    let roleList: any[];
-    let role: string[];
-
-    for (var key in RoleClass) {
-      if (RoleClass.hasOwnProperty(key)) {
-        roleList.push(RoleClass[key]);
-      }
-    }
-
-    _.map(_.sortBy(roleList, (r: Role) => r.ordering), (r: Role) => {
+    let role: string[] = [];
+    _.map(this.getGameRole(), (r: Role) => {
       role.push(r.fullName);
     });
 
@@ -165,6 +157,14 @@ export class Game {
 
   setLang(_lang: string) {
     this.lang.setLang(_lang);
+
+    _.map(this.players, (player: Player) => {
+      player.setLang(_lang);
+    });
+
+    _.map(this.table.getRoles(), (role: Role) => {
+      role.setLang(_lang);
+    });
   }
 
   getPhase(): string {
@@ -213,9 +213,9 @@ export class Game {
     return this.lang.getString("WAIT_FOR_START") + "\n" + rtnMsg;
   }
 
-  sendVotingList(msgId) {
+  sendVotingList(msg) {
     if (this.getPhase() !== Game.PHASE_CONVERSATION && this.getPhase() !== Game.PHASE_VOTING) {
-      return this.sendInvalidActionMessage(msgId);
+      return this.sendInvalidActionMessage(msg.chat.id);
     }
 
     const key = [];
@@ -224,16 +224,78 @@ export class Game {
     _.map(this.players, (player: Player) => {
       let row = pos / this.btnPerLine | 0;
       if (!key[row]) key[row] = [];
-      key[row].push({ text: player.name, callback_data: `${player.id}` });
+      key[row].push({ text: `${player.name}${(player.getKillTarget() ? this.lang.getString("PLAYER_VOTED") : "")}`, callback_data: `${player.id}` });
       pos++;
     });
 
     key.push([{ text: this.lang.getString("VOTE_BLANK"), callback_data: `-1` }]);
-
-    this.msgInterface.sendMsg(this.lang.getString("VOTE_LIST"),
-      {
+    
+    //If call by command, sendMsg; If call by button, update message
+    if (!msg.message) {
+      this.msgInterface.sendMsg(this.lang.getString("VOTE_LIST"), {
+          reply_markup: JSON.stringify({ inline_keyboard: key })
+        });
+    }
+    else {
+      this.msgInterface.editAction(this.lang.getString("VOTE_LIST"), {
+        gameActionID: msg.message.message_id,
         reply_markup: JSON.stringify({ inline_keyboard: key })
       });
+    }
+  }
+
+  setToken(msg) {
+    let p: Player = this.getPlayer(msg.from.id);
+    if (!p) { return; } // If player not in game, throw the call
+    //console.log("game.setToken: " + msg.data);
+    
+    const regex = /SET_TOKEN_(.+)/;
+    const para: string[] = regex.exec(msg.data);
+    const roleName: string = para[1].toUpperCase();
+
+    // Token remain unchanged
+    if (p.token && p.token.code.toUpperCase() == roleName) return;
+
+    // Create Token for the player himself
+    p.setToken(DeckFactory.createRoleByCode(roleName));
+    // Show the token list
+    this.showToken(msg);
+    return;
+  }
+
+  showToken(msg) {
+    let p: Player = this.getPlayer(msg.from.id);
+    if (!p) { return; } // If player not in game, throw the call
+    
+    let rtnMsg: string = '';
+    _.map(this.players, (player: Player) => {
+      rtnMsg += `${player.name} - ${(player.token ? player.token.fullName : this.lang.getString("TOKEN_UNKNOWN"))}\n`;
+    });
+
+    const roleList: Role[] = this.getGameRole();
+    const key = [];
+    let pos = 0;
+    let btnPerLine = 3;
+
+    _.map(_.uniqBy(roleList, "code"), (role: Role) => {
+      let row = pos / btnPerLine | 0;
+      if (!key[row]) key[row] = [];
+      key[row].push({ text: role.fullName, callback_data: "SET_TOKEN_" + role.code.toUpperCase() });
+      pos++;
+    });
+
+    //If call by command, sendMsg; If call by button, update message
+    if (!msg.message) {
+      this.msgInterface.sendMsg(this.lang.getString("TOKEN_LIST") + rtnMsg, {
+        reply_markup: JSON.stringify({ inline_keyboard: key })
+      });
+    }
+    else {
+      this.msgInterface.editAction(this.lang.getString("TOKEN_LIST") + rtnMsg, {
+        gameActionID: msg.message.message_id,
+        reply_markup: JSON.stringify({ inline_keyboard: key })
+      });
+    }
   }
 
   on(event, msg) {
@@ -297,16 +359,8 @@ export class Game {
     this.setPhase(Game.PHASE_ANNOUNCE_PLAYER_ROLE);
 
     return new Promise((resolve, reject) => {
-      let roles: Role[] = [];
       let role: string[] = [];
-      _.map(this.players, (p: Player) => {
-        roles.push(p.getOriginalRole());
-      });
-      _.map(this.table.getRoles(), (r: Role) => {
-        roles.push(r);
-      });
-
-      _.map(_.sortBy(roles, (r:Role) => r.ordering), (r: Role) => {
+      _.map(this.getGameRole(), (r: Role) => {
         role.push(r.fullName);
       });
 
@@ -421,7 +475,7 @@ export class Game {
       }
       else {
         this.msgInterface.sendMsg(this.lang.getString("VOTE_START"))
-          .then(this.sendVotingList(msg.chat.id))
+          .then(this.sendVotingList(msg))
           .then(setTimeout(() => {
             // make sure every vote a player, random vote if needed
             _.map(this.players, (player) => {
@@ -624,17 +678,7 @@ export class Game {
     }
     else if (parseInt(event)) {
       //if the command = integer, it should be a Vote.
-      const id = parseInt(event);
-
-      if (id && _.filter(this.players, player => player.id == id)) {
-        if (player.id === id) {
-          return this.sendInvalidActionMessage(msg.id);
-        }
-
-        this.votePlayer(id, msg, player);
-        if (_.filter(this.players, (player) => !(player.getKillTarget())).length == 0 && this.votingResolve)
-          this.votingResolve();
-      }
+      this.handleVotingEvent(event, msg, player);
     }
     else {
       // unknown command
@@ -643,12 +687,15 @@ export class Game {
 
   private handleVotingEvent(event: string, msg: any, player: Player) {
     const id = parseInt(event);
+    const target = player.getKillTarget();
 
     if (player.id === id) {
       return this.sendInvalidActionMessage(msg.id);
     }
 
     this.votePlayer(id, msg, player);
+    // Update the list if the player is first time to vote
+    if (!target && player.getKillTarget()) this.sendVotingList(msg);
     if (_.filter(this.players, (player) => !(player.getKillTarget())).length == 0 && this.votingResolve)
       this.votingResolve();
   }
@@ -657,18 +704,6 @@ export class Game {
     const targets = _.filter(this.players, player => player.id !== host.id);
     const pos = _.random(0, targets.length - 1);
     host.setKillTarget(targets[pos]);
-
-    /*console.log("randomVote.player: " + host.id);
-    let target;
-    if (host.id % 2 == 0) {
-      target = _.filter(this.players, player => player.getRole().checkRole(Role.TANNER))[0];
-    }
-    else {
-      target = _.filter(this.players, player => player.getRole().checkRole(Role.WEREWOLF))[0];
-    }
-    console.log("randomVote.target: " + target.id);
-
-    host.setKillTarget(target);*/
   }
 
   private determineWinners(deathPlayers: Player[]) {
@@ -722,7 +757,7 @@ export class Game {
   }
 
   private votePlayer(id: number, msg, player) {
-    let target = _.find(this.players, p => p.id === id);
+    let target = _.find(this.players, p => p.id === id && p.id != player.id);
     if (id == -1) target = new Player({id: -1, name: ""});
     let rtnMsg = "";
     if (target) {
@@ -775,5 +810,20 @@ export class Game {
       this.msgInterface.sendMsg(this.lang.getString("COUNT_DOWN") + interval.count + " " + unit + "...");
       if (timerArray.length > 0) this.countDown(msg, timerArray, unit);
     }, interval.time);
+  }
+
+  private getGameRole(): Role[] {
+    if (!this.isStarted()) return;
+
+    let roles: Role[] = [];
+    let role: string[] = [];
+    _.map(this.players, (p: Player) => {
+      roles.push(p.getOriginalRole());
+    });
+    _.map(this.table.getRoles(), (r: Role) => {
+      roles.push(r);
+    });
+
+    return _.sortBy(roles, (r: Role) => r.ordering);
   }
 }

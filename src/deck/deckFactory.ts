@@ -22,55 +22,73 @@ export const DeckFactory = {
    * @returns {Deck}
    */
   generate: (gameRoles: RoleClassInterface[]): Deck => {
+    const roleWorker: RoleFactory = new RoleFactory();
     gameRoles = _.shuffle(gameRoles);
-    const roles:Role[] = [];
+    const roles: Role[] = [];
 
     _.map(gameRoles, (role) => {
-      switch (role) {
-        case RoleClass.COPYCAT:
-          roles.push(new Copycat());
-          break;
-        case RoleClass.DOPPELGANGER:
-          roles.push(new Doppelganger());
-          break;
-        case RoleClass.WEREWOLF:
-          roles.push(new Werewolf());
-          break;
-        case RoleClass.MINION:
-          roles.push(new Minion());
-          break;
-        case RoleClass.MASON:
-          roles.push(new Mason());
-          break;
-        case RoleClass.SEER:
-          roles.push(new Seer());
-          break;
-        case RoleClass.ROBBER:
-          roles.push(new Robber());
-          break;
-        case RoleClass.TROUBLEMAKER:
-          roles.push(new Troublemaker());
-          break;
-        case RoleClass.DRUNK:
-          roles.push(new Drunk());
-          break;
-        case RoleClass.INSOMNIAC:
-          roles.push(new Insomniac());
-          break;
-        case RoleClass.VILLAGER:
-          roles.push(new Villager());
-          break;
-        case RoleClass.TANNER:
-          roles.push(new Tanner());
-          break;
-        case RoleClass.HUNTER:
-          roles.push(new Hunter());
-          break;
-        default:
-          return;
-      }
+      roles.push(roleWorker.createRoleByInterface(role));
     });
 
     return new Deck(roles);
+  },
+
+  createRoleByCode: (roleName: string): Role => {
+    const roleWorker: RoleFactory = new RoleFactory();
+    return roleWorker.createRoleByCode(roleName);
   }
 };
+
+export class RoleFactory {
+  createRoleByCode(roleName: string): Role {
+    let r: Role;
+    switch (roleName.toUpperCase()) {
+      case RoleClass.COPYCAT.code:
+        r = new Copycat();
+        break;
+      case RoleClass.DOPPELGANGER.code:
+        r = new Doppelganger();
+        break;
+      case RoleClass.WEREWOLF.code:
+        r = new Werewolf();
+        break;
+      case RoleClass.MINION.code:
+        r = new Minion();
+        break;
+      case RoleClass.MASON.code:
+        r = new Mason();
+        break;
+      case RoleClass.SEER.code:
+        r = new Seer();
+        break;
+      case RoleClass.ROBBER.code:
+        r = new Robber();
+        break;
+      case RoleClass.TROUBLEMAKER.code:
+        r = new Troublemaker();
+        break;
+      case RoleClass.DRUNK.code:
+        r = new Drunk();
+        break;
+      case RoleClass.INSOMNIAC.code:
+        r = new Insomniac();
+        break;
+      case RoleClass.VILLAGER.code:
+        r = new Villager();
+        break;
+      case RoleClass.TANNER.code:
+        r = new Tanner();
+        break;
+      case RoleClass.HUNTER.code:
+        r = new Hunter();
+        break;
+      default:
+        break;
+    }
+    return r;
+  }
+  
+  createRoleByInterface(roleInterface: RoleClassInterface): Role {
+    return this.createRoleByCode(roleInterface.code);
+  }
+}
