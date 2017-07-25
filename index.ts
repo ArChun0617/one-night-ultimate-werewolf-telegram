@@ -174,6 +174,52 @@ bot.onText(/\/newgame/, (msg) => {
   console.log(`GAME ${id} has been created`);
 });
 
+bot.onText(/\/newbiegame/, (msg) => {
+  const id = msg.chat.id;
+  console.log(`newbiegame: chat.id: `, id);
+  // validation and make sure one channel only have one game
+  const game = getGame(msg.chat.id);
+
+  if (game) {
+    bot.sendMessage(msg.chat.id, lang.getString("GAME_FOUND"));
+    return;
+  }
+
+  let gameSetting = _.find(gameSettings, setting => setting.id === msg.chat.id);
+
+  if (!gameSetting) {
+    /*sendAskForSettingMessage(msg.chat.id);
+    return;*/
+    gameSetting = { id: msg.chat.id, roles: [] };
+    gameSettings.push(gameSetting);
+
+    addGameSettingRole(msg.id, gameSetting, RoleClass.COPYCAT);          // 7 - 4p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 1 - 0
+    addGameSettingRole(msg.id, gameSetting, RoleClass.SEER);             // 2 - 0
+    addGameSettingRole(msg.id, gameSetting, RoleClass.ROBBER);           // 3 - 0
+    addGameSettingRole(msg.id, gameSetting, RoleClass.INSOMNIAC);        // 4 - 0
+    addGameSettingRole(msg.id, gameSetting, RoleClass.TROUBLEMAKER);     // 5 - 0
+    addGameSettingRole(msg.id, gameSetting, RoleClass.MINION);           // 6 - 3p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 8 - 5p
+    //addGameSettingRole(msg.id, gameSetting, RoleClass.DOPPELGANGER);     // 8 - 5p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.TANNER);           // 9 - 6p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 10- 7p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 11- 8p
+    //addGameSettingRole(msg.id, gameSetting, RoleClass.DRUNK);            // 12- 9p
+    //addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
+    //addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
+    //addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
+  }
+
+  const players: Player[] = [
+    new Player({ id: msg.from.id, name: msg.from.first_name })
+  ];
+
+  games.push(new Game(id, bot, players, gameSetting.roles, true));
+  bot.sendMessage(msg.chat.id, lang.getString("NEW_GAME"));
+  console.log(`GAME ${id} has been created`);
+});
+
 bot.onText(/\/join/, (msg) => {
   const game = getGame(msg.chat.id);
 

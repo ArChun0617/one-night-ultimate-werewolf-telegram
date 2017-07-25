@@ -4,6 +4,9 @@ export class MessagerInterface {
   bot: any;
   private gameChatID: number;
   private gameActionID: number;
+  private gameTokenID: number;
+  private gameVoteID: number;
+  private newbieMode: boolean;
 
   get chatID(): number {
     return this.gameChatID;
@@ -18,7 +21,7 @@ export class MessagerInterface {
     this.gameActionID = value;
   }
   
-  constructor(_bot: any) {
+  constructor(_bot: any, _newbieMode: boolean) {
     /*let ansCallback = _bot.answerCallbackQuery;
 
     _bot.answerCallbackQuery = ((callbackQueryId, text, showAlert, form = {}) => {
@@ -33,6 +36,7 @@ export class MessagerInterface {
     this.bot = _bot;
     this.gameChatID = -1;
     this.gameActionID = -1;
+    this.newbieMode = _newbieMode;
   }
 
   sendMsg(text, option = {}) {
@@ -56,12 +60,77 @@ export class MessagerInterface {
     }
   }
 
-  showNotification(callbackQueryId, text, showAlert = true, form = {}) {
+  showNotification(callbackQueryId, text, showAlert = this.newbieMode, form = {}) {
     try {
       this.bot.answerCallbackQuery(callbackQueryId, text, showAlert, form);
     }
     catch (err) {
       console.log(`ERROR !!! [showNotification] : `, err.substring(0, 10)+"...");
+    }
+  }
+
+  sendTokenMessage(text: string, isCommand: boolean, option = {}) {
+    var msgKeyID = this.gameTokenID;
+
+    if (isCommand) {
+      // If by command, delete-insert
+      if (msgKeyID)
+        this.bot.deleteMessage(this.gameChatID, msgKeyID);
+
+      this.bot
+        .sendMessage(this.gameChatID, text, option)
+        .then((sended) => {
+          this.gameTokenID = sended.message_id;
+        });
+    }
+    else {
+      // If by callback, update-insert
+      if (msgKeyID) {
+        this.bot.editMessageText(text, _.extend(option, {
+          chat_id: this.gameChatID,
+          message_id: msgKeyID
+        }));
+      }
+      else {
+        // Abnormal case as callback without original message, but send message anyway
+        this.bot
+          .sendMessage(this.gameChatID, text, option)
+          .then((sended) => {
+            this.gameTokenID = sended.message_id;
+          });
+      }
+    }
+  }
+
+  sendVoteMessage(text: string, isCommand: boolean, option = {}) {
+    var msgKeyID = this.gameVoteID;
+    if (isCommand) {
+      // If by command, delete-insert
+      if (msgKeyID)
+        this.bot.deleteMessage(this.gameChatID, msgKeyID);
+
+      this.bot
+        .sendMessage(this.gameChatID, text, option)
+        .then((sended) => {
+          this.gameVoteID = sended.message_id;
+        });
+    }
+    else {
+      // If by callback, update-insert
+      if (msgKeyID) {
+        this.bot.editMessageText(text, _.extend(option, {
+          chat_id: this.gameChatID,
+          message_id: msgKeyID
+        }));
+      }
+      else {
+        // Abnormal case as callback without original message, but send message anyway
+        this.bot
+          .sendMessage(this.gameChatID, text, option)
+          .then((sended) => {
+            this.gameVoteID = sended.message_id;
+          });
+      }
     }
   }
 }

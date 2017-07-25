@@ -54,16 +54,18 @@ export class Game {
   winners: Player[] = [];
   losers: Player[] = [];
   actionStack: ActionFootprint[] = [];
+  newbieMode: boolean = false;
 
   votingTimer: any;
   votingResolve: any;
 
-  constructor(chatID: number, bot: any, players: Player[], roles: RoleClassInterface[]) {
+  constructor(chatID: number, bot: any, players: Player[], roles: RoleClassInterface[], newbieMode: boolean = false) {
     this.id = chatID;
-    this.msgInterface = new MessagerInterface(bot);
+    this.msgInterface = new MessagerInterface(bot, newbieMode);
     this.msgInterface.chatID = chatID;
     this.gameRoles = roles;
     this.players = players;
+    this.newbieMode = newbieMode;
   }
 
   start(msg) {
@@ -231,17 +233,9 @@ export class Game {
     key.push([{ text: this.lang.getString("VOTE_BLANK"), callback_data: `-1` }]);
     
     //If call by command, sendMsg; If call by button, update message
-    if (!msg.message) {
-      this.msgInterface.sendMsg(this.lang.getString("VOTE_LIST"), {
-          reply_markup: JSON.stringify({ inline_keyboard: key })
-        });
-    }
-    else {
-      this.msgInterface.editAction(this.lang.getString("VOTE_LIST"), {
-        gameActionID: msg.message.message_id,
-        reply_markup: JSON.stringify({ inline_keyboard: key })
-      });
-    }
+    this.msgInterface.sendVoteMessage(this.lang.getString("VOTE_LIST"), (!msg.message), {
+      reply_markup: JSON.stringify({ inline_keyboard: key })
+    });
   }
 
   setToken(msg) {
@@ -285,17 +279,9 @@ export class Game {
     });
 
     //If call by command, sendMsg; If call by button, update message
-    if (!msg.message) {
-      this.msgInterface.sendMsg(this.lang.getString("TOKEN_LIST") + rtnMsg, {
-        reply_markup: JSON.stringify({ inline_keyboard: key })
-      });
-    }
-    else {
-      this.msgInterface.editAction(this.lang.getString("TOKEN_LIST") + rtnMsg, {
-        gameActionID: msg.message.message_id,
-        reply_markup: JSON.stringify({ inline_keyboard: key })
-      });
-    }
+    this.msgInterface.sendTokenMessage(this.lang.getString("TOKEN_LIST") + rtnMsg, (!msg.message), {
+      reply_markup: JSON.stringify({ inline_keyboard: key })
+    });
   }
 
   on(event, msg) {
@@ -532,17 +518,17 @@ export class Game {
 
       result += `<b>${Emoji.get('skull')} ${this.lang.getString("RESULT_DEATHS")}</b>\n`;
       _.map(this.deathPlayers, (death) => {
-        result += `${death.name} ${death.getOriginalRole().fullName} ${Emoji.get('arrow_right')} ${death.getRole().fullName}  ${Emoji.get('point_left')} ${death.count} \n`;
+        result += `${death.name} ${(this.newbieMode ? death.getOriginalRole().fullName : death.getOriginalRole().emoji)} ${Emoji.get('arrow_right')} ${(this.newbieMode ? death.getRole().fullName : death.getRole().emoji)}  ${Emoji.get('point_left')} ${death.count} \n`;
       });
 
       result += `\n<b>${Emoji.get('trophy')}${Emoji.get('full_moon_with_face')} ${this.lang.getString("RESULT_WINNERS")}</b>\n`;
       _.map(this.winners, (winner: Player) => {
-        result += `${winner.name} ${winner.getOriginalRole().fullName} ${Emoji.get('arrow_right')} ${winner.getRole().fullName}  ${Emoji.get('point_right')} ${winner.getKillTarget().name} \n`;
+        result += `${winner.name} ${(this.newbieMode ? winner.getOriginalRole().fullName : winner.getOriginalRole().emoji)} ${Emoji.get('arrow_right')} ${(this.newbieMode ? winner.getRole().fullName : winner.getRole().emoji)}  ${Emoji.get('point_right')} ${winner.getKillTarget().name} \n`;
       });
 
       result += `\n<b>${Emoji.get('new_moon_with_face')} ${this.lang.getString("RESULT_LOSERS")}</b>\n`;
       _.map(this.losers, (loser: Player) => {
-        result += `${loser.name} ${loser.getOriginalRole().fullName} ${Emoji.get('arrow_right')} ${loser.getRole().fullName}  ${Emoji.get('point_right')} ${loser.getKillTarget().name} \n`;
+        result += `${loser.name} ${(this.newbieMode ? loser.getOriginalRole().fullName : loser.getOriginalRole().emoji)} ${Emoji.get('arrow_right')} ${(this.newbieMode ? loser.getRole().fullName : loser.getRole().emoji)}  ${Emoji.get('point_right')} ${loser.getKillTarget().name} \n`;
       });
 
       result += `\n<b>${this.lang.getString("ACTION_STACK")}</b>\n`;
@@ -553,7 +539,7 @@ export class Game {
           role = step.player.getOriginalRole();
           rolePrefix = (role.shadowChoice ? role.shadowChoice.emoji : "");
         }
-        return `${step.player.getOriginalRole().fullName}${rolePrefix}${step.player.name} : ${step.toString()}`
+        return `${(this.newbieMode ? step.player.getOriginalRole().fullName : step.player.getOriginalRole().emoji)}${rolePrefix}${step.player.name} : ${step.toString()}`
       }).join("\n");
 
       this.msgInterface.sendMsg(result, { "parse_mode": "html" });
@@ -677,7 +663,12 @@ export class Game {
       }
 
       //this.msgInterface.showNotification(msg.id, `${rolePrefix}${action.toString()}`);
-      this.msgInterface.showNotification(msg.id, `${this.lang.getString("DOZED_ROLE")}${rolePrefix}\n${this.lang.getString("DOZED_ACTION")}${actionMsg}`);
+      this.msgInterface.showNotification(msg.id,
+        (this.newbieMode ?
+          `${this.lang.getString("DOZED_ROLE")}${rolePrefix}\n${this.lang.getString("DOZED_ACTION")}${actionMsg}` :
+          `${rolePrefix} ${Emoji.get('arrow_right')} ${this.lang.getString("DOZED_ACTION")}${actionMsg}`
+        )
+      );
     }
     else if (parseInt(event)) {
       //if the command = integer, it should be a Vote.
