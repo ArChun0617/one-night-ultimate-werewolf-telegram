@@ -23,8 +23,8 @@ const token = process.env.BOT_TOKEN || '331592410:AAHy9uA7PLWBHmIcNcyNt78hT6XLar
 let bot = new TelegramBot(token, { polling: true });
 let lang = new Language();
 const roles = [
-  { name: RoleClass.COPYCAT.name, max: 0 },
-  { name: RoleClass.DOPPELGANGER.name, max: 0 },
+  // { name: RoleClass.COPYCAT.name, max: 0 },
+  // { name: RoleClass.DOPPELGANGER.name, max: 0 },
   { name: RoleClass.WEREWOLF.name, max: 2 },
   { name: RoleClass.MINION.name, max: 1 },
   { name: RoleClass.MASON.name, max: 2 },
@@ -147,7 +147,7 @@ bot.onText(/\/newgame/, (msg) => {
     gameSetting = { id: msg.chat.id, roles: [] };
     gameSettings.push(gameSetting);
 
-    addGameSettingRole(msg.id, gameSetting, RoleClass.COPYCAT);          // 7 - 4p
+    // addGameSettingRole(msg.id, gameSetting, RoleClass.COPYCAT);          // 7 - 4p
     addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 1 - 0
     addGameSettingRole(msg.id, gameSetting, RoleClass.SEER);             // 2 - 0
     addGameSettingRole(msg.id, gameSetting, RoleClass.ROBBER);           // 3 - 0
@@ -193,7 +193,7 @@ bot.onText(/\/newbiegame/, (msg) => {
     gameSetting = { id: msg.chat.id, roles: [] };
     gameSettings.push(gameSetting);
 
-    addGameSettingRole(msg.id, gameSetting, RoleClass.COPYCAT);          // 7 - 4p
+    // addGameSettingRole(msg.id, gameSetting, RoleClass.COPYCAT);          // 7 - 4p
     addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 1 - 0
     addGameSettingRole(msg.id, gameSetting, RoleClass.SEER);             // 2 - 0
     addGameSettingRole(msg.id, gameSetting, RoleClass.ROBBER);           // 3 - 0
