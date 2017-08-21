@@ -9,7 +9,7 @@ import { Player } from "./player/player";
 import { Table } from "./npc/table";
 import { ActionFootprint } from "./util/ActionFootprint";
 import { MessagerInterface } from "./util/MessagerInterface";
-import { Language } from "./util/language";
+import { Language } from "./util/Language";
 
 interface Result {
   target: Player;

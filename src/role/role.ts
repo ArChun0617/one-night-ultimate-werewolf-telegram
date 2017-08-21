@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import { Player } from "../player/player";
 import { Table } from "../npc/table";
 import { ActionFootprint } from "../util/ActionFootprint";
-import { Language } from "../util/language";
+import { Language } from "../util/Language";
 
 export class RoleClassInterface {
   emoji: string;

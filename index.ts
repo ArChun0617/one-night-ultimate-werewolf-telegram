@@ -5,7 +5,7 @@ import { Game } from './src/game';
 import { Role, RoleClass, RoleClassInterface } from "./src/role/role";
 import { Player } from "./src/player/player";
 import { GameEndError } from "./src/error/gameend";
-import { Language } from "./src/util/language";
+import { Language } from "./src/util/Language";
 
 interface GameSetting {
   id: string;
