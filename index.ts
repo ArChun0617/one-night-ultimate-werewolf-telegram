@@ -23,8 +23,8 @@ const token = process.env.BOT_TOKEN || '331592410:AAHy9uA7PLWBHmIcNcyNt78hT6XLar
 let bot = new TelegramBot(token, { polling: true });
 let lang = new Language();
 const roles = [
-  { name: RoleClass.COPYCAT.name, max: 1 },
-  { name: RoleClass.DOPPELGANGER.name, max: 1 },
+  { name: RoleClass.COPYCAT.name, max: 0 },
+  { name: RoleClass.DOPPELGANGER.name, max: 0 },
   { name: RoleClass.WEREWOLF.name, max: 2 },
   { name: RoleClass.MINION.name, max: 1 },
   { name: RoleClass.MASON.name, max: 2 },
