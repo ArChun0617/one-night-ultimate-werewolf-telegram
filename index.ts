@@ -19,7 +19,7 @@ console.log(`port: ${port}`);
 
 const gameSettings: GameSetting[] = [];
 const games: Game[] = [];
-const token = '331592410:AAHy9uA7PLWBHmIcNcyNt78hT6XLarrOjHM';
+const token = process.env.BOT_TOKEN || '331592410:AAHy9uA7PLWBHmIcNcyNt78hT6XLarrOjHM';
 let bot = new TelegramBot(token, { polling: true });
 let lang = new Language();
 const roles = [
