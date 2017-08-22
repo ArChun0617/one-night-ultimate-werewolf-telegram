@@ -494,7 +494,7 @@ export class Game {
               if (!player.getKillTarget()) this.randomVote(player);
             });
             resolve();
-          }, this.actionTime * 2));
+          }, process.env.VOTE_SECOND * 1000 || (this.actionTime * 12)));
       }
     });
   }
