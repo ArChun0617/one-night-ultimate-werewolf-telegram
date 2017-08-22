@@ -147,22 +147,22 @@ bot.onText(/\/newgame/, (msg) => {
     gameSetting = { id: msg.chat.id, roles: [] };
     gameSettings.push(gameSetting);
 
-    // addGameSettingRole(msg.id, gameSetting, RoleClass.COPYCAT);          // 7 - 4p
+    // addGameSettingRole(msg.id, gameSetting, RoleClass.COPYCAT);       // 0 - 4p
+    //addGameSettingRole(msg.id, gameSetting, RoleClass.DOPPELGANGER);   // 0 - 5p
     addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 1 - 0
     addGameSettingRole(msg.id, gameSetting, RoleClass.SEER);             // 2 - 0
     addGameSettingRole(msg.id, gameSetting, RoleClass.ROBBER);           // 3 - 0
     addGameSettingRole(msg.id, gameSetting, RoleClass.INSOMNIAC);        // 4 - 0
     addGameSettingRole(msg.id, gameSetting, RoleClass.TROUBLEMAKER);     // 5 - 0
     addGameSettingRole(msg.id, gameSetting, RoleClass.MINION);           // 6 - 3p
-    addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 8 - 5p
-    //addGameSettingRole(msg.id, gameSetting, RoleClass.DOPPELGANGER);     // 8 - 5p
-    addGameSettingRole(msg.id, gameSetting, RoleClass.DRUNK);            // 12- 9p
-    addGameSettingRole(msg.id, gameSetting, RoleClass.TANNER);           // 9 - 6p
-    addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 10- 7p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 7 - 4p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.TANNER);           // 8 - 5p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.DRUNK);            // 9 - 6p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 10- 8p
     addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 11- 8p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 12- 10p
     addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
-    addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
-    addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 10- 7p
   }
 
   const players: Player[] = [
@@ -193,22 +193,22 @@ bot.onText(/\/newbiegame/, (msg) => {
     gameSetting = { id: msg.chat.id, roles: [] };
     gameSettings.push(gameSetting);
 
-    // addGameSettingRole(msg.id, gameSetting, RoleClass.COPYCAT);          // 7 - 4p
+    // addGameSettingRole(msg.id, gameSetting, RoleClass.COPYCAT);       // 0 - 4p
+    //addGameSettingRole(msg.id, gameSetting, RoleClass.DOPPELGANGER);   // 0 - 5p
     addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 1 - 0
     addGameSettingRole(msg.id, gameSetting, RoleClass.SEER);             // 2 - 0
     addGameSettingRole(msg.id, gameSetting, RoleClass.ROBBER);           // 3 - 0
     addGameSettingRole(msg.id, gameSetting, RoleClass.INSOMNIAC);        // 4 - 0
     addGameSettingRole(msg.id, gameSetting, RoleClass.TROUBLEMAKER);     // 5 - 0
     addGameSettingRole(msg.id, gameSetting, RoleClass.MINION);           // 6 - 3p
-    addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 8 - 5p
-    //addGameSettingRole(msg.id, gameSetting, RoleClass.DOPPELGANGER);     // 8 - 5p
-    addGameSettingRole(msg.id, gameSetting, RoleClass.TANNER);           // 9 - 6p
-    addGameSettingRole(msg.id, gameSetting, RoleClass.DRUNK);            // 12- 9p
-    addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 10- 7p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 7 - 4p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.TANNER);           // 8 - 5p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.DRUNK);            // 9 - 6p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 10- 8p
     addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 11- 8p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 12- 10p
     addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
-    addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
-    addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
+    addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 10- 7p
   }
 
   const players: Player[] = [

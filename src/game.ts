@@ -74,7 +74,14 @@ export class Game {
     this.msgInterface.sendMsg(this.lang.getString("GAME_START"));
 
     if (this.players.length >= 3) {
-      this.gameRoles = this.gameRoles.slice(0, this.players.length + 3);  // Auto apply role by number of user, *unless* user below 3, then debug mode.
+      // 7 players add villager, 8 player pick Mason
+      if (this.players.length === 7) {
+        let roles = [];
+        roles = this.gameRoles.slice(0, 9);
+        roles.push(this.gameRoles.pop());
+      } else {
+        this.gameRoles = this.gameRoles.slice(0, this.players.length + 3);  // Auto apply role by number of user, *unless* user below 3, then debug mode.
+      }
     }
     else {
       const playerTemp = [
