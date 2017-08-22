@@ -304,7 +304,7 @@ bot.onText(/\/vote/, (msg) => {
 
   if (!game) return askForCreateNewGame(msg.chat.id);
 
-  game.sendVotingList(msg);
+  game.sendVotingList(msg, true);
 });
 
 bot.on('callback_query', (msg) => {

@@ -37,7 +37,7 @@ export class Game {
   public static PHASE_VOTING: string = 'voting';
   public static PHASE_KILL_PLAYER: string = 'kill_player';
   public static PHASE_END_GAME: string = 'endgame';
-  
+
   lang: Language = new Language();
   id: number;
   players: any[];
@@ -215,7 +215,7 @@ export class Game {
     return this.lang.getString("WAIT_FOR_START") + "\n" + rtnMsg;
   }
 
-  sendVotingList(msg) {
+  sendVotingList(msg, isCommand: boolean = false) {
     if (this.getPhase() !== Game.PHASE_CONVERSATION && this.getPhase() !== Game.PHASE_VOTING) {
       return this.sendInvalidActionMessage(msg.chat.id);
     }
@@ -226,23 +226,31 @@ export class Game {
     _.map(this.players, (player: Player) => {
       let row = pos / this.btnPerLine | 0;
       if (!key[row]) key[row] = [];
-      key[row].push({ text: `${player.name}${(player.getKillTarget() ? this.lang.getString("PLAYER_VOTED") : "")}`, callback_data: `${player.id}` });
+      key[row].push({
+        text: `${player.name}${(player.getKillTarget() ? this.lang.getString("PLAYER_VOTED") : "")}`,
+        callback_data: `${player.id}`
+      });
       pos++;
     });
 
     key.push([{ text: this.lang.getString("VOTE_BLANK"), callback_data: `-1` }]);
-    
+
     //If call by command, sendMsg; If call by button, update message
-    this.msgInterface.sendVoteMessage(this.lang.getString("VOTE_LIST"), (!msg.message), {
+    // this.msgInterface.sendVoteMessage(this.lang.getString("VOTE_LIST"), (!msg.message), {
+    //   reply_markup: JSON.stringify({ inline_keyboard: key })
+    // });
+    this.msgInterface.sendVoteMessage(this.lang.getString("VOTE_LIST"), isCommand, {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     });
   }
 
   setToken(msg) {
     let p: Player = this.getPlayer(msg.from.id);
-    if (!p) { return; } // If player not in game, throw the call
+    if (!p) {
+      return;
+    } // If player not in game, throw the call
     //console.log("game.setToken: " + msg.data);
-    
+
     const regex = /SET_TOKEN_(.+)/;
     const para: string[] = regex.exec(msg.data);
     const roleName: string = para[1].toUpperCase();
@@ -259,8 +267,10 @@ export class Game {
 
   showToken(msg) {
     let p: Player = this.getPlayer(msg.from.id);
-    if (!p) { return; } // If player not in game, throw the call
-    
+    if (!p) {
+      return;
+    } // If player not in game, throw the call
+
     let rtnMsg: string = '';
     _.map(this.players, (player: Player) => {
       rtnMsg += `${player.name} - ${(player.token ? player.token.fullName : this.lang.getString("TOKEN_UNKNOWN"))}\n`;
@@ -287,13 +297,13 @@ export class Game {
   on(event, msg) {
     // status validation
     if (_.indexOf([
-      Game.PHASE_WAITING_PLAYER,
-      Game.PHASE_START_GAME,
-      Game.PHASE_PREPARE_DECK,
-      Game.PHASE_START_NIGHT,
-      Game.PHASE_KILL_PLAYER,
-      Game.PHASE_END_GAME
-    ], this.getPhase()) >= 0) {
+        Game.PHASE_WAITING_PLAYER,
+        Game.PHASE_START_GAME,
+        Game.PHASE_PREPARE_DECK,
+        Game.PHASE_START_NIGHT,
+        Game.PHASE_KILL_PLAYER,
+        Game.PHASE_END_GAME
+      ], this.getPhase()) >= 0) {
       this.sendInvalidActionMessage(msg.id);
       return;
     }
@@ -307,10 +317,18 @@ export class Game {
     }
 
     switch (this.getPhase()) {
-      case Game.PHASE_ANNOUNCE_PLAYER_ROLE: this.handleAnnouncePlayerEvent(event, msg, player); break;
-      case Game.PHASE_CONVERSATION: this.handleConversationEvent(event, msg, player); break;
-      case Game.PHASE_VOTING: this.handleVotingEvent(event, msg, player); break;
-      default: this.handleWakeUpEvent(event, msg, player); break;
+      case Game.PHASE_ANNOUNCE_PLAYER_ROLE:
+        this.handleAnnouncePlayerEvent(event, msg, player);
+        break;
+      case Game.PHASE_CONVERSATION:
+        this.handleConversationEvent(event, msg, player);
+        break;
+      case Game.PHASE_VOTING:
+        this.handleVotingEvent(event, msg, player);
+        break;
+      default:
+        this.handleWakeUpEvent(event, msg, player);
+        break;
     }
   }
 
@@ -436,7 +454,12 @@ export class Game {
 
     this.msgInterface.editAction(this.lang.getString("GAME_DAY_START") + (gameDuration / 60 / 1000) + this.lang.getString("GAME_DAY_START_VOTE") + (now.getHours() + ":" + ("0" + now.getMinutes()).slice(-2) + ":" + now.getSeconds())
       , {
-        reply_markup: JSON.stringify({ inline_keyboard: [[{ text: this.lang.getString("GAME_DAY_DOZED"), callback_data: "DOZED_WAKE_UP" }]] })
+        reply_markup: JSON.stringify({
+          inline_keyboard: [[{
+            text: this.lang.getString("GAME_DAY_DOZED"),
+            callback_data: "DOZED_WAKE_UP"
+          }]]
+        })
       }
     );
 
@@ -464,7 +487,7 @@ export class Game {
       }
       else {
         this.msgInterface.sendMsg(this.lang.getString("VOTE_START"))
-          .then(this.sendVotingList(msg))
+          .then(this.sendVotingList(msg, false))
           .then(setTimeout(() => {
             // make sure every vote a player, random vote if needed
             _.map(this.players, (player) => {
@@ -494,11 +517,11 @@ export class Game {
       // sort result
       this.result = _.reverse(_.sortBy(this.result, (result) => result.count));
       const deaths = _.filter(this.result, (result) => result.count >= this.result[0].count && result.count >= 2);
-      
+
       //console.log('this.result', util.inspect(this.result, false, 3));
       _.map(deaths, (death: Result) => {
         if (death.target.getOriginalRole().checkRole([RoleClass.HUNTER])) {
-          this.deathPlayers.push(_.assignIn(death.target.getKillTarget(), {"count": "HUNTER"}));
+          this.deathPlayers.push(_.assignIn(death.target.getKillTarget(), { "count": "HUNTER" }));
         }
         this.deathPlayers.push(_.assignIn(death.target, { "count": death.count }));
       });
@@ -535,7 +558,7 @@ export class Game {
       result += _.map(this.actionStack, (step: ActionFootprint) => {
         let rolePrefix = "";
         let role: any;
-        if (step.player.getOriginalRole().code == RoleClass.DOPPELGANGER.code || step.player.getOriginalRole().code == RoleClass.COPYCAT.code ) {
+        if (step.player.getOriginalRole().code == RoleClass.DOPPELGANGER.code || step.player.getOriginalRole().code == RoleClass.COPYCAT.code) {
           role = step.player.getOriginalRole();
           rolePrefix = (role.shadowChoice ? role.shadowChoice.emoji : "");
         }
@@ -562,16 +585,36 @@ export class Game {
 
   private setWakeUpPhase(role) {
     switch (role) {
-      case RoleClass.COPYCAT: this.setPhase(Game.PHASE_WAKEUP_COPYCAT); break;
-      case RoleClass.DOPPELGANGER: this.setPhase(Game.PHASE_WAKEUP_DOPPELGANGER); break;
-      case RoleClass.WEREWOLF: this.setPhase(Game.PHASE_WAKEUP_WEREWOLF); break;
-      case RoleClass.MINION: this.setPhase(Game.PHASE_WAKEUP_MINION); break;
-      case RoleClass.MASON: this.setPhase(Game.PHASE_WAKEUP_MASON); break;
-      case RoleClass.SEER: this.setPhase(Game.PHASE_WAKEUP_SEER); break;
-      case RoleClass.ROBBER: this.setPhase(Game.PHASE_WAKEUP_ROBBER); break;
-      case RoleClass.TROUBLEMAKER: this.setPhase(Game.PHASE_WAKEUP_TROUBLEMAKER); break;
-      case RoleClass.DRUNK: this.setPhase(Game.PHASE_WAKEUP_DRUNK); break;
-      case RoleClass.INSOMNIAC: this.setPhase(Game.PHASE_WAKEUP_INSOMNIAC); break;
+      case RoleClass.COPYCAT:
+        this.setPhase(Game.PHASE_WAKEUP_COPYCAT);
+        break;
+      case RoleClass.DOPPELGANGER:
+        this.setPhase(Game.PHASE_WAKEUP_DOPPELGANGER);
+        break;
+      case RoleClass.WEREWOLF:
+        this.setPhase(Game.PHASE_WAKEUP_WEREWOLF);
+        break;
+      case RoleClass.MINION:
+        this.setPhase(Game.PHASE_WAKEUP_MINION);
+        break;
+      case RoleClass.MASON:
+        this.setPhase(Game.PHASE_WAKEUP_MASON);
+        break;
+      case RoleClass.SEER:
+        this.setPhase(Game.PHASE_WAKEUP_SEER);
+        break;
+      case RoleClass.ROBBER:
+        this.setPhase(Game.PHASE_WAKEUP_ROBBER);
+        break;
+      case RoleClass.TROUBLEMAKER:
+        this.setPhase(Game.PHASE_WAKEUP_TROUBLEMAKER);
+        break;
+      case RoleClass.DRUNK:
+        this.setPhase(Game.PHASE_WAKEUP_DRUNK);
+        break;
+      case RoleClass.INSOMNIAC:
+        this.setPhase(Game.PHASE_WAKEUP_INSOMNIAC);
+        break;
     }
   }
 
@@ -585,8 +628,12 @@ export class Game {
 
   private handleAnnouncePlayerEvent(event: string, msg: any, player: Player) {
     switch (event) {
-      case 'view_role': this.viewPlayerRole(player, msg); break;
-      default: this.sendInvalidActionMessage(msg.id); break;
+      case 'view_role':
+        this.viewPlayerRole(player, msg);
+        break;
+      default:
+        this.sendInvalidActionMessage(msg.id);
+        break;
     }
   }
 
@@ -617,8 +664,7 @@ export class Game {
       else if (this.getPhase() == 'wakeup_' + shadowRoleName) {
         //If (picked and correct phase), Okay
       }
-      else
-      {
+      else {
         this.sendInvalidActionMessage(msg.id);
         return;
       }
@@ -649,8 +695,7 @@ export class Game {
           role = action.player.getOriginalRole();
           rolePrefix = role.emoji + role.shadowChoice.emoji + role.shadowChoice.name;
         }
-        else
-        {
+        else {
           rolePrefix = action.player.getOriginalRole().fullName;
         }
 
@@ -665,8 +710,8 @@ export class Game {
       //this.msgInterface.showNotification(msg.id, `${rolePrefix}${action.toString()}`);
       this.msgInterface.showNotification(msg.id,
         (this.newbieMode ?
-          `${this.lang.getString("DOZED_ROLE")}${rolePrefix}\n${this.lang.getString("DOZED_ACTION")}${actionMsg}` :
-          `${rolePrefix} ${Emoji.get('arrow_right')} ${this.lang.getString("DOZED_ACTION")}${actionMsg}`
+            `${this.lang.getString("DOZED_ROLE")}${rolePrefix}\n${this.lang.getString("DOZED_ACTION")}${actionMsg}` :
+            `${rolePrefix} ${Emoji.get('arrow_right')} ${this.lang.getString("DOZED_ACTION")}${actionMsg}`
         )
       );
     }
@@ -689,7 +734,7 @@ export class Game {
 
     this.votePlayer(id, msg, player);
     // Update the list if the player is first time to vote
-    if (!target && player.getKillTarget()) this.sendVotingList(msg);
+    if (!target && player.getKillTarget()) this.sendVotingList(msg, true);
     if (_.filter(this.players, (player) => !(player.getKillTarget())).length == 0 && this.votingResolve)
       this.votingResolve();
   }
@@ -752,7 +797,7 @@ export class Game {
 
   private votePlayer(id: number, msg, player) {
     let target = _.find(this.players, p => p.id === id && p.id != player.id);
-    if (id == -1) target = new Player({id: -1, name: ""});
+    if (id == -1) target = new Player({ id: -1, name: "" });
     let rtnMsg = "";
     if (target) {
       player.setKillTarget(target);
@@ -796,8 +841,7 @@ export class Game {
     if (timerArray.length > 0) this.countDown(msg, timerArray, unit);
   }
 
-  private countDown(msg, timerArray: any[], unit: string)
-  {
+  private countDown(msg, timerArray: any[], unit: string) {
     if (!timerArray) return;
     let interval = timerArray.shift();
     this.votingTimer = setTimeout(() => {
