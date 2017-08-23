@@ -240,7 +240,7 @@ export class Game {
       pos++;
     });
 
-    key.push([{ text: this.lang.getString("VOTE_BLANK"), callback_data: `-1` }]);
+    // key.push([{ text: this.lang.getString("VOTE_BLANK"), callback_data: `-1` }]);
 
     //If call by command, sendMsg; If call by button, update message
     // this.msgInterface.sendVoteMessage(this.lang.getString("VOTE_LIST"), (!msg.message), {
