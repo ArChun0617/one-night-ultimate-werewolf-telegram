@@ -46,7 +46,7 @@ export class Game {
   deck: Deck;
   gameRoles: RoleClassInterface[];
   gameTime: number = 10 * 60 * 1000;
-  actionTime: number = 10 * 1000;
+  actionTime: number = (process.env.ACTION_TIME ||10 ) * 1000;
   btnPerLine: number = 3;
   phase: string = Game.PHASE_WAITING_PLAYER;
   result: Result[] = [];
