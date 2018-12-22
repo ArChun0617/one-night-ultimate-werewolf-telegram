@@ -15,8 +15,6 @@ interface GameSetting {
 let port = process.env.PORT || 8443;
 let host = process.env.HOST;
 
-console.log(`port: ${port}`);
-
 const gameSettings: GameSetting[] = [];
 const games: Game[] = [];
 const token = process.env.BOT_TOKEN || '331592410:AAHC0JBE5EOFnkfoZJr6QTec_FMwARYwV2U';
@@ -447,3 +445,5 @@ function sendAskForSettingMessage(msgId) {
 }
 
 console.log(`${Emoji.get('robot_face')}  Hi! I am up`);
+console.log(`${Emoji.get('robot_face')}  BOT_TOKEN : ${token}`);
+console.log(`${Emoji.get('robot_face')}  Host : ${host}:${port}`);
