@@ -7,6 +7,8 @@ import { Player } from "./src/player/player";
 import { GameEndError } from "./src/error/gameend";
 import { Language } from "./src/util/Language";
 
+import * as http from 'http';
+
 interface GameSetting {
   id: string;
   roles: RoleClassInterface[];
@@ -443,6 +445,11 @@ function sendGameHasBeenStartedMessage(msgId) {
 function sendAskForSettingMessage(msgId) {
   bot.sendMessage(msgId, lang.getString("ASK_SETTING"));
 }
+
+http.createServer(function (request, response) {
+	response.writeHead(200, { 'Content-Type': 'text/html' });
+	response.end(`${Emoji.get('robot_face')}  Hi! I am up! ${token}`, 'utf-8');
+}).listen(port);
 
 console.log(`${Emoji.get('robot_face')}  Hi! I am up`);
 console.log(`${Emoji.get('robot_face')}  BOT_TOKEN : ${token}`);
