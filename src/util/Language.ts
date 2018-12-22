@@ -94,6 +94,7 @@ export class Language {
     this.en["DOZED_ROLE"] = `Your original role: `;
     this.en["DOZED_ACTION"] = `Action: `;
     
+    this.en["RESULT_PLAYERS"] = `Players (Original${Emoji.get('arrow_right')}Final ${Emoji.get('point_left')}Total Vote)`;
     this.en["RESULT_DEATHS"] = `Death (Original${Emoji.get('arrow_right')}Final ${Emoji.get('point_left')}Total Vote)`;
     this.en["RESULT_WINNERS"] = `Winner (Original${Emoji.get('arrow_right')}Final ${Emoji.get('point_right')}Voted)`;
     this.en["RESULT_LOSERS"] = `Loser (Original${Emoji.get('arrow_right')}Final ${Emoji.get('point_right')}Voted)`;
@@ -165,7 +166,7 @@ export class Language {
     this.zhHK["ROLE_INVALID_ACTION"] = "行動錯誤 !";
     this.zhHK["ROLE_ACTION_WAKE_UP"] = `起身${Emoji.get('eyes')}`;
     this.zhHK["ROLE_ACTION_VIEW_ERROR"] = "你唔可以睇呢張牌喎";
-    this.zhHK["ROLE_ACTION_ROLE_NOT_EXISTS"] = " 唔喺度";
+    this.zhHK["ROLE_ACTION_ROLE_NOT_EXISTS"] = " 冇人";
 
     this.zhHK["ROLE_ACTION_DOPPELGANGER"] = "複製";
     this.zhHK["ROLE_ACTION_COPYCAT"] = "複製";
@@ -181,6 +182,7 @@ export class Language {
     this.zhHK["DOZED_ROLE"] = `你原本嘅身份係: `;
     this.zhHK["DOZED_ACTION"] = `行動: `;
 
+    this.zhHK["RESULT_PLAYERS"] = `玩家 (初始身份${Emoji.get('arrow_right')}最後身份 ${Emoji.get('point_left')}總票數)`;
     this.zhHK["RESULT_DEATHS"] = `死亡玩家 (初始身份${Emoji.get('arrow_right')}最後身份 ${Emoji.get('point_left')}總票數)`;
     this.zhHK["RESULT_WINNERS"] = `贏家 (初始身份${Emoji.get('arrow_right')}最後身份 ${Emoji.get('point_right')}投票目標)`;
     this.zhHK["RESULT_LOSERS"] = `輸家 (初始身份${Emoji.get('arrow_right')}最後身份 ${Emoji.get('point_right')}投票目標)`;

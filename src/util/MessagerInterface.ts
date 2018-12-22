@@ -73,9 +73,15 @@ export class MessagerInterface {
     var msgKeyID = this.gameTokenID;
 
     if (isCommand) {
+      //console.log(`sendTokenMessage.isCommand = true`, msgKeyID);
       // If by command, delete-insert
-      if (msgKeyID)
-        this.bot.deleteMessage(this.gameChatID, msgKeyID);
+      if (msgKeyID) {
+        try {
+            this.bot.deleteMessage(this.gameChatID, msgKeyID);
+        }catch (e) {
+            // Unknown error for unsupported deleteMessage
+        }
+      }
 
       this.bot
         .sendMessage(this.gameChatID, text, option)
@@ -84,6 +90,7 @@ export class MessagerInterface {
         });
     }
     else {
+      //console.log(`sendTokenMessage.isCommand = false`);
       // If by callback, update-insert
       if (msgKeyID) {
         this.bot.editMessageText(text, _.extend(option, {
@@ -106,8 +113,13 @@ export class MessagerInterface {
     var msgKeyID = this.gameVoteID;
     if (isCommand) {
       // If by command, delete-insert
-      if (msgKeyID)
-        this.bot.deleteMessage(this.gameChatID, msgKeyID);
+      if (msgKeyID) {
+        try {
+            this.bot.deleteMessage(this.gameChatID, msgKeyID);
+        }catch (e) {
+            // Unknown error for unsupported deleteMessage
+        }
+      }
 
       this.bot
         .sendMessage(this.gameChatID, text, option)

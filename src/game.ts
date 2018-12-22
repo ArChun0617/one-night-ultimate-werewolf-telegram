@@ -70,13 +70,11 @@ export class Game {
 
   start(msg) {
     if (this.getPhase() != Game.PHASE_WAITING_PLAYER) return; //Prevent double start game
-    console.log(`Game started: ${this.id}`);
-    this.msgInterface.sendMsg(this.lang.getString("GAME_START"));
 
     if (this.players.length >= 3) {
       this.gameRoles = this.gameRoles.slice(0, this.players.length + 3);  // Auto apply role by number of user, *unless* user below 3, then debug mode.
     }
-    else {
+    else if (this.id == 322552798) {
       const playerTemp = [
         "Thomas",
         "Kenny",
@@ -98,12 +96,18 @@ export class Game {
         }
 
       //Debug mode = 3sec action
-      this.actionTime = 3 * 1000;
+      this.actionTime = 1 * 500;
+    }
+    else {
+      return Promise.reject(this.lang.getString("GAME_ERROR_PLAYER_NOT_ENOUGH"));
     }
 
     if (this.players.length + 3 !== this.gameRoles.length) {
       return Promise.reject('Number of players and roles doesn\'t match');
     }
+    
+    console.log(`Game started: ${this.id}`);
+    this.msgInterface.sendMsg(this.lang.getString("GAME_START"));
 
     return this.prepareDeck(this.lang.culture)
       .then(() => console.log(`>> [Announce player role]`))
@@ -277,7 +281,7 @@ export class Game {
       key[row].push({ text: role.fullName, callback_data: "SET_TOKEN_" + role.code.toUpperCase() });
       pos++;
     });
-
+    
     //If call by command, sendMsg; If call by button, update message
     this.msgInterface.sendTokenMessage(this.lang.getString("TOKEN_LIST") + rtnMsg, (!msg.message), {
       reply_markup: JSON.stringify({ inline_keyboard: key })
@@ -516,6 +520,7 @@ export class Game {
       this.winners = this.determineWinners(this.deathPlayers);
       this.losers = _.difference(this.players, this.winners);
 
+      /*
       result += `<b>${Emoji.get('skull')} ${this.lang.getString("RESULT_DEATHS")}</b>\n`;
       _.map(this.deathPlayers, (death) => {
         result += `${death.name} ${(this.newbieMode ? death.getOriginalRole().fullName : death.getOriginalRole().emoji)} ${Emoji.get('arrow_right')} ${(this.newbieMode ? death.getRole().fullName : death.getRole().emoji)}  ${Emoji.get('point_left')} ${death.count} \n`;
@@ -528,6 +533,22 @@ export class Game {
 
       result += `\n<b>${Emoji.get('new_moon_with_face')} ${this.lang.getString("RESULT_LOSERS")}</b>\n`;
       _.map(this.losers, (loser: Player) => {
+        result += `${loser.name} ${(this.newbieMode ? loser.getOriginalRole().fullName : loser.getOriginalRole().emoji)} ${Emoji.get('arrow_right')} ${(this.newbieMode ? loser.getRole().fullName : loser.getRole().emoji)}  ${Emoji.get('point_right')} ${loser.getKillTarget().name} \n`;
+      });
+      */
+      
+      result += `<b>${this.lang.getString("RESULT_PLAYERS")}</b>\n`;
+      _.map(_.sortBy(this.winners, (winner: Player) => winner.getKillTarget().name), (winner: Player) => {
+          //${Emoji.get('trophy')}
+        result += `${Emoji.get('full_moon_with_face')}`;
+        if(_.find(this.deathPlayers, (d: Player) => { return d.name == winner.name}))
+            result += Emoji.get('skull');
+        result += `${winner.name} ${(this.newbieMode ? winner.getOriginalRole().fullName : winner.getOriginalRole().emoji)} ${Emoji.get('arrow_right')} ${(this.newbieMode ? winner.getRole().fullName : winner.getRole().emoji)}  ${Emoji.get('point_right')} ${winner.getKillTarget().name} \n`;
+      });
+      _.map(_.sortBy(this.losers, (loser: Player) => loser.getKillTarget().name), (loser: Player) => {
+        result += `${Emoji.get('new_moon_with_face')}`;
+        if(_.find(this.deathPlayers, (d: Player) => { return d.name == loser.name}))
+            result += Emoji.get('skull');
         result += `${loser.name} ${(this.newbieMode ? loser.getOriginalRole().fullName : loser.getOriginalRole().emoji)} ${Emoji.get('arrow_right')} ${(this.newbieMode ? loser.getRole().fullName : loser.getRole().emoji)}  ${Emoji.get('point_right')} ${loser.getKillTarget().name} \n`;
       });
 

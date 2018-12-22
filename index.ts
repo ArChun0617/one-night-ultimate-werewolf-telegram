@@ -19,7 +19,7 @@ console.log(`port: ${port}`);
 
 const gameSettings: GameSetting[] = [];
 const games: Game[] = [];
-const token = process.env.BOT_TOKEN || '331592410:AAHy9uA7PLWBHmIcNcyNt78hT6XLarrOjHM';
+const token = process.env.BOT_TOKEN || '331592410:AAHC0JBE5EOFnkfoZJr6QTec_FMwARYwV2U';
 let bot = new TelegramBot(token, { polling: true });
 let lang = new Language();
 const roles = [
@@ -147,6 +147,7 @@ bot.onText(/\/newgame/, (msg) => {
     gameSetting = { id: msg.chat.id, roles: [] };
     gameSettings.push(gameSetting);
 
+	/*
     addGameSettingRole(msg.id, gameSetting, RoleClass.COPYCAT);          // 7 - 4p
     addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 1 - 0
     addGameSettingRole(msg.id, gameSetting, RoleClass.SEER);             // 2 - 0
@@ -163,6 +164,7 @@ bot.onText(/\/newgame/, (msg) => {
     //addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
     //addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
     //addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
+	*/
   }
 
   const players: Player[] = [
@@ -259,6 +261,40 @@ bot.onText(/\/start/, (msg) => {
 
   let rtnReady: string = game.setPlayerReady(msg.from.id);
   if (rtnReady == "") {
+	
+    addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 1 - 0
+    addGameSettingRole(msg.id, gameSetting, RoleClass.SEER);             // 2 - 0
+    addGameSettingRole(msg.id, gameSetting, RoleClass.ROBBER);           // 3 - 0
+    addGameSettingRole(msg.id, gameSetting, RoleClass.INSOMNIAC);        // 4 - 0
+    addGameSettingRole(msg.id, gameSetting, RoleClass.TROUBLEMAKER);     // 5 - 0
+	addGameSettingRole(msg.id, gameSetting, RoleClass.MINION);           // 6 - 3p
+	
+	if (game.players.length == 4) {
+		addGameSettingRole(msg.id, gameSetting, RoleClass.COPYCAT);           // 7 - 4p
+	}
+	else if (game.players.length == 5) {
+		addGameSettingRole(msg.id, gameSetting, RoleClass.COPYCAT);           // 7 - 4p
+		addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 6 - 3p
+	}
+	else if (game.players.length == 6) {
+	addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 6 - 3p
+		addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 11 - 6p
+		addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 12 - 6p
+	}
+	else if (game.players.length == 7) {
+		addGameSettingRole(msg.id, gameSetting, RoleClass.COPYCAT);           // 7 - 4p
+	addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 6 - 3p
+		addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 14 - 7p
+		addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 15 - 7p
+	}
+	else if (game.players.length == 8) {
+		addGameSettingRole(msg.id, gameSetting, RoleClass.COPYCAT);          // 7 - 4p
+		addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 6 - 3p
+		addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 14 - 7p
+		addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 15 - 7p
+		addGameSettingRole(msg.id, gameSetting, RoleClass.TANNER);           // 16 - 7p
+	}
+	
     game.start(msg)
       .then(() => {
         killGame(msg.chat.id);
@@ -386,11 +422,12 @@ function killGame(id: number) {
   console.log('Kill Game (found game): ', (game ? "true" : "false"));
 
   if (game) {
+	console.log('Kill Game B4: ', _.map(games, (game: Game) => game.id));
     _.remove(games, (game: Game) => game.id === id);
     game.end();
   }
   
-  console.log('games', _.map(games, (game: Game) => game.id));
+	console.log('Kill Game AF: ', _.map(games, (game: Game) => game.id));
 }
 
 function getGame(id: number) : Game {
