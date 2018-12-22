@@ -6,7 +6,7 @@
   "scripts": {
     "watch": "./node_modules/webpack/bin/webpack.js --watch",
     "watch:dev": "npm run server & npm run watch",
-    "server": "forever dist/index.js",
+    "server": "nodemon dist/index.js",
     "start": "npm run build && npm run server",
     "build": "node ./node_modules/webpack/bin/webpack.js",
     "app": "nodemon ./src/app.js",
