@@ -195,6 +195,7 @@ bot.onText(/\/newbiegame/, (msg) => {
     gameSetting = { id: msg.chat.id, roles: [] };
     gameSettings.push(gameSetting);
 
+    /*
     addGameSettingRole(msg.id, gameSetting, RoleClass.COPYCAT);          // 7 - 4p
     addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 1 - 0
     addGameSettingRole(msg.id, gameSetting, RoleClass.SEER);             // 2 - 0
@@ -211,6 +212,7 @@ bot.onText(/\/newbiegame/, (msg) => {
     //addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
     //addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
     //addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
+    */
   }
 
   const players: Player[] = [
