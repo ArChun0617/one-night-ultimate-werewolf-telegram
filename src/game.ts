@@ -189,7 +189,7 @@ export class Game {
 
     let rtnMsg: string = '';
     _.map(this.players, (player: Player) => {
-      rtnMsg += `${player.name}\n`;
+      rtnMsg += `${player.name} ${(player.readyStart ? "[READY]" : "")}\n`;
     });
 
     this.msgInterface.sendMsg(this.lang.getString("PLAYER_LIST") + rtnMsg);
