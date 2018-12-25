@@ -138,7 +138,7 @@ export class Game {
     
     this.setLang(this.lang.culture);
 
-    console.log(`Game [${this.id}] started`);
+    console.log(`GAME [${this.id}] started`);
     this.msgInterface.sendMsg(this.lang.getString("GAME_START"));
 
     return this.prepareDeck(this.lang.culture)
@@ -146,33 +146,33 @@ export class Game {
       .then(() => this.announcePlayerRole(msg, this.actionTime * 2))
       .then(() => {
         // debug
-        console.log('>> [announcePlayerRole]');
-        console.log('>> [Deck]', this.deck);
-        //console.log('>> [Table]', util.inspect(this.table, { colors: true }));
-        console.log('>> [Table]', util.inspect(_.map(this.table.getRoles(), (r: Role) => { return `${r.emoji}${r.name}` }), { colors: true }));
-        //console.log('>> [Players]', util.inspect(this.players, { colors: true }));
-        console.log('>> [Players]', util.inspect(_.map(this.players, (p: Player) => { return `${p.name} : ${p.role.emoji}${p.role.name}` }), { colors: true }));
+        console.log(`>> [${this.id}:announcePlayerRole]`);
+        console.log(`>> [${this.id}:Deck]`, this.deck);
+        //console.log(`>> [${this.id}:Table]`, util.inspect(this.table, { colors: true }));
+        console.log(`>> [${this.id}:Table]`, util.inspect(_.map(this.table.getRoles(), (r: Role) => { return `${r.emoji}${r.name}` }), { colors: true }));
+        //console.log(`>> [${this.id}:Players]`, util.inspect(this.players, { colors: true }));
+        console.log(`>> [${this.id}:Players]`, util.inspect(_.map(this.players, (p: Player) => { return `${p.name} : ${p.role.emoji}${p.role.name}` }), { colors: true }));
       })
-      .then(() => console.log(`>> [Start night]`))
+      .then(() => console.log(`>> [${this.id}:Start night]`))
       .then(() => this.startNight(msg, this.actionTime))
       .then(() => {
         // debug
-        console.log('>> [Start Day]');
-        console.log('>> [Deck]', this.deck);
-        //console.log('>> [Table]', util.inspect(this.table, { colors: true }));
-        console.log('>> [Table]', util.inspect(_.map(this.table.getRoles(), (r: Role) => { return `${r.emoji}${r.name}` }), { colors: true }));
-        //console.log('>> [Players]', util.inspect(this.players, { colors: true }));
-        console.log('>> [Players]', util.inspect(_.map(this.players, (p: Player) => { return `${p.name} : ${p.role.emoji}${p.role.name}` }), { colors: true }));
-        //console.log('>> [ActionStack]', util.inspect(this.actionStack, { colors: true }));
-        console.log('>> [ActionStack]', util.inspect(_.map(this.actionStack, (a: ActionFootprint) => { return `${a.toDetailString()}` }), { colors: true }));
+        console.log(`>> [${this.id}:Start Day]`);
+        console.log(`>> [${this.id}:Deck]`, this.deck);
+        //console.log(`>> [${this.id}:Table]`, util.inspect(this.table, { colors: true }));
+        console.log(`>> [${this.id}:Table]`, util.inspect(_.map(this.table.getRoles(), (r: Role) => { return `${r.emoji}${r.name}` }), { colors: true }));
+        //console.log(`>> [${this.id}:Players]`, util.inspect(this.players, { colors: true }));
+        console.log(`>> [${this.id}:Players]`, util.inspect(_.map(this.players, (p: Player) => { return `${p.name} : ${p.role.emoji}${p.role.name}` }), { colors: true }));
+        //console.log(`>> [${this.id}:ActionStack]`, util.inspect(this.actionStack, { colors: true }));
+        console.log(`>> [${this.id}:ActionStack]`, util.inspect(_.map(this.actionStack, (a: ActionFootprint) => { return `${a.toDetailString()}` }), { colors: true }));
       })
-      .then(() => console.log(`>> [Start conversation]`))
+      .then(() => console.log(`>> [${this.id}:Start conversation]`))
       .then(() => this.startConversation(msg, this.gameTime * (this.players.length > 6 ? 2 : 1)))  // If more than 6 player, then game time *2
-      .then(() => console.log(`>> [Begin voting]`))
+      .then(() => console.log(`>> [${this.id}:Begin voting]`))
       .then(() => this.beginVoting(msg, this.actionTime))
-      .then(() => console.log(`>> [Kill player]`))
+      .then(() => console.log(`>> [${this.id}:Kill player]`))
       .then(() => this.killPlayer())
-      .then(() => console.log(`>> [Show result]`))
+      .then(() => console.log(`>> [${this.id}:Show result]`))
       .then(() => this.showResult(msg));
   }
 
@@ -474,6 +474,7 @@ export class Game {
     let now: Date = new Date(new Date().getTime() + gameDuration);
     this.setPhase(Game.PHASE_CONVERSATION);
 
+    //this.lang.getString("GAME_DAY_START") + (gameDuration / 60 / 1000) + this.lang.getString("GAME_DAY_START_VOTE") + (now.getHours() + ":" + ("0" + now.getMinutes()).slice(-2) + ":" + now.getSeconds())
     this.msgInterface.editAction(this.lang.getString("GAME_DAY_START") + (gameDuration / 60 / 1000) + this.lang.getString("GAME_DAY_START_VOTE") + (now.getHours() + ":" + ("0" + now.getMinutes()).slice(-2) + ":" + now.getSeconds())
       , {
         reply_markup: JSON.stringify({ inline_keyboard: [[{ text: this.lang.getString("GAME_DAY_DOZED"), callback_data: "DOZED_WAKE_UP" }],
@@ -592,7 +593,7 @@ export class Game {
       result += _.map(this.actionStack, (step: ActionFootprint) => { return step.toDetailString() + "\n"; });
 
       this.msgInterface.sendMsg(result, { "parse_mode": "html" });
-      console.log('Result', result);
+      console.log(`>> [${this.id}:Result]`, result);
       resolve();
     });
   }
@@ -764,11 +765,15 @@ export class Game {
       RoleClass.WEREWOLF.code, RoleClass.MINION.code, RoleClass.TANNER.code
     ], player.getRole().code) < 0);
 
-    console.log('>> determineWinners.deathPlayers', deathPlayers);
-    console.log('>> determineWinners.deathTanners', deathTanners);
-    console.log('>> determineWinners.deathWerewolfs', deathWerewolfs);
-    console.log('>> determineWinners.deathVillages', deathVillages);
-    console.log('>> determineWinners.hasWerewolfOnTable()', this.hasWerewolfOnTable());
+    //console.log(`>> determineWinners.deathPlayers`, deathPlayers);
+    console.log(`>> [${this.id}:determineWinners.deathPlayers]`, util.inspect(_.map(deathPlayers, (p: Player) => { return `${p.name}${p.role.emoji}${p.role.name}` }), { colors: true }));
+    //console.log(`>> determineWinners.deathTanners`, deathTanners);
+    console.log(`>> [${this.id}:determineWinners.deathTanners]`, util.inspect(_.map(deathTanners, (p: Player) => { return `${p.name}${p.role.emoji}${p.role.name}` }), { colors: true }));
+    //console.log(`>> determineWinners.deathWerewolfs`, deathWerewolfs);
+    console.log(`>> [${this.id}:determineWinners.deathWerewolfs]`, util.inspect(_.map(deathWerewolfs, (p: Player) => { return `${p.name}${p.role.emoji}${p.role.name}` }), { colors: true }));
+    //console.log(`>> determineWinners.deathVillages`, deathVillages);
+    console.log(`>> [${this.id}:determineWinners.deathVillages]`, util.inspect(_.map(deathVillages, (p: Player) => { return `${p.name}${p.role.emoji}${p.role.name}` }), { colors: true }));
+    console.log(`>> [${this.id}:determineWinners.hasWerewolfOnTable()]`, this.hasWerewolfOnTable());
 
     // Tanner always win when he die
     winners = _.concat(winners, deathTanners);

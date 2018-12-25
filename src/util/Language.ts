@@ -64,8 +64,8 @@ export class Language {
     this.en["GAME_VIEW_ROLE"] = `View your role${Emoji.get("black_joker")}`;
     this.en["NOTIFY_ROLE"] = `Your role is `;
     this.en["GAME_NIGHT_START"] = `${Emoji.get('crescent_moon')}  Night start, Everyone close your eye.`;
-    this.en["GAME_DAY_START"] = `${Emoji.get('hourglass_flowing_sand')}  Everyone wake up! You can discuss for `;
-    this.en["GAME_DAY_START_VOTE"] = `mins... vote at `;
+    this.en["GAME_DAY_START"] = `${Emoji.get('hourglass_flowing_sand')}  Everyone wake up, use \/showtoken to mark yourself. You can discuss for `;
+    this.en["GAME_DAY_START_VOTE"] = `mins... \/vote at `;
     this.en["GAME_DAY_DOZED"] = `Action History`;
     this.en["GAME_DAY_SHOWOKEN"] = `Show Token`;
     this.en["GAME_DAY_VOTE"] = `Voting`;
@@ -154,8 +154,8 @@ export class Language {
     this.zhHK["GAME_VIEW_ROLE"] = `開牌${Emoji.get("black_joker")}`;
     this.zhHK["NOTIFY_ROLE"] = `你嘅身份係 `;
     this.zhHK["GAME_NIGHT_START"] = `${Emoji.get('crescent_moon')} 夜深喇, 夠鐘瞓覺喇, 大家合埋眼`;
-    this.zhHK["GAME_DAY_START"] = `${Emoji.get('hourglass_flowing_sand')}  天光喇 起身喇! 你地可以傾 `;
-    this.zhHK["GAME_DAY_START_VOTE"] = `分鐘... 投票時間係 `;
+    this.zhHK["GAME_DAY_START"] = `${Emoji.get('hourglass_flowing_sand')}  天光喇 起身喇, 用 \/showtoken 去標記你嘅身份. 你地可以傾 `;
+    this.zhHK["GAME_DAY_START_VOTE"] = `分鐘... \/vote 投票時間係 `;
     this.zhHK["GAME_DAY_DOZED"] = `行動紀錄`;
     this.zhHK["GAME_DAY_SHOWOKEN"] = `標記身份`;
     this.zhHK["GAME_DAY_VOTE"] = `投票工具`;
