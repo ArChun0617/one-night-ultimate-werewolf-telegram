@@ -200,23 +200,22 @@ export class Game {
   }
 
   setPlayerReady(_id: number) {
+    let rtnMsg: string = '';
+    
+    //Set executor to [READY]
     _.map(_.filter(this.players, (player: Player) => player.id == _id), (player: Player) => player.readyStart = true);
 
-    /*let readyPlayers: number = _.filter(this.players, (player: Player) => player.readyStart).length;
-    let totalPlayers: number = this.players.length;
-
-    return (readyPlayers == totalPlayers ? "" : this.lang.getString("WAIT_FOR_START") + readyPlayers + "/" + totalPlayers);*/
-
-    //Return immediately if all ready
-    if (_.filter(this.players, (player: Player) => !player.readyStart).length == 0) return "";
-
-    //else show list of player
-    let rtnMsg: string = '';
-    _.map(this.players, (player: Player) => {
-      rtnMsg += `${player.name} ${(player.readyStart ? "[READY]" : "")}\n`;
-    });
-
-    return this.lang.getString("WAIT_FOR_START") + "\n" + rtnMsg;
+    //Check if all player set ready
+    if (_.filter(this.players, (player: Player) => !player.readyStart).length > 0) {
+        //else show list of player
+        _.map(this.players, (player: Player) => {
+          rtnMsg += `${player.name} ${(player.readyStart ? "[READY]" : "")}\n`;
+        });
+        
+        this.msgInterface.sendMsg(this.lang.getString("WAIT_FOR_START") + "\n" + rtnMsg);
+    }
+        
+    return rtnMsg;
   }
 
   sendVotingList(msg) {

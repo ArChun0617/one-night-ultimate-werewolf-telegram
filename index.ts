@@ -319,9 +319,6 @@ bot.onText(/\/start/, (msg) => {
         }
       });
   }
-  else {
-    bot.sendMessage(msg.chat.id, `${rtnReady}`);
-  }
 });
 
 bot.onText(/\/delgame/, (msg) => {
@@ -450,7 +447,17 @@ function sendAskForSettingMessage(msgId) {
 
 http.createServer(function (request, response) {
 	response.writeHead(200, { 'Content-Type': 'text/html' });
-	response.end(`${Emoji.get('robot_face')}  Hi! I am up! ${token}`, 'utf-8');
+	response.end(`${Emoji.get('robot_face')}  ${token} <br />
+<pre style="line-height:2em;font-size:small;font-family:'Courier New';">
+No one sleep at night and no one die, 
+but villages deceive murderer hide,
+they discuss and vote to kill the guy.
+
+The wolfs are innocent but they aren't fine,
+suffered from bullying makes them cry,
+they know the only thing can help is lie,
+this is the only way they can survive...
+</pre>`, 'utf-8');
 }).listen(port);
 
 console.log(`${Emoji.get('robot_face')}  Hi! I am up`);
