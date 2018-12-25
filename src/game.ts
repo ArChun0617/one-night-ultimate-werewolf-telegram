@@ -67,6 +67,10 @@ export class Game {
     this.players = players;
     this.newbieMode = newbieMode;
   }
+  
+  setGameRole(roles: RoleClassInterface[]) {
+    this.gameRoles = roles;
+  }
 
   start(msg) {
     if (this.getPhase() != Game.PHASE_WAITING_PLAYER) return; //Prevent double start game
@@ -816,8 +820,7 @@ export class Game {
     if (timerArray.length > 0) this.countDown(msg, timerArray, unit);
   }
 
-  private countDown(msg, timerArray: any[], unit: string)
-  {
+  private countDown(msg, timerArray: any[], unit: string) {
     if (!timerArray) return;
     let interval = timerArray.shift();
     this.votingTimer = setTimeout(() => {
@@ -825,7 +828,7 @@ export class Game {
       if (timerArray.length > 0) this.countDown(msg, timerArray, unit);
     }, interval.time);
   }
-
+  
   private getGameRole(): Role[] {
     if (!this.isStarted()) return;
 

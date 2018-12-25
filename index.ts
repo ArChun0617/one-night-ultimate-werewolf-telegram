@@ -244,7 +244,6 @@ bot.onText(/\/join/, (msg) => {
 });
 
 bot.onText(/\/start/, (msg) => {
-  const gameSetting = _.find(gameSettings, setting => setting.id === msg.chat.id);
   const game = getGame(msg.chat.id);
 
   if (!gameSetting) {
@@ -259,11 +258,8 @@ bot.onText(/\/start/, (msg) => {
     return;
   }
 
-  //console.log('gameSetting.roles', gameSetting.roles);
-
   let rtnReady: string = game.setPlayerReady(msg.from.id);
-  if (rtnReady == "") {
-	
+  if (rtnReady == "") {	
     addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 1 - 0
     addGameSettingRole(msg.id, gameSetting, RoleClass.SEER);             // 2 - 0
     addGameSettingRole(msg.id, gameSetting, RoleClass.ROBBER);           // 3 - 0
@@ -296,6 +292,10 @@ bot.onText(/\/start/, (msg) => {
 		addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 15 - 7p
 		addGameSettingRole(msg.id, gameSetting, RoleClass.TANNER);           // 16 - 7p
 	}
+    
+    const gameSetting = _.find(gameSettings, setting => setting.id === msg.chat.id);    
+    games.setGameRole(gameSetting.roles);
+    console.log(`${game.id} gameSetting.roles`, gameSetting.roles);
 	
     game.start(msg)
       .then(() => {
