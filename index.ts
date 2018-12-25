@@ -293,7 +293,7 @@ bot.onText(/\/start/, (msg) => {
 		addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 15 - 7p
 		addGameSettingRole(msg.id, gameSetting, RoleClass.TANNER);           // 16 - 7p
 	} 
-    games.setGameRole(gameSetting.roles);
+    game.setGameRole(gameSetting.roles);
     console.log(`${game.id} gameSetting.roles`, gameSetting.roles);
 	
     game.start(msg)
