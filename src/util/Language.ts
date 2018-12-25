@@ -26,17 +26,17 @@ export class Language {
     this.en["ROLE_VILLAGER"] = "Villager";
     this.en["ROLE_TANNER"] = "Tanner";
     this.en["ROLE_HUNTER"] = "Hunter";
-
-    this.en["ROLE_WAKE_UP_COPYCAT"] = "你可以揀中間一張身份然後複製果個身份, 到果個身份行動嘅時候, 你需要起身做佢嘅行動";
+    
+    this.en["ROLE_WAKE_UP_COPYCAT"] = "Look at one of the centre cards. You are now that role. If that role is called, wake up and do that night action.";
     this.en["ROLE_WAKE_UP_DOPPELGANGER"] =  `Choose a player to copy his role.\n If you are ${RoleClass.SEER.emoji}${RoleClass.ROBBER.emoji}${RoleClass.TROUBLEMAKER.emoji}${RoleClass.DRUNK.emoji}, do your action now.\nIf you are ${RoleClass.WEREWOLF.emoji}${RoleClass.MINION.emoji}${RoleClass.MASON.emoji}${RoleClass.INSOMNIAC.emoji}, wait until their turn.`;
-    this.en["ROLE_WAKE_UP_WEREWOLF"] = "你可以確認場上嘅狼人, 如果只有你一位狼人, 你可以揀中間一張身份嚟睇";
-    this.en["ROLE_WAKE_UP_MINION"] = "你可以確認場上嘅狼人";
-    this.en["ROLE_WAKE_UP_MASON"] = "你可以確認場上嘅守夜人";
-    this.en["ROLE_WAKE_UP_SEER"] = "你可以揀一個玩家或者中間兩張身份嚟睇";
-    this.en["ROLE_WAKE_UP_ROBBER"] = "你可以揀一個玩家同佢對調身份, 你會知道對調後嘅身份係乜嘢";
-    this.en["ROLE_WAKE_UP_TROUBLEMAKER"] = "你可以揀兩個玩家嘅牌嚟對調, 揀多一次同一個人可以重新選擇";
-    this.en["ROLE_WAKE_UP_DRUNK"] = "你要揀中間一隻牌同自己對調, 但你唔會知道果隻係咩身份";
-    this.en["ROLE_WAKE_UP_INSOMNIAC"] = "你再睇一次自己最後嘅身份係乜嘢";
+    this.en["ROLE_WAKE_UP_WEREWOLF"] = "Look for other werewolves. If there is only one werewolf, you may look at a card from the centre.";
+    this.en["ROLE_WAKE_UP_MINION"] = "Werewolves, stick out your thumb so the `Minion` can see who you are.";
+    this.en["ROLE_WAKE_UP_MASON"] = "Look for the other Mason";
+    this.en["ROLE_WAKE_UP_SEER"] = "You may look at another player's card or two of the center cards.";
+    this.en["ROLE_WAKE_UP_ROBBER"] = "You may exchange your card with another player's card, and then view your new card.";
+    this.en["ROLE_WAKE_UP_TROUBLEMAKER"] = "You may exchange cards between two other players.";
+    this.en["ROLE_WAKE_UP_DRUNK"] = "Exchange your card with a card from the center.";
+    this.en["ROLE_WAKE_UP_INSOMNIAC"] = "Look at your card";
     this.en["ROLE_WAKE_UP_VILLAGER"] = "你冇嘢需要做, 最緊要醒目";
     this.en["ROLE_WAKE_UP_TANNER"] = "你要令其他人殺你";
     this.en["ROLE_WAKE_UP_HUNTER"] = "當你死嘅時候, 你所投票嘅人會一齊死";
@@ -64,9 +64,11 @@ export class Language {
     this.en["GAME_VIEW_ROLE"] = `View your role${Emoji.get("black_joker")}`;
     this.en["NOTIFY_ROLE"] = `Your role is `;
     this.en["GAME_NIGHT_START"] = `${Emoji.get('crescent_moon')}  Night start, Everyone close your eye.`;
-    this.en["GAME_DAY_START"] = `${Emoji.get('hourglass_flowing_sand')}  Everyone wake up, use \/showtoken to mark yourself. You can discuss for `;
-    this.en["GAME_DAY_START_VOTE"] = `mins... \/vote at `;
+    this.en["GAME_DAY_START"] = `${Emoji.get('hourglass_flowing_sand')}  Everyone wake up! You can discuss for `;
+    this.en["GAME_DAY_START_VOTE"] = `mins... vote at `;
     this.en["GAME_DAY_DOZED"] = `Action History`;
+    this.en["GAME_DAY_SHOWOKEN"] = `Show Token`;
+    this.en["GAME_DAY_VOTE"] = `Voting`;
     this.en["VOTE_START"] = `${Emoji.get('alarm_clock')}  Time\'s up. Everyone please vote.`;
     this.en["INVALID_ACTION"] = `${Emoji.get('middle_finger')}  Hey! Stop doing that!`;
     this.en["VOTE_ERROR"] = `Invalid player selected !`;
@@ -94,7 +96,7 @@ export class Language {
     this.en["DOZED_ROLE"] = `Your original role: `;
     this.en["DOZED_ACTION"] = `Action: `;
     
-    this.en["RESULT_PLAYERS"] = `Players (Original${Emoji.get('arrow_right')}Final ${Emoji.get('point_left')}Total Vote)`;
+    this.en["RESULT_PLAYERS"] = `Players (Original${Emoji.get('arrow_right')}Final ${Emoji.get('point_right')}Voted)`;
     this.en["RESULT_DEATHS"] = `Death (Original${Emoji.get('arrow_right')}Final ${Emoji.get('point_left')}Total Vote)`;
     this.en["RESULT_WINNERS"] = `Winner (Original${Emoji.get('arrow_right')}Final ${Emoji.get('point_right')}Voted)`;
     this.en["RESULT_LOSERS"] = `Loser (Original${Emoji.get('arrow_right')}Final ${Emoji.get('point_right')}Voted)`;
@@ -152,9 +154,11 @@ export class Language {
     this.zhHK["GAME_VIEW_ROLE"] = `開牌${Emoji.get("black_joker")}`;
     this.zhHK["NOTIFY_ROLE"] = `你嘅身份係 `;
     this.zhHK["GAME_NIGHT_START"] = `${Emoji.get('crescent_moon')} 夜深喇, 夠鐘瞓覺喇, 大家合埋眼`;
-    this.zhHK["GAME_DAY_START"] = `${Emoji.get('hourglass_flowing_sand')}  天光喇 起身喇, 用 \/showtoken 去標記你嘅身份. 你地可以傾 `;
-    this.zhHK["GAME_DAY_START_VOTE"] = `分鐘... \/vote 投票時間係 `;
+    this.zhHK["GAME_DAY_START"] = `${Emoji.get('hourglass_flowing_sand')}  天光喇 起身喇! 你地可以傾 `;
+    this.zhHK["GAME_DAY_START_VOTE"] = `分鐘... 投票時間係 `;
     this.zhHK["GAME_DAY_DOZED"] = `行動紀錄`;
+    this.zhHK["GAME_DAY_SHOWOKEN"] = `標記身份`;
+    this.zhHK["GAME_DAY_VOTE"] = `投票工具`;
     this.zhHK["VOTE_START"] = `${Emoji.get('alarm_clock')} 夠鐘喇, 大家要投票喇`;
     this.zhHK["INVALID_ACTION"] = `${Emoji.get('middle_finger')} 喂! 唔好亂禁好喎!`;
     this.zhHK["VOTE_ERROR"] = `你唔可以投呢個人喎 !`;
@@ -182,7 +186,7 @@ export class Language {
     this.zhHK["DOZED_ROLE"] = `你原本嘅身份係: `;
     this.zhHK["DOZED_ACTION"] = `行動: `;
 
-    this.zhHK["RESULT_PLAYERS"] = `玩家 (初始身份${Emoji.get('arrow_right')}最後身份 ${Emoji.get('point_left')}總票數)`;
+    this.zhHK["RESULT_PLAYERS"] = `玩家 (初始身份${Emoji.get('arrow_right')}最後身份 ${Emoji.get('point_right')}投票目標)`;
     this.zhHK["RESULT_DEATHS"] = `死亡玩家 (初始身份${Emoji.get('arrow_right')}最後身份 ${Emoji.get('point_left')}總票數)`;
     this.zhHK["RESULT_WINNERS"] = `贏家 (初始身份${Emoji.get('arrow_right')}最後身份 ${Emoji.get('point_right')}投票目標)`;
     this.zhHK["RESULT_LOSERS"] = `輸家 (初始身份${Emoji.get('arrow_right')}最後身份 ${Emoji.get('point_right')}投票目標)`;

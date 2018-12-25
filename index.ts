@@ -17,26 +17,11 @@ interface GameSetting {
 let port = process.env.PORT || 8443;
 let host = process.env.HOST;
 
-const gameSettings: GameSetting[] = [];
 const games: Game[] = [];
 const token = process.env.BOT_TOKEN || '331592410:AAHC0JBE5EOFnkfoZJr6QTec_FMwARYwV2U';
 let bot = new TelegramBot(token, { polling: true });
 let lang = new Language();
-const roles = [
-  { name: RoleClass.COPYCAT.name, max: 1 },
-  { name: RoleClass.DOPPELGANGER.name, max: 1 },
-  { name: RoleClass.WEREWOLF.name, max: 2 },
-  { name: RoleClass.MINION.name, max: 1 },
-  { name: RoleClass.MASON.name, max: 2 },
-  { name: RoleClass.SEER.name, max: 1 },
-  { name: RoleClass.ROBBER.name, max: 1 },
-  { name: RoleClass.TROUBLEMAKER.name, max: 1 },
-  { name: RoleClass.DRUNK.name, max: 1 },
-  { name: RoleClass.INSOMNIAC.name, max: 1 },
-  { name: RoleClass.VILLAGER.name, max: 3 },
-  { name: RoleClass.HUNTER.name, max: 1 },
-  { name: RoleClass.TANNER.name, max: 1 }
-];
+
 
 bot.onText(/\/adminlist/, (msg) => {
   if (msg.chat.id <= 0) return; //Prevent the action run in group
@@ -139,41 +124,13 @@ bot.onText(/\/newgame/, (msg) => {
     return;
   }
 
-  let gameSetting = _.find(gameSettings, setting => setting.id === msg.chat.id);
-  
-  if (!gameSetting) {
-    /*sendAskForSettingMessage(msg.chat.id);
-    return;*/
-    gameSetting = { id: msg.chat.id, roles: [] };
-    gameSettings.push(gameSetting);
-
-	/*
-    addGameSettingRole(msg.id, gameSetting, RoleClass.COPYCAT);          // 7 - 4p
-    addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 1 - 0
-    addGameSettingRole(msg.id, gameSetting, RoleClass.SEER);             // 2 - 0
-    addGameSettingRole(msg.id, gameSetting, RoleClass.ROBBER);           // 3 - 0
-    addGameSettingRole(msg.id, gameSetting, RoleClass.INSOMNIAC);        // 4 - 0
-    addGameSettingRole(msg.id, gameSetting, RoleClass.TROUBLEMAKER);     // 5 - 0
-    addGameSettingRole(msg.id, gameSetting, RoleClass.MINION);           // 6 - 3p
-    addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 8 - 5p
-    //addGameSettingRole(msg.id, gameSetting, RoleClass.DOPPELGANGER);     // 8 - 5p
-    addGameSettingRole(msg.id, gameSetting, RoleClass.TANNER);           // 9 - 6p
-    addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 10- 7p
-    addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 11- 8p
-    //addGameSettingRole(msg.id, gameSetting, RoleClass.DRUNK);            // 12- 9p
-    //addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
-    //addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
-    //addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
-	*/
-  }
-
   const players: Player[] = [
     new Player({ id: msg.from.id, name: msg.from.first_name })
   ];
 
-  games.push(new Game(id, bot, players, gameSetting.roles));
+  games.push(new Game(id, bot, players, []));
   bot.sendMessage(msg.chat.id, lang.getString("NEW_GAME"));
-  console.log(`GAME ${id} has been created`);
+  console.log(`GAME [${id}] created`);
 });
 
 bot.onText(/\/newbiegame/, (msg) => {
@@ -186,42 +143,14 @@ bot.onText(/\/newbiegame/, (msg) => {
     bot.sendMessage(msg.chat.id, lang.getString("GAME_FOUND"));
     return;
   }
-
-  let gameSetting = _.find(gameSettings, setting => setting.id === msg.chat.id);
-
-  if (!gameSetting) {
-    /*sendAskForSettingMessage(msg.chat.id);
-    return;*/
-    gameSetting = { id: msg.chat.id, roles: [] };
-    gameSettings.push(gameSetting);
-
-    /*
-    addGameSettingRole(msg.id, gameSetting, RoleClass.COPYCAT);          // 7 - 4p
-    addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 1 - 0
-    addGameSettingRole(msg.id, gameSetting, RoleClass.SEER);             // 2 - 0
-    addGameSettingRole(msg.id, gameSetting, RoleClass.ROBBER);           // 3 - 0
-    addGameSettingRole(msg.id, gameSetting, RoleClass.INSOMNIAC);        // 4 - 0
-    addGameSettingRole(msg.id, gameSetting, RoleClass.TROUBLEMAKER);     // 5 - 0
-    addGameSettingRole(msg.id, gameSetting, RoleClass.MINION);           // 6 - 3p
-    addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 8 - 5p
-    //addGameSettingRole(msg.id, gameSetting, RoleClass.DOPPELGANGER);     // 8 - 5p
-    addGameSettingRole(msg.id, gameSetting, RoleClass.TANNER);           // 9 - 6p
-    addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 10- 7p
-    addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 11- 8p
-    //addGameSettingRole(msg.id, gameSetting, RoleClass.DRUNK);            // 12- 9p
-    //addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
-    //addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
-    //addGameSettingRole(msg.id, gameSetting, RoleClass.VILLAGER);         // 13- 10p
-    */
-  }
-
+  
   const players: Player[] = [
     new Player({ id: msg.from.id, name: msg.from.first_name })
   ];
 
-  games.push(new Game(id, bot, players, gameSetting.roles, true));
+  games.push(new Game(id, bot, players, [], true));
   bot.sendMessage(msg.chat.id, lang.getString("NEW_GAME"));
-  console.log(`GAME ${id} has been created`);
+  console.log(`GAME [${id}] created`);
 });
 
 bot.onText(/\/join/, (msg) => {
@@ -244,13 +173,7 @@ bot.onText(/\/join/, (msg) => {
 });
 
 bot.onText(/\/start/, (msg) => {
-  const gameSetting = _.find(gameSettings, setting => setting.id === msg.chat.id);
   const game = getGame(msg.chat.id);
-
-  if (!gameSetting) {
-    /*sendAskForSettingMessage(msg.chat.id);
-    return;*/
-  }
 
   if (!game) return askForCreateNewGame(msg.chat.id);
   // validation game isStarted
@@ -261,62 +184,60 @@ bot.onText(/\/start/, (msg) => {
 
   let rtnReady: string = game.setPlayerReady(msg.from.id);
   if (rtnReady == "") {	
-    addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 1 - 0
-    addGameSettingRole(msg.id, gameSetting, RoleClass.SEER);             // 2 - 0
-    addGameSettingRole(msg.id, gameSetting, RoleClass.ROBBER);           // 3 - 0
-    addGameSettingRole(msg.id, gameSetting, RoleClass.INSOMNIAC);        // 4 - 0
-    addGameSettingRole(msg.id, gameSetting, RoleClass.TROUBLEMAKER);     // 5 - 0
-	addGameSettingRole(msg.id, gameSetting, RoleClass.MINION);           // 6 - 3p
+    game.addGameSettingRole(RoleClass.WEREWOLF);         // 1 - 0
+    game.addGameSettingRole(RoleClass.SEER);             // 2 - 0
+    game.addGameSettingRole(RoleClass.ROBBER);           // 3 - 0
+    game.addGameSettingRole(RoleClass.INSOMNIAC);        // 4 - 0
+    game.addGameSettingRole(RoleClass.TROUBLEMAKER);     // 5 - 0
+    game.addGameSettingRole(RoleClass.MINION);           // 6 - 3p
 	
 	if (game.players.length == 4) {
-		addGameSettingRole(msg.id, gameSetting, RoleClass.COPYCAT);           // 7 - 4p
+		game.addGameSettingRole(RoleClass.COPYCAT);           // 7 - 4p
 	}
 	else if (game.players.length == 5) {
-		addGameSettingRole(msg.id, gameSetting, RoleClass.COPYCAT);           // 7 - 4p
-		addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 6 - 3p
+		game.addGameSettingRole(RoleClass.COPYCAT);           // 7 - 4p
+		game.addGameSettingRole(RoleClass.WEREWOLF);         // 6 - 3p
 	}
 	else if (game.players.length == 6) {
-	addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 6 - 3p
-		addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 11 - 6p
-		addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 12 - 6p
+    game.addGameSettingRole(RoleClass.WEREWOLF);         // 6 - 3p
+		game.addGameSettingRole(RoleClass.MASON);            // 11 - 6p
+		game.addGameSettingRole(RoleClass.MASON);            // 12 - 6p
 	}
 	else if (game.players.length == 7) {
-		addGameSettingRole(msg.id, gameSetting, RoleClass.COPYCAT);           // 7 - 4p
-	addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 6 - 3p
-		addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 14 - 7p
-		addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 15 - 7p
+		game.addGameSettingRole(RoleClass.COPYCAT);           // 7 - 4p
+    game.addGameSettingRole(RoleClass.WEREWOLF);         // 6 - 3p
+		game.addGameSettingRole(RoleClass.MASON);            // 14 - 7p
+		game.addGameSettingRole(RoleClass.MASON);            // 15 - 7p
 	}
 	else if (game.players.length == 8) {
-		addGameSettingRole(msg.id, gameSetting, RoleClass.COPYCAT);          // 7 - 4p
-		addGameSettingRole(msg.id, gameSetting, RoleClass.WEREWOLF);         // 6 - 3p
-		addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 14 - 7p
-		addGameSettingRole(msg.id, gameSetting, RoleClass.MASON);            // 15 - 7p
-		addGameSettingRole(msg.id, gameSetting, RoleClass.TANNER);           // 16 - 7p
-	} 
-    game.setGameRole(gameSetting.roles);
-    console.log(`${game.id} gameSetting.roles`, gameSetting.roles);
-	
-    game.start(msg)
-      .then(() => {
-        killGame(msg.chat.id);
-      })
-      .catch((error) => {
-        console.log(`Catch error`, error);
-        console.log(`Catch error.message`, error.message);
-        console.log(`Catch error.name`, error.name);
-        if (error) {
-          console.log(`Error`, error);
-          // crazy I don't know why it is not instanceof GameEndError
-          console.log('error instanceof GameEndError', error instanceof GameEndError);
-          // shit way to catch the error
-          if (error.message === 'This game is end') {
-            console.log('Catch game is ended');
-            return;
-          }
-
-          bot.sendMessage(msg.chat.id, `${Emoji.get('bomb')}  Error: ${error}.`);
+		game.addGameSettingRole(RoleClass.COPYCAT);          // 7 - 4p
+		game.addGameSettingRole(RoleClass.WEREWOLF);         // 6 - 3p
+		game.addGameSettingRole(RoleClass.MASON);            // 14 - 7p
+		game.addGameSettingRole(RoleClass.MASON);            // 15 - 7p
+		game.addGameSettingRole(RoleClass.TANNER);           // 16 - 7p
+	}
+  
+  game.start(msg)
+    .then(() => {
+      killGame(msg.chat.id);
+    })
+    .catch((error) => {
+      console.log(`Catch error`, error);
+      console.log(`Catch error.message`, error.message);
+      console.log(`Catch error.name`, error.name);
+      if (error) {
+        console.log(`Error`, error);
+        // crazy I don't know why it is not instanceof GameEndError
+        console.log('error instanceof GameEndError', error instanceof GameEndError);
+        // shit way to catch the error
+        if (error.message === 'This game is end') {
+          console.log('Catch game is ended');
+          return;
         }
-      });
+
+        bot.sendMessage(msg.chat.id, `${Emoji.get('bomb')}  Error: ${error}.`);
+      }
+    });
   }
 });
 
@@ -342,11 +263,12 @@ bot.onText(/\/vote/, (msg) => {
 });
 
 bot.on('callback_query', (msg) => {
+  /*
   const gameSetting = _.find(gameSettings, setting => setting.id === msg.message.chat.id);
   
   if (!gameSetting) {
-    /*sendAskForSettingMessage(msg.message.chat.id);
-    return;*/
+    //sendAskForSettingMessage(msg.message.chat.id);
+    //return;
   }
 
   const regex = new RegExp(/^SET_ROLE_(.+?)/);
@@ -368,6 +290,7 @@ bot.on('callback_query', (msg) => {
 
     return;
   }
+  */
 
   // find the user and callback the Game on handler
   const game = getGame(msg.message.chat.id);
@@ -392,18 +315,6 @@ bot.on('callback_query', (msg) => {
   }
   // return askForCreateNewGame(msg.message.chat.id);
 });
-
-function addGameSettingRole(msgId: number, gameSetting: any, role: RoleClassInterface) {
-  const roleSetting = _.find(roles, r => r.name === role.name);
-
-  if (_.filter(gameSetting.roles, (r) => r === role).length <= roleSetting.max) {
-    gameSetting.roles.push(role);
-    //bot.answerCallbackQuery(msgId, `${Emoji.get('white_check_mark')}  Added ${role}`);
-  } else {
-    //bot.answerCallbackQuery(msgId, `${Emoji.get('no_entry_sign')}  Too many ${role}`);
-  }
-
-}
 
 bot.onText(/\/showrole/, (msg, match) => {
   const game = getGame(msg.chat.id);

@@ -68,7 +68,33 @@ export class Game {
     this.newbieMode = newbieMode;
   }
   
-  setGameRole(roles: RoleClassInterface[]) {
+  addGameSettingRole(role: RoleClassInterface) {
+    const roles = [
+      { name: RoleClass.COPYCAT.name, max: 1 },
+      { name: RoleClass.DOPPELGANGER.name, max: 1 },
+      { name: RoleClass.WEREWOLF.name, max: 2 },
+      { name: RoleClass.MINION.name, max: 1 },
+      { name: RoleClass.MASON.name, max: 2 },
+      { name: RoleClass.SEER.name, max: 1 },
+      { name: RoleClass.ROBBER.name, max: 1 },
+      { name: RoleClass.TROUBLEMAKER.name, max: 1 },
+      { name: RoleClass.DRUNK.name, max: 1 },
+      { name: RoleClass.INSOMNIAC.name, max: 1 },
+      { name: RoleClass.VILLAGER.name, max: 3 },
+      { name: RoleClass.HUNTER.name, max: 1 },
+      { name: RoleClass.TANNER.name, max: 1 }
+    ];
+    const roleSetting = _.find(roles, r => r.name === role.name);
+
+    if (_.filter(this.gameRoles, (r) => r === role).length <= roleSetting.max) {
+      this.gameRoles.push(role);
+      //bot.answerCallbackQuery(msgId, `${Emoji.get('white_check_mark')}  Added ${role}`);
+    } else {
+      //bot.answerCallbackQuery(msgId, `${Emoji.get('no_entry_sign')}  Too many ${role}`);
+    }
+  }
+  
+  addGameRole(roles: RoleClassInterface[]) {
     this.gameRoles = roles;
   }
 
@@ -110,7 +136,9 @@ export class Game {
       return Promise.reject('Number of players and roles doesn\'t match');
     }
     
-    console.log(`Game started: ${this.id}`);
+    this.setLang(this.lang.culture);
+
+    console.log(`Game [${this.id}] started`);
     this.msgInterface.sendMsg(this.lang.getString("GAME_START"));
 
     return this.prepareDeck(this.lang.culture)
@@ -120,8 +148,10 @@ export class Game {
         // debug
         console.log('>> [announcePlayerRole]');
         console.log('>> [Deck]', this.deck);
-        console.log('>> [Table]', util.inspect(this.table, { colors: true }));
-        console.log('>> [Players]', util.inspect(this.players, { colors: true }));
+        //console.log('>> [Table]', util.inspect(this.table, { colors: true }));
+        console.log('>> [Table]', util.inspect(_.map(this.table.getRoles(), (r: Role) => { return `${r.emoji}${r.name}` }), { colors: true }));
+        //console.log('>> [Players]', util.inspect(this.players, { colors: true }));
+        console.log('>> [Players]', util.inspect(_.map(this.players, (p: Player) => { return `${p.name} : ${p.role.emoji}${p.role.name}` }), { colors: true }));
       })
       .then(() => console.log(`>> [Start night]`))
       .then(() => this.startNight(msg, this.actionTime))
@@ -129,9 +159,12 @@ export class Game {
         // debug
         console.log('>> [Start Day]');
         console.log('>> [Deck]', this.deck);
-        console.log('>> [Table]', util.inspect(this.table, { colors: true }));
-        console.log('>> [Players]', util.inspect(this.players, { colors: true }));
-        console.log('>> [ActionStack]', util.inspect(this.actionStack, { colors: true }));
+        //console.log('>> [Table]', util.inspect(this.table, { colors: true }));
+        console.log('>> [Table]', util.inspect(_.map(this.table.getRoles(), (r: Role) => { return `${r.emoji}${r.name}` }), { colors: true }));
+        //console.log('>> [Players]', util.inspect(this.players, { colors: true }));
+        console.log('>> [Players]', util.inspect(_.map(this.players, (p: Player) => { return `${p.name} : ${p.role.emoji}${p.role.name}` }), { colors: true }));
+        //console.log('>> [ActionStack]', util.inspect(this.actionStack, { colors: true }));
+        console.log('>> [ActionStack]', util.inspect(_.map(this.actionStack, (a: ActionFootprint) => { return `${a.toDetailString()}` }), { colors: true }));
       })
       .then(() => console.log(`>> [Start conversation]`))
       .then(() => this.startConversation(msg, this.gameTime * (this.players.length > 6 ? 2 : 1)))  // If more than 6 player, then game time *2
@@ -240,7 +273,7 @@ export class Game {
     key.push([{ text: this.lang.getString("VOTE_BLANK"), callback_data: `-1` }]);
     
     //If call by command, sendMsg; If call by button, update message
-    this.msgInterface.sendVoteMessage(this.lang.getString("VOTE_LIST"), (!msg.message), {
+    this.msgInterface.sendVoteMessage(this.lang.getString("VOTE_LIST"), msg, {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     });
   }
@@ -286,7 +319,7 @@ export class Game {
     });
     
     //If call by command, sendMsg; If call by button, update message
-    this.msgInterface.sendTokenMessage(this.lang.getString("TOKEN_LIST") + rtnMsg, (!msg.message), {
+    this.msgInterface.sendTokenMessage(this.lang.getString("TOKEN_LIST") + rtnMsg, msg, {
       reply_markup: JSON.stringify({ inline_keyboard: key })
     });
   }
@@ -443,7 +476,8 @@ export class Game {
 
     this.msgInterface.editAction(this.lang.getString("GAME_DAY_START") + (gameDuration / 60 / 1000) + this.lang.getString("GAME_DAY_START_VOTE") + (now.getHours() + ":" + ("0" + now.getMinutes()).slice(-2) + ":" + now.getSeconds())
       , {
-        reply_markup: JSON.stringify({ inline_keyboard: [[{ text: this.lang.getString("GAME_DAY_DOZED"), callback_data: "DOZED_WAKE_UP" }]] })
+        reply_markup: JSON.stringify({ inline_keyboard: [[{ text: this.lang.getString("GAME_DAY_DOZED"), callback_data: "DOZED_WAKE_UP" }],
+        [{ text: this.lang.getString("GAME_DAY_SHOWOKEN"), callback_data: "SHOWOKEN_TOOLS" }, { text: this.lang.getString("GAME_DAY_VOTE"), callback_data: "VOTE_TOOLS" }]] })
       }
     );
 
@@ -542,8 +576,7 @@ export class Game {
       
       result += `<b>${this.lang.getString("RESULT_PLAYERS")}</b>\n`;
       _.map(_.sortBy(this.winners, (winner: Player) => winner.getKillTarget().name), (winner: Player) => {
-          //${Emoji.get('trophy')}
-        result += `${Emoji.get('full_moon_with_face')}`;
+        result += `${Emoji.get('trophy')}`;
         if(_.find(this.deathPlayers, (d: Player) => { return d.name == winner.name}))
             result += Emoji.get('skull');
         result += `${winner.name} ${(this.newbieMode ? winner.getOriginalRole().fullName : winner.getOriginalRole().emoji)} ${Emoji.get('arrow_right')} ${(this.newbieMode ? winner.getRole().fullName : winner.getRole().emoji)}  ${Emoji.get('point_right')} ${winner.getKillTarget().name} \n`;
@@ -556,15 +589,7 @@ export class Game {
       });
 
       result += `\n<b>${this.lang.getString("ACTION_STACK")}</b>\n`;
-      result += _.map(this.actionStack, (step: ActionFootprint) => {
-        let rolePrefix = "";
-        let role: any;
-        if (step.player.getOriginalRole().code == RoleClass.DOPPELGANGER.code || step.player.getOriginalRole().code == RoleClass.COPYCAT.code ) {
-          role = step.player.getOriginalRole();
-          rolePrefix = (role.shadowChoice ? role.shadowChoice.emoji : "");
-        }
-        return `${(this.newbieMode ? step.player.getOriginalRole().fullName : step.player.getOriginalRole().emoji)}${rolePrefix}${step.player.name} : ${step.toString()}`
-      }).join("\n");
+      result += _.map(this.actionStack, (step: ActionFootprint) => { return step.toDetailString() + "\n"; });
 
       this.msgInterface.sendMsg(result, { "parse_mode": "html" });
       console.log('Result', result);
@@ -693,6 +718,12 @@ export class Game {
           `${rolePrefix} ${Emoji.get('arrow_right')} ${this.lang.getString("DOZED_ACTION")}${actionMsg}`
         )
       );
+    }
+    else if(event == "SHOWOKEN_TOOLS") {
+      this.showToken(msg);
+    }
+    else if(event == "VOTE_TOOLS") {
+      this.sendVotingList(msg);
     }
     else if (parseInt(event)) {
       //if the command = integer, it should be a Vote.

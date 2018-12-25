@@ -9,7 +9,7 @@
     "server": "forever dist/index.js",
     "start": "npm run build && npm run server",
     "build": "node ./node_modules/webpack/bin/webpack.js",
-    "app": "nodemon ./src/app.js",
+    "app": "nodemon dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Teddy Lok <teddydesu@gmail.com>, ArChun <raphaello.work@gmail.com>",
@@ -22,12 +22,15 @@
     "es6-promise": "^4.0.5",
     "lodash": "^4.17.4",
     "node-emoji": "^1.5.1",
-    "node-telegram-bot-api": "^0.27.0",
+    "node-telegram-bot-api": "^0.30.0",
     "nodemon": "^1.11.0",
     "awesome-typescript-loader": "^3.0.4",
     "typescript": "^2.1.6",
     "webpack": "^2.2.1",
     "forever": "^0.15.1"
+  },
+  "engines": {
+    "node": ">=6.0"
   },
   "devDependencies": {
     "@types/es6-promise": "0.0.32",

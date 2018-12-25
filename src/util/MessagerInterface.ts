@@ -22,17 +22,6 @@ export class MessagerInterface {
   }
   
   constructor(_bot: any, _newbieMode: boolean) {
-    /*let ansCallback = _bot.answerCallbackQuery;
-
-    _bot.answerCallbackQuery = ((callbackQueryId, text, showAlert, form = {}) => {
-      try {
-        ansCallback(callbackQueryId, text, showAlert, form = {});
-      }
-      catch (err) {
-        console.log("errorrr!! ", err);
-      }
-    });*/
-
     this.bot = _bot;
     this.gameChatID = -1;
     this.gameActionID = -1;
@@ -60,38 +49,20 @@ export class MessagerInterface {
     }
   }
 
-  showNotification(callbackQueryId, text, showAlert = this.newbieMode, form = {}) {
+  showNotification(callbackQueryId, text, showAlert = this.newbieMode) {
     try {
-      this.bot.answerCallbackQuery(callbackQueryId, text, showAlert, form);
+      this.bot.answerCallbackQuery(callbackQueryId, {text: text, show_alert: showAlert});
     }
     catch (err) {
       console.log(`ERROR !!! [showNotification] : `, err.substring(0, 10)+"...");
     }
   }
 
-  sendTokenMessage(text: string, isCommand: boolean, option = {}) {
+  sendTokenMessage(text: string, msg, option = {}) {
     var msgKeyID = this.gameTokenID;
 
-    if (isCommand) {
-      //console.log(`sendTokenMessage.isCommand = true`, msgKeyID);
-      // If by command, delete-insert
-      if (msgKeyID) {
-        try {
-            this.bot.deleteMessage(this.gameChatID, msgKeyID);
-        }catch (e) {
-            // Unknown error for unsupported deleteMessage
-        }
-      }
-
-      this.bot
-        .sendMessage(this.gameChatID, text, option)
-        .then((sended) => {
-          this.gameTokenID = sended.message_id;
-        });
-    }
-    else {
-      //console.log(`sendTokenMessage.isCommand = false`);
-      // If by callback, update-insert
+    if (msg.message && msg.message.message_id == msgKeyID) {
+      // If from same message callback, update-insert
       if (msgKeyID) {
         this.bot.editMessageText(text, _.extend(option, {
           chat_id: this.gameChatID,
@@ -107,12 +78,11 @@ export class MessagerInterface {
           });
       }
     }
-  }
-
-  sendVoteMessage(text: string, isCommand: boolean, option = {}) {
-    var msgKeyID = this.gameVoteID;
-    if (isCommand) {
-      // If by command, delete-insert
+    else if (
+        (!msg.message) ||                                     //If by command
+        (msg.message && msg.message.message_id != msgKeyID)   // If from other message
+    ){
+      // If by command/other message, delete-insert
       if (msgKeyID) {
         try {
             this.bot.deleteMessage(this.gameChatID, msgKeyID);
@@ -124,11 +94,16 @@ export class MessagerInterface {
       this.bot
         .sendMessage(this.gameChatID, text, option)
         .then((sended) => {
-          this.gameVoteID = sended.message_id;
+          this.gameTokenID = sended.message_id;
         });
     }
-    else {
-      // If by callback, update-insert
+  }
+
+  sendVoteMessage(text: string, msg, option = {}) {
+    var msgKeyID = this.gameVoteID;
+
+    if (msg.message && msg.message.message_id == msgKeyID) {
+      // If from same message callback, update-insert
       if (msgKeyID) {
         this.bot.editMessageText(text, _.extend(option, {
           chat_id: this.gameChatID,
@@ -143,6 +118,25 @@ export class MessagerInterface {
             this.gameVoteID = sended.message_id;
           });
       }
+    }
+    else if (
+        (!msg.message) ||                                     //If by command
+        (msg.message && msg.message.message_id != msgKeyID)   // If from other message
+    ){
+      // If by command/other message, delete-insert
+      if (msgKeyID) {
+        try {
+            this.bot.deleteMessage(this.gameChatID, msgKeyID);
+        }catch (e) {
+            // Unknown error for unsupported deleteMessage
+        }
+      }
+
+      this.bot
+        .sendMessage(this.gameChatID, text, option)
+        .then((sended) => {
+          this.gameVoteID = sended.message_id;
+        });
     }
   }
 }
