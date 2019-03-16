@@ -100,11 +100,12 @@ export class Game {
 
   start(msg) {
     if (this.getPhase() != Game.PHASE_WAITING_PLAYER) return; //Prevent double start game
+    console.log(`[Start] PlayerID: ${this.id}`)
 
     if (this.players.length >= 3) {
       this.gameRoles = this.gameRoles.slice(0, this.players.length + 3);  // Auto apply role by number of user, *unless* user below 3, then debug mode.
     }
-    else if (this.id == 322552798) {
+    else {
       const playerTemp = [
         "Thomas",
         "Kenny",
@@ -127,9 +128,6 @@ export class Game {
 
       //Debug mode = 3sec action
       this.actionTime = 1 * 500;
-    }
-    else {
-      return Promise.reject(this.lang.getString("GAME_ERROR_PLAYER_NOT_ENOUGH"));
     }
 
     if (this.players.length + 3 !== this.gameRoles.length) {
