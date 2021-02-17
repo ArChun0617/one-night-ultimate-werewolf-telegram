@@ -8,10 +8,14 @@ export class Player {
   killTarget: Player;
   readyStart: boolean;
   token: Role;
+  isHost: boolean;
+  msgFrom: object;
 
   constructor(options) {
     this.id = options.id;
     this.name = options.name;
+    this.isHost = options.isHost;
+    this.msgFrom = options.msgFrom;
   }
 
   setLang = (_lang: string) => {

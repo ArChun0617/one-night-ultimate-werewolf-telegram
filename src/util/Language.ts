@@ -44,7 +44,7 @@ export class Language {
     this.en["SET_LANG"] = `${Emoji.get('robot_face')}  Select language`;
     this.en["LANG_SET"] = `${Emoji.get('robot_face')}  Language set !`;
     this.en["GAME_FOUND"] = `${Emoji.get('no_entry_sign')}  Sorry. There is a game start in this channel, please \/join the game`;
-    this.en["NEW_GAME"] = `${Emoji.get('star')}  Created a new game, please \/join the game or \/start the game.`;
+    this.en["NEW_GAME"] = `${Emoji.get('star')}  Created a new game, please \/join the game or host \/start the game.`;
     this.en["GAME_TERMINATED"] = `${Emoji.get('bomb')}  Game terminated.`;
     this.en["GAME_ERROR_PLAYER_NOT_ENOUGH"] = `${Emoji.get('no_entry_sign')} At least 3 player to start the game.`;
     this.en["GAME_ROLE_LIST"] = `The game has following roles:\n`;
@@ -56,7 +56,7 @@ export class Language {
     this.en["PLAYER_LIST"] = `Player joined, You can use \/start to start the game:\n`;
     this.en["TOKEN_LIST"] = `Player and Claimed role:\n`;
     this.en["TOKEN_UNKNOWN"] = `Unknown`;
-    this.en["WAIT_FOR_START"] = `${Emoji.get('microphone')} Wait for player to \/start... `;
+    this.en["WAIT_FOR_START"] = `${Emoji.get('microphone')} Wait for host to \/start... `;
     this.en["VOTE_BLANK"] = "Blank vote";
     this.en["PLAYER_VOTED"] = "(Voted)";
     this.en["VOTE_LIST"] = `${Emoji.get('arrow_right')}  Voting list ${Emoji.get('arrow_left')}`;
@@ -134,7 +134,7 @@ export class Language {
     this.zhHK["SET_LANG"] = `${Emoji.get('robot_face')}  選擇語言`;
     this.zhHK["LANG_SET"] = `${Emoji.get('robot_face')}  語言設定完成`;
     this.zhHK["GAME_FOUND"] = `${Emoji.get('no_entry_sign')}  有人開咗局喇, 你可以用 \/join 加入遊戲`;
-    this.zhHK["NEW_GAME"] = `${Emoji.get('star')} 開咗局新遊戲, 其他人可以用 \/join 加入遊戲 或 \/start 嚟開始遊戲`;
+    this.zhHK["NEW_GAME"] = `${Emoji.get('star')} 開咗局新遊戲, 其他人可以用 \/join 加入遊戲 或 主持人用 \/start 嚟開始遊戲`;
     this.zhHK["GAME_TERMINATED"] = `${Emoji.get('bomb')}  遊戲中止`;
     this.zhHK["GAME_ERROR_PLAYER_NOT_ENOUGH"] = `${Emoji.get('no_entry_sign')}  需要最少3位玩家開局.`;
     this.zhHK["GAME_ROLE_LIST"] = `呢局遊戲有以下嘅角色:\n`;
@@ -146,7 +146,7 @@ export class Language {
     this.zhHK["PLAYER_LIST"] = `以下玩家己加入, 用 \/start 嚟開始遊戲:\n`;
     this.zhHK["TOKEN_LIST"] = `玩家 - 身份(自稱):\n`;
     this.zhHK["TOKEN_UNKNOWN"] = `不明`;
-    this.zhHK["WAIT_FOR_START"] = `${Emoji.get('microphone')} 等全部人準備好 \/start ... `;
+    this.zhHK["WAIT_FOR_START"] = `${Emoji.get('microphone')} 等主持人準備好 \/start ... `;
     this.zhHK["VOTE_BLANK"] = "白票";
     this.zhHK["PLAYER_VOTED"] = "(已投票)";
     this.zhHK["VOTE_LIST"] = `${Emoji.get('arrow_right')} 投票 ${Emoji.get('arrow_left')}`;

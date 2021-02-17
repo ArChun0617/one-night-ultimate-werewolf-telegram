@@ -55,6 +55,8 @@ export class Game {
   losers: Player[] = [];
   actionStack: ActionFootprint[] = [];
   newbieMode: boolean = false;
+  isDebug: boolean = false;
+  adminTG: number = 322552798;
 
   votingTimer: any;
   votingResolve: any;
@@ -102,10 +104,8 @@ export class Game {
     if (this.getPhase() != Game.PHASE_WAITING_PLAYER) return; //Prevent double start game
     console.log(`[Start] PlayerID: ${this.id}`)
 
-    if (this.players.length >= 3) {
-      this.gameRoles = this.gameRoles.slice(0, this.players.length + 3);  // Auto apply role by number of user, *unless* user below 3, then debug mode.
-    }
-    else {
+    // Auto apply role by number of user, *unless* user below 3, then debug mode.
+    if(this.players.length < 3) {
       const playerTemp = [
         "Thomas",
         "Kenny",
@@ -128,6 +128,11 @@ export class Game {
 
       //Debug mode = 3sec action
       this.actionTime = 1 * 500;
+      this.isDebug = true;
+    }
+    else {
+      // normal game (at least 3 player)
+      this.gameRoles = this.gameRoles.slice(0, this.players.length + 3);  
     }
 
     if (this.players.length + 3 !== this.gameRoles.length) {
@@ -167,7 +172,7 @@ export class Game {
       .then(() => console.log(`>> [${this.id}:Start conversation]`))
       .then(() => this.startConversation(msg, this.gameTime * (this.players.length > 6 ? 2 : 1)))  // If more than 6 player, then game time *2
       .then(() => console.log(`>> [${this.id}:Begin voting]`))
-      .then(() => this.beginVoting(msg, this.actionTime))
+      .then(() => this.beginVoting(msg, this.actionTime * 2))
       .then(() => console.log(`>> [${this.id}:Kill player]`))
       .then(() => this.killPlayer())
       .then(() => console.log(`>> [${this.id}:Show result]`))
@@ -234,9 +239,27 @@ export class Game {
     return _.find(this.players, player => player.id === id);
   }
 
-  setPlayerReady(_id: number) {
+  checkGameStart(_id: number) {
     let rtnMsg: string = '';
-    
+    let player: Player[];
+
+    player = _.filter(this.players, (player: Player) => player.id == _id && player.isHost);
+
+    // If the caller is host, then start (return empty), else prompt
+    if (player.length != 1) {
+      this.msgInterface.sendMsg(this.lang.getString("WAIT_FOR_START"));
+      rtnMsg = this.lang.getString("WAIT_FOR_START");
+    }
+
+    // If less than 3 player, check is admin
+    if (player.length < 3) {
+      if (player[0].id != this.adminTG) {
+        this.msgInterface.sendMsg(this.lang.getString("GAME_ERROR_PLAYER_NOT_ENOUGH"));
+        rtnMsg = this.lang.getString("GAME_ERROR_PLAYER_NOT_ENOUGH");
+      }
+    }
+
+    /*
     //Set executor to [READY]
     _.map(_.filter(this.players, (player: Player) => player.id == _id), (player: Player) => player.readyStart = true);
 
@@ -249,6 +272,7 @@ export class Game {
         
         this.msgInterface.sendMsg(this.lang.getString("WAIT_FOR_START") + "\n" + rtnMsg);
     }
+    */
         
     return rtnMsg;
   }
@@ -446,25 +470,28 @@ export class Game {
         roleCard.wakeUp(this.msgInterface, msg, this.players, this.table,);
       }
 
-      setTimeout(() => {
-        _.map(_.filter(this.players, (p) => p.getOriginalRole().checkRole([role])),
-          (player) => {
-            // Start - prevent auto shadow action in Copycat.endTurn()
-            let role: any = player.getOriginalRole();
-            let shadowRoleName: string = (role.shadowChoice ? role.shadowChoice.code.toLowerCase() : "");
-            if (this.getPhase() == Game.PHASE_WAKEUP_COPYCAT && shadowRoleName)
-              return; // If the already shadow someone, then skip endTurn;
-            // End - prevent auto shadow action in Copycat.endTurn()
-
-            let footprint: ActionFootprint;
-            footprint = player.getOriginalRole().endTurn(this.msgInterface, msg, this.players, this.table, player);
-
-            if (footprint && footprint.action)
-              this.actionStack.push(footprint);
-          });
-
-        resolve();
-      }, timeDuration);
+      if (this.isDebug) {
+        // Auto-action only when debug mode
+        setTimeout(() => {
+          _.map(_.filter(this.players, (p) => p.getOriginalRole().checkRole([role])),
+            (player) => {
+              // Start - prevent auto shadow action in Copycat.endTurn()
+              let role: any = player.getOriginalRole();
+              let shadowRoleName: string = (role.shadowChoice ? role.shadowChoice.code.toLowerCase() : "");
+              if (this.getPhase() == Game.PHASE_WAKEUP_COPYCAT && shadowRoleName)
+                return; // If the already shadow someone, then skip endTurn;
+              // End - prevent auto shadow action in Copycat.endTurn()
+  
+              let footprint: ActionFootprint;
+              footprint = player.getOriginalRole().endTurn(this.msgInterface, msg, this.players, this.table, player);
+  
+              if (footprint && footprint.action)
+                this.actionStack.push(footprint);
+            });
+  
+          resolve();
+        }, timeDuration);
+      }
     });
   }
 
@@ -511,7 +538,7 @@ export class Game {
               if (!player.getKillTarget()) this.randomVote(player);
             });
             resolve();
-          }, this.actionTime * 2));
+          }, timeDuration));
       }
     });
   }

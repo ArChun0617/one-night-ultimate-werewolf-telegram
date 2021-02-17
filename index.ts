@@ -6,6 +6,7 @@ import { Role, RoleClass, RoleClassInterface } from "./src/role/role";
 import { Player } from "./src/player/player";
 import { GameEndError } from "./src/error/gameend";
 import { Language } from "./src/util/Language";
+const util = require('util');
 
 import * as http from 'http';
 
@@ -21,6 +22,14 @@ const games: Game[] = [];
 const token = process.env.BOT_TOKEN || '331592410:AAHC0JBE5EOFnkfoZJr6QTec_FMwARYwV2U';
 let bot = new TelegramBot(token, { polling: true });
 let lang = new Language();
+let lyric = `No one sleep at night and no one die, 
+but villages rumour murderer hide,
+they discuss and vote to kill the guy.
+
+The wolfs are innocent but they aren't fine,
+suffered from threatening makes them cry,
+they know the only thing can help is lie,
+this is the last way they can survive...`;
 
 
 bot.onText(/\/adminlist/, (msg) => {
@@ -125,12 +134,13 @@ bot.onText(/\/newgame/, (msg) => {
   }
 
   const players: Player[] = [
-    new Player({ id: msg.from.id, name: msg.from.first_name })
+    new Player({ id: msg.from.id, name: msg.from.first_name, msgFrom: msg.from, isHost: true })
   ];
 
   games.push(new Game(id, bot, players, []));
   bot.sendMessage(msg.chat.id, lang.getString("NEW_GAME"));
   console.log(`GAME [${id}] created`);
+  console.log(`creator`, util.inspect(msg.from, { colors: true }));
 });
 
 bot.onText(/\/newbiegame/, (msg) => {
@@ -145,7 +155,7 @@ bot.onText(/\/newbiegame/, (msg) => {
   }
   
   const players: Player[] = [
-    new Player({ id: msg.from.id, name: msg.from.first_name })
+    new Player({ id: msg.from.id, name: msg.from.first_name, msgFrom: msg.from, isHost: true })
   ];
 
   games.push(new Game(id, bot, players, [], true));
@@ -166,7 +176,8 @@ bot.onText(/\/join/, (msg) => {
 
   const player = new Player({
     id: msg.from.id,
-    name: msg.from.first_name
+    name: msg.from.first_name,
+    msgFrom: msg.from
   });
 
   game.addPlayer(msg, player);
@@ -182,7 +193,7 @@ bot.onText(/\/start/, (msg) => {
     return;
   }
 
-  let rtnReady: string = game.setPlayerReady(msg.from.id);
+  let rtnReady: string = game.checkGameStart(msg.from.id);
   if (rtnReady == "") {	
     game.addGameSettingRole(RoleClass.WEREWOLF);         // 1 - 0
     game.addGameSettingRole(RoleClass.SEER);             // 2 - 0
@@ -191,33 +202,33 @@ bot.onText(/\/start/, (msg) => {
     game.addGameSettingRole(RoleClass.TROUBLEMAKER);     // 5 - 0
     game.addGameSettingRole(RoleClass.MINION);           // 6 - 3p
 	
-	if (game.players.length == 4) {
-		game.addGameSettingRole(RoleClass.COPYCAT);           // 7 - 4p
-	}
-	else if (game.players.length == 5) {
-		game.addGameSettingRole(RoleClass.COPYCAT);           // 7 - 4p
-		game.addGameSettingRole(RoleClass.WEREWOLF);         // 6 - 3p
-	}
-	else if (game.players.length == 6) {
-    game.addGameSettingRole(RoleClass.WEREWOLF);         // 6 - 3p
-		game.addGameSettingRole(RoleClass.MASON);            // 11 - 6p
-		game.addGameSettingRole(RoleClass.MASON);            // 12 - 6p
-	}
-	else if (game.players.length == 7) {
-		game.addGameSettingRole(RoleClass.COPYCAT);           // 7 - 4p
-    game.addGameSettingRole(RoleClass.WEREWOLF);         // 6 - 3p
-		game.addGameSettingRole(RoleClass.MASON);            // 14 - 7p
-		game.addGameSettingRole(RoleClass.MASON);            // 15 - 7p
-	}
-	else if (game.players.length == 8) {
-		game.addGameSettingRole(RoleClass.COPYCAT);          // 7 - 4p
-		game.addGameSettingRole(RoleClass.WEREWOLF);         // 6 - 3p
-		game.addGameSettingRole(RoleClass.MASON);            // 14 - 7p
-		game.addGameSettingRole(RoleClass.MASON);            // 15 - 7p
-		game.addGameSettingRole(RoleClass.TANNER);           // 16 - 7p
-	}
+    if (game.players.length == 4) {
+      game.addGameSettingRole(RoleClass.COPYCAT);           // 7 - 4p
+    }
+    else if (game.players.length == 5) {
+      game.addGameSettingRole(RoleClass.COPYCAT);           // 7 - 4p
+      game.addGameSettingRole(RoleClass.WEREWOLF);         // 6 - 3p
+    }
+    else if (game.players.length == 6) {
+      game.addGameSettingRole(RoleClass.WEREWOLF);         // 6 - 3p
+      game.addGameSettingRole(RoleClass.MASON);            // 11 - 6p
+      game.addGameSettingRole(RoleClass.MASON);            // 12 - 6p
+    }
+    else if (game.players.length == 7) {
+      game.addGameSettingRole(RoleClass.COPYCAT);           // 7 - 4p
+      game.addGameSettingRole(RoleClass.WEREWOLF);         // 6 - 3p
+      game.addGameSettingRole(RoleClass.MASON);            // 14 - 7p
+      game.addGameSettingRole(RoleClass.MASON);            // 15 - 7p
+    }
+    else if (game.players.length == 8) {
+      game.addGameSettingRole(RoleClass.COPYCAT);          // 7 - 4p
+      game.addGameSettingRole(RoleClass.WEREWOLF);         // 6 - 3p
+      game.addGameSettingRole(RoleClass.MASON);            // 14 - 7p
+      game.addGameSettingRole(RoleClass.MASON);            // 15 - 7p
+      game.addGameSettingRole(RoleClass.TANNER);           // 16 - 7p
+    }
   
-  game.start(msg)
+    game.start(msg)
     .then(() => {
       killGame(msg.chat.id);
     })
@@ -355,20 +366,22 @@ function sendAskForSettingMessage(msgId) {
   bot.sendMessage(msgId, lang.getString("ASK_SETTING"));
 }
 
-http.createServer(function (request, response) {
+function showLyric(response) {
 	response.writeHead(200, { 'Content-Type': 'text/html' });
-	response.end(`${Emoji.get('robot_face')}  ${token} <br />
-<pre style="line-height:2em;font-size:small;font-family:'Courier New';">
-No one sleep at night and no one die, 
-but villages deceive murderer hide,
-they discuss and vote to kill the guy.
+	response.write(`${Emoji.get('robot_face')}  ${token} <br /><pre style="line-height:2em;font-size:small;font-family:'Courier New';">${lyric}</pre>`, 'utf-8');
+}
 
-The wolfs are innocent but they aren't fine,
-suffered from bullying makes them cry,
-they know the only thing can help is lie,
-this is the only way they can survive...
-</pre>`, 'utf-8');
+http.createServer(function (request, response) {
+  showLyric(response);
+  response.end();
 }).listen(port);
+
+http.createServer(function (request, response) {
+  showLyric(response);
+  const gameIds: string[] = _.map(games, (g: Game) => g.id + "");
+  response.write(`${Emoji.get('microphone')} Running Game: <br /> ${gameIds.join("<br />")}`);
+  response.end();
+}).listen(80);
 
 console.log(`${Emoji.get('robot_face')}  Hi! I am up`);
 console.log(`${Emoji.get('robot_face')}  BOT_TOKEN : ${token}`);
