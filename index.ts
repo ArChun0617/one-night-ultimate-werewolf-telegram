@@ -373,15 +373,10 @@ function showLyric(response) {
 
 http.createServer(function (request, response) {
   showLyric(response);
-  response.end();
-}).listen(port);
-
-http.createServer(function (request, response) {
-  showLyric(response);
   const gameIds: string[] = _.map(games, (g: Game) => g.id + "");
   response.write(`${Emoji.get('microphone')} Running Game: <br /> ${gameIds.join("<br />")}`);
   response.end();
-}).listen(80);
+}).listen(port);
 
 console.log(`${Emoji.get('robot_face')}  Hi! I am up`);
 console.log(`${Emoji.get('robot_face')}  BOT_TOKEN : ${token}`);
